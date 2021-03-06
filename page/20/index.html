@@ -150,6 +150,119 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-错误的集合" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/01/16/%E9%94%99%E8%AF%AF%E7%9A%84%E9%9B%86%E5%90%88/">错误的集合</a>
+    </h1>
+  
+
+        
+        <a href="/2021/01/16/%E9%94%99%E8%AF%AF%E7%9A%84%E9%9B%86%E5%90%88/" class="archive-article-date">
+  	<time datetime="2021-01-16T12:48:26.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-01-16</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<h4 id="645-错误的集合"><a href="#645-错误的集合" class="headerlink" title="645. 错误的集合"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/set-mismatch/">645. 错误的集合</a></h4><p>难度：简单</p>
+<p>集合 <code>s</code> 包含从 <code>1</code> 到 <code>n</code> 的整数。不幸的是，因为数据错误，导致集合里面某一个数字复制了成了集合里面的另外一个数字的值，导致集合 <strong>丢失了一个数字</strong> 并且 <strong>有一个数字重复</strong> 。</p>
+<p>给定一个数组 <code>nums</code> 代表了集合 <code>S</code> 发生错误后的结果。</p>
+<p>请你找出重复出现的整数，再找到丢失的整数，将它们以数组的形式返回。</p>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [1,2,2,4]</span><br><span class="line">输出：[2,3]</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [1,1]</span><br><span class="line">输出：[1,2]</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>2 &lt;= nums.length &lt;= 104</code></li>
+<li><code>1 &lt;= nums[i] &lt;= 104</code></li>
+</ul>
+<h1 id="原地哈希表"><a href="#原地哈希表" class="headerlink" title="原地哈希表"></a>原地哈希表</h1><h2 id="查找重复元素"><a href="#查找重复元素" class="headerlink" title="查找重复元素"></a>查找重复元素</h2><p><strong>遍历数组的每个元素，将当前遍历的元素 $c$ 作为 $index$ ，使 $nums[index]*=-1$,遍历下一个元素时，判断下一个元素 $c$ 作为 $index$ 时, $nums[index]$ 是否小于 $0$ ,如果小于 $0$说明元素c已经被遍历过了，是重复元素</strong></p>
+<h2 id="查找丢失元素"><a href="#查找丢失元素" class="headerlink" title="查找丢失元素"></a>查找丢失元素</h2><p><strong>再次遍历修改后的数组，如果修改后的数组中某个值不小于0，说明这个index没有被遍历到，也就是原数组中没有这个值（因为index就是遍历的值）</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] findErrorNums(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">        <span class="keyword">int</span> dup = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> val : nums) &#123;</span><br><span class="line">            <span class="keyword">if</span> (nums[Math.abs(val) - <span class="number">1</span>] &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                dup = Math.abs(Math.abs(val));</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                nums[Math.abs(val) - <span class="number">1</span>] *= -<span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> missing = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (nums[i] &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                missing = i + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;dup, missing&#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="异或运算"><a href="#异或运算" class="headerlink" title="异或运算"></a>异或运算</h1><p><strong>通过异或运算对数字分组，类似于前面做的<a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/shu-zu-zhong-shu-zi-chu-xian-de-ci-shu-lcof/">剑指 Offer 56 - I. 数组中数字出现的次数</a></strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] findErrorNums(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">        <span class="keyword">int</span> xor = <span class="number">0</span>, xor0 = <span class="number">0</span>, xor1 = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> n: nums)</span><br><span class="line">            xor ^= n;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= nums.length; i++)</span><br><span class="line">            xor ^= i;</span><br><span class="line">        <span class="keyword">int</span> rightmostbit = xor &amp; ~(xor - <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> n: nums) &#123;</span><br><span class="line">            <span class="keyword">if</span> ((n &amp; rightmostbit) != <span class="number">0</span>)</span><br><span class="line">                xor1 ^= n;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                xor0 ^= n;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= nums.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> ((i &amp; rightmostbit) != <span class="number">0</span>)</span><br><span class="line">                xor1 ^= i;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                xor0 ^= i;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (nums[i] == xor0)</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;xor0, xor1&#125;;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;xor1, xor0&#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/set-mismatch/solution/cuo-wu-de-ji-he-by-leetcode/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数学</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">哈希表</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/01/16/%E9%94%99%E8%AF%AF%E7%9A%84%E9%9B%86%E5%90%88/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-最少移动次数使数组元素相等II" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -979,7 +1092,8 @@ tex2jax: {
 <!--latex数学显示公式-->
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
-<h1 id="排序算法集合"><a href="#排序算法集合" class="headerlink" title="排序算法集合"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/sort-an-array/solution/fu-xi-ji-chu-pai-xu-suan-fa-java-by-liweiwei1419/">排序算法集合</a></h1><h1 id="快排"><a href="#快排" class="headerlink" title="快排"></a>快排</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] getLeastNumbers(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> k) &#123;</span><br><span class="line">        quickSort(arr, <span class="number">0</span>, arr.length - <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> Arrays.copyOf(arr, k);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">quickSort</span><span class="params">(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> l, <span class="keyword">int</span> r)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 子数组长度为 1 时终止递归</span></span><br><span class="line">        <span class="keyword">if</span> (l &gt;= r) <span class="keyword">return</span>;</span><br><span class="line">        <span class="comment">// 哨兵划分操作（以 arr[l] 作为基准数）</span></span><br><span class="line">        <span class="keyword">int</span> i = l, j = r;</span><br><span class="line">        <span class="keyword">while</span> (i &lt; j) &#123;</span><br><span class="line">            <span class="comment">// 右边的大于哨兵，不需要交换</span></span><br><span class="line">            <span class="keyword">while</span> (i &lt; j &amp;&amp; arr[j] &gt;= arr[l]) j--;</span><br><span class="line">            <span class="comment">// 左边的小于哨兵，也不需要交换</span></span><br><span class="line">            <span class="keyword">while</span> (i &lt; j &amp;&amp; arr[i] &lt;= arr[l]) i++;</span><br><span class="line">            <span class="comment">// 找到需要交换的值，进行交换</span></span><br><span class="line">            swap(arr, i, j);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 将哨兵交换到分界位置</span></span><br><span class="line">        swap(arr, i, l);</span><br><span class="line">        <span class="comment">// 递归左（右）子数组执行哨兵划分</span></span><br><span class="line">        quickSort(arr, l, i - <span class="number">1</span>);</span><br><span class="line">        quickSort(arr, i + <span class="number">1</span>, r);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> i, <span class="keyword">int</span> j)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> tmp = arr[i];</span><br><span class="line">        arr[i] = arr[j];</span><br><span class="line">        arr[j] = tmp;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：jyd</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/zui-xiao-de-kge-shu-lcof/solution/jian-zhi-offer-40-zui-xiao-de-k-ge-shu-j-9yze/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+<h1 id="排序算法集合"><a href="#排序算法集合" class="headerlink" title="排序算法集合"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/sort-an-array/solution/fu-xi-ji-chu-pai-xu-suan-fa-java-by-liweiwei1419/">排序算法集合</a></h1><p><img src="img/cde64bf682850738153e6c76dd3f6fb32201ce3c73c23415451da1eead9eb7cb-20190624173156.jpg" alt="cde64bf682850738153e6c76dd3f6fb32201ce3c73c23415451da1eead9eb7cb-20190624173156"></p>
+<h1 id="快排"><a href="#快排" class="headerlink" title="快排"></a>快排</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] getLeastNumbers(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> k) &#123;</span><br><span class="line">        quickSort(arr, <span class="number">0</span>, arr.length - <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> Arrays.copyOf(arr, k);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">quickSort</span><span class="params">(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> l, <span class="keyword">int</span> r)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 子数组长度为 1 时终止递归</span></span><br><span class="line">        <span class="keyword">if</span> (l &gt;= r) <span class="keyword">return</span>;</span><br><span class="line">        <span class="comment">// 哨兵划分操作（以 arr[l] 作为基准数）</span></span><br><span class="line">        <span class="keyword">int</span> i = l, j = r;</span><br><span class="line">        <span class="keyword">while</span> (i &lt; j) &#123;</span><br><span class="line">            <span class="comment">// 右边的大于哨兵，不需要交换</span></span><br><span class="line">            <span class="keyword">while</span> (i &lt; j &amp;&amp; arr[j] &gt;= arr[l]) j--;</span><br><span class="line">            <span class="comment">// 左边的小于哨兵，也不需要交换</span></span><br><span class="line">            <span class="keyword">while</span> (i &lt; j &amp;&amp; arr[i] &lt;= arr[l]) i++;</span><br><span class="line">            <span class="comment">// 找到需要交换的值，进行交换</span></span><br><span class="line">            swap(arr, i, j);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 将哨兵交换到分界位置</span></span><br><span class="line">        swap(arr, i, l);</span><br><span class="line">        <span class="comment">// 递归左（右）子数组执行哨兵划分</span></span><br><span class="line">        quickSort(arr, l, i - <span class="number">1</span>);</span><br><span class="line">        quickSort(arr, i + <span class="number">1</span>, r);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> i, <span class="keyword">int</span> j)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> tmp = arr[i];</span><br><span class="line">        arr[i] = arr[j];</span><br><span class="line">        arr[j] = tmp;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：jyd</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/zui-xiao-de-kge-shu-lcof/solution/jian-zhi-offer-40-zui-xiao-de-k-ge-shu-j-9yze/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
 <h4 id="快排应用"><a href="#快排应用" class="headerlink" title="快排应用"></a>快排应用</h4><p><a target="_blank" rel="noopener" href="https://imvector.github.io/2021/01/15/%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E7%AC%ACk%E4%B8%AA%E6%9C%80%E5%A4%A7%E5%85%83%E7%B4%A0/">快速排序修改版</a></p>
 <h1 id="插入排序"><a href="#插入排序" class="headerlink" title="插入排序"></a>插入排序</h1><p><a target="_blank" rel="noopener" href="https://imvector.github.io/2020/11/20/%E5%AF%B9%E9%93%BE%E8%A1%A8%E8%BF%9B%E8%A1%8C%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F/">对链表进行插入排序</a></p>
 <h1 id="冒泡排序"><a href="#冒泡排序" class="headerlink" title="冒泡排序"></a>冒泡排序</h1><h1 id="基数排序"><a href="#基数排序" class="headerlink" title="基数排序"></a>基数排序</h1><ul>
@@ -1021,112 +1135,6 @@ tex2jax: {
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/01/15/%E6%8E%92%E5%BA%8F/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-打家劫舍2" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/01/15/%E6%89%93%E5%AE%B6%E5%8A%AB%E8%88%8D2/">打家劫舍2</a>
-    </h1>
-  
-
-        
-        <a href="/2021/01/15/%E6%89%93%E5%AE%B6%E5%8A%AB%E8%88%8D2/" class="archive-article-date">
-  	<time datetime="2021-01-15T04:05:23.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-01-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="213-打家劫舍-II"><a href="#213-打家劫舍-II" class="headerlink" title="213. 打家劫舍 II"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/house-robber-ii/">213. 打家劫舍 II</a></h4><p>难度：中等</p>
-<p>你是一个专业的小偷，计划偷窃沿街的房屋，每间房内都藏有一定的现金。这个地方所有的房屋都 <strong>围成一圈</strong> ，这意味着第一个房屋和最后一个房屋是紧挨着的。同时，相邻的房屋装有相互连通的防盗系统，<strong>如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警</strong> 。</p>
-<p>给定一个代表每个房屋存放金额的非负整数数组，计算你 <strong>在不触动警报装置的情况下</strong> ，能够偷窃到的最高金额。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [2,3,2]</span><br><span class="line">输出：3</span><br><span class="line">解释：你不能先偷窃 1 号房屋（金额 &#x3D; 2），然后偷窃 3 号房屋（金额 &#x3D; 2）, 因为他们是相邻的。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [1,2,3,1]</span><br><span class="line">输出：4</span><br><span class="line">解释：你可以先偷窃 1 号房屋（金额 &#x3D; 1），然后偷窃 3 号房屋（金额 &#x3D; 3）。</span><br><span class="line">     偷窃到的最高金额 &#x3D; 1 + 3 &#x3D; 4 。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [0]</span><br><span class="line">输出：0</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= nums.length &lt;= 100</code></li>
-<li><code>0 &lt;= nums[i] &lt;= 1000</code></li>
-</ul>
-<h1 id="动态规划"><a href="#动态规划" class="headerlink" title="动态规划"></a>动态规划</h1><p><strong>算法题有两大核心简化复杂问题的思路：减而治之和分而治之，这题把环形分为单排就是分而治之，即把一个问题分成多个规模更小的子问题。</strong></p>
-<p><strong>使用两个dp数组，一个负责 $0 : (n-1)$,另一个负责$1:n$,最后计算$n$和$(n-1)$的最大值</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">rob</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (nums == <span class="keyword">null</span> || nums.length == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span> (nums.length == <span class="number">1</span>) <span class="keyword">return</span> nums[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">if</span> (nums.length == <span class="number">2</span>) <span class="keyword">return</span> Math.max(nums[<span class="number">0</span>], nums[<span class="number">1</span>]);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line">        <span class="keyword">int</span>[] dp1 = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">        dp1[<span class="number">0</span>] = nums[<span class="number">0</span>];</span><br><span class="line">        dp1[<span class="number">1</span>] = Math.max(nums[<span class="number">0</span>], nums[<span class="number">1</span>]);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">2</span>; i &lt; n - <span class="number">1</span>; i++) &#123;</span><br><span class="line">            dp1[i] = Math.max(dp1[i - <span class="number">2</span>] + nums[i], dp1[i - <span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span>[] dp2 = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">        dp2[<span class="number">1</span>] = nums[<span class="number">1</span>];</span><br><span class="line">        dp2[<span class="number">2</span>] = Math.max(nums[<span class="number">1</span>], nums[<span class="number">2</span>]);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">3</span>; i &lt; n; i++) &#123;</span><br><span class="line">            dp2[i] = Math.max(dp2[i - <span class="number">2</span>] + nums[i], dp2[i - <span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> Math.max(dp1[n - <span class="number">2</span>], dp2[n - <span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">动态规划</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/01/15/%E6%89%93%E5%AE%B6%E5%8A%AB%E8%88%8D2/">展开全文 >></a>
         </p>
       
 
@@ -1270,11 +1278,11 @@ MathJax.Hub.Queue(function() {
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+                <a href="javascript:void(0)" class="js-tag color5">二分查找</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">二分查找</a>
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1294,11 +1302,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">标准写法</a>
+                <a href="javascript:void(0)" class="js-tag color5">最短路径</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">最短路径</a>
+                <a href="javascript:void(0)" class="js-tag color5">标准写法</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1318,11 +1326,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">优化</a>
+                <a href="javascript:void(0)" class="js-tag color4">知识点</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">知识点</a>
+                <a href="javascript:void(0)" class="js-tag color3">优化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1334,11 +1342,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">AFDX网络仿真</a>
+                <a href="javascript:void(0)" class="js-tag color4">双指针</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">动态规划</a>
+                <a href="javascript:void(0)" class="js-tag color4">AFDX网络仿真</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1346,7 +1354,7 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">双指针</a>
+                <a href="javascript:void(0)" class="js-tag color5">动态规划</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1354,11 +1362,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">递归</a>
+                <a href="javascript:void(0)" class="js-tag color1">二叉搜索树</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">二叉搜索树</a>
+                <a href="javascript:void(0)" class="js-tag color3">递归</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1406,11 +1414,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">集合</a>
+                <a href="javascript:void(0)" class="js-tag color4">并查集</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">并查集</a>
+                <a href="javascript:void(0)" class="js-tag color3">集合</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1418,7 +1426,7 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">子数组的最值</a>
+                <a href="javascript:void(0)" class="js-tag color4">找规律</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1427,6 +1435,10 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">贪心</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">子数组的最值</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1462,19 +1474,15 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">堆</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">反思</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">栈</a>
+                <a href="javascript:void(0)" class="js-tag color2">堆</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">树状数组</a>
+                <a href="javascript:void(0)" class="js-tag color2">栈</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1483,6 +1491,10 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">栈与队列</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">树状数组</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1498,11 +1510,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">竞赛</a>
+                <a href="javascript:void(0)" class="js-tag color5">滑动窗口</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">滑动窗口</a>
+                <a href="javascript:void(0)" class="js-tag color3">竞赛</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1550,11 +1562,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">幂集</a>
+                <a href="javascript:void(0)" class="js-tag color3">人生</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">人生</a>
+                <a href="javascript:void(0)" class="js-tag color3">幂集</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1594,6 +1606,14 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">操作系统</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">基础知识</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">小顶堆</a>
               </li>
              
@@ -1606,15 +1626,19 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">时间复杂度</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">组合</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">时间复杂度</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">子串</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">图形算法</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1623,10 +1647,6 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">最大堆</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">图形算法</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1662,6 +1682,10 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">树洞</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">数的遍历</a>
               </li>
              
@@ -1690,11 +1714,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">拼车问题</a>
+                <a href="javascript:void(0)" class="js-tag color2">链表环路检测</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">链表环路检测</a>
+                <a href="javascript:void(0)" class="js-tag color5">拼车问题</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1702,11 +1726,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">绝对值展开</a>
+                <a href="javascript:void(0)" class="js-tag color4">红黑树</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">红黑树</a>
+                <a href="javascript:void(0)" class="js-tag color1">绝对值展开</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1718,11 +1742,11 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">计算机网络</a>
+                <a href="javascript:void(0)" class="js-tag color5">拓扑排序</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">拓扑排序</a>
+                <a href="javascript:void(0)" class="js-tag color1">计算机网络</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1742,15 +1766,19 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">广度优先搜索</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">背包问题</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">广度优先搜索</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">源码</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1762,23 +1790,7 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">全排列</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">树的遍历</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">找规律</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">树洞</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1786,11 +1798,7 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">操作系统</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">基础知识</a>
+                <a href="javascript:void(0)" class="js-tag color5">树的遍历</a>
               </li>
             
             <div class="clearfix"></div>
