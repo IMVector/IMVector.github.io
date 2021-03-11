@@ -150,6 +150,162 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-单调递增的数字" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/12/15/%E5%8D%95%E8%B0%83%E9%80%92%E5%A2%9E%E7%9A%84%E6%95%B0%E5%AD%97/">单调递增的数字</a>
+    </h1>
+  
+
+        
+        <a href="/2020/12/15/%E5%8D%95%E8%B0%83%E9%80%92%E5%A2%9E%E7%9A%84%E6%95%B0%E5%AD%97/" class="archive-article-date">
+  	<time datetime="2020-12-15T05:31:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">给定一个非负整数 N，找出小于或等于 N 的最大的整数，同时这个整数需要满足其各个位数上的数字是单调递增。</span><br><span class="line"></span><br><span class="line">（当且仅当每个相邻位数上的数字 x 和 y 满足 x &lt;&#x3D; y 时，我们称这个整数是单调递增的。）</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: N &#x3D; 10</span><br><span class="line">输出: 9</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: N &#x3D; 1234</span><br><span class="line">输出: 1234</span><br><span class="line">示例 3:</span><br><span class="line"></span><br><span class="line">输入: N &#x3D; 332</span><br><span class="line">输出: 299</span><br><span class="line">说明: N 是在 [0, 10^9] 范围内的一个整数。</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;monotone-increasing-digits</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+<h2 id="贪心算法"><a href="#贪心算法" class="headerlink" title="贪心算法"></a>贪心算法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">monotoneIncreasingDigits</span><span class="params">(<span class="keyword">int</span> N)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">char</span>[] num = Integer.toString(N).toCharArray();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i + <span class="number">1</span> &lt; num.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (num[i] &gt; num[i + <span class="number">1</span>]) &#123;<span class="comment">//如果前一位大于后一位</span></span><br><span class="line">                num[i]--;<span class="comment">//前一位减一</span></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> j = i; j - <span class="number">1</span> &gt;= <span class="number">0</span>; j--) &#123;<span class="comment">//去查看当前位之前的元素是不是小于当前的位，如果不满足，要修改更靠前的位</span></span><br><span class="line">                    <span class="keyword">if</span> (num[j - <span class="number">1</span>] &gt; num[j]) &#123;</span><br><span class="line">                        num[j - <span class="number">1</span>]--;</span><br><span class="line">                        num[j] = <span class="string">&#x27;9&#x27;</span>;</span><br><span class="line">                    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j &lt; num.length; j++) &#123;<span class="comment">//i后面的所有元素都要变成9</span></span><br><span class="line">                    num[j] = <span class="string">&#x27;9&#x27;</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        String s = String.valueOf(num);</span><br><span class="line">        <span class="keyword">return</span> Integer.valueOf(s);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="贪心算法-1"><a href="#贪心算法-1" class="headerlink" title="贪心算法"></a>贪心算法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">monotoneIncreasingDigits</span><span class="params">(<span class="keyword">int</span> N)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">char</span>[] strN = Integer.toString(N).toCharArray();</span><br><span class="line">        <span class="keyword">int</span> i = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span> (i &lt; strN.length &amp;&amp; strN[i - <span class="number">1</span>] &lt;= strN[i]) &#123;<span class="comment">//先跳到第一个前一位大于后一位的位置</span></span><br><span class="line">            i += <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (i &lt; strN.length) &#123;</span><br><span class="line">            <span class="keyword">while</span> (i &gt; <span class="number">0</span> &amp;&amp; strN[i - <span class="number">1</span>] &gt; strN[i]) &#123;<span class="comment">//在这一位向前检查修改后的数字是否小于更前一位的数字，如果小于继续向前</span></span><br><span class="line">                strN[i - <span class="number">1</span>] -= <span class="number">1</span>;</span><br><span class="line">                i -= <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">for</span> (i += <span class="number">1</span>; i &lt; strN.length; ++i) &#123;<span class="comment">//对这一位往后的元素都变成最大数字9</span></span><br><span class="line">                strN[i] = <span class="string">&#x27;9&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> Integer.parseInt(<span class="keyword">new</span> String(strN));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>参考文献</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;monotone-increasing-digits&#x2F;solution&#x2F;dan-diao-di-zeng-de-shu-zi-by-leetcode-s-5908&#x2F;</span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">贪心</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/12/15/%E5%8D%95%E8%B0%83%E9%80%92%E5%A2%9E%E7%9A%84%E6%95%B0%E5%AD%97/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-下降路径最小和" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/12/14/%E4%B8%8B%E9%99%8D%E8%B7%AF%E5%BE%84%E6%9C%80%E5%B0%8F%E5%92%8C/">下降路径最小和</a>
+    </h1>
+  
+
+        
+        <a href="/2020/12/14/%E4%B8%8B%E9%99%8D%E8%B7%AF%E5%BE%84%E6%9C%80%E5%B0%8F%E5%92%8C/" class="archive-article-date">
+  	<time datetime="2020-12-14T13:06:06.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">给定一个方形整数数组 A，我们想要得到通过 A 的下降路径的最小和。</span><br><span class="line"></span><br><span class="line">下降路径可以从第一行中的任何元素开始，并从每一行中选择一个元素。在下一行选择的元素和当前行所选元素最多相隔一列。</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">示例：</span><br><span class="line"></span><br><span class="line">输入：[[1,2,3],[4,5,6],[7,8,9]]</span><br><span class="line">输出：12</span><br><span class="line">解释：</span><br><span class="line">可能的下降路径有：</span><br><span class="line">[1,4,7], [1,4,8], [1,5,7], [1,5,8], [1,5,9]</span><br><span class="line">[2,4,7], [2,4,8], [2,5,7], [2,5,8], [2,5,9], [2,6,8], [2,6,9]</span><br><span class="line">[3,5,7], [3,5,8], [3,5,9], [3,6,8], [3,6,9]</span><br><span class="line">和最小的下降路径是 [1,4,7]，所以答案是 12。</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">提示：</span><br><span class="line"></span><br><span class="line">1 &lt;&#x3D; A.length &#x3D;&#x3D; A[0].length &lt;&#x3D; 100</span><br><span class="line">-100 &lt;&#x3D; A[i][j] &lt;&#x3D; 100</span><br><span class="line">通过次数8,626提交次数13,883</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;minimum-falling-path-sum</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">minFallingPathSum</span><span class="params">(<span class="keyword">int</span>[][] A)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> N = A.length;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> r = N - <span class="number">2</span>; r &gt;= <span class="number">0</span>; --r) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> c = <span class="number">0</span>; c &lt; N; ++c) &#123;</span><br><span class="line">                <span class="comment">// best = min(A[r+1][c-1], A[r+1][c], A[r+1][c+1])</span></span><br><span class="line">                <span class="keyword">int</span> best = A[r + <span class="number">1</span>][c];</span><br><span class="line">                <span class="keyword">if</span> (c &gt; <span class="number">0</span>)</span><br><span class="line">                    best = Math.min(best, A[r + <span class="number">1</span>][c - <span class="number">1</span>]);</span><br><span class="line">                <span class="keyword">if</span> (c + <span class="number">1</span> &lt; N)</span><br><span class="line">                    best = Math.min(best, A[r + <span class="number">1</span>] [c + <span class="number">1</span>]);</span><br><span class="line">                A[r][c] += best;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> ans = Integer.MAX_VALUE;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> x : A[<span class="number">0</span>])</span><br><span class="line">            ans = Math.min(ans, x);</span><br><span class="line">        <span class="keyword">return</span> ans;    </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/12/14/%E4%B8%8B%E9%99%8D%E8%B7%AF%E5%BE%84%E6%9C%80%E5%B0%8F%E5%92%8C/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-最大平均值和的分组" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -782,210 +938,6 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2020/12/12/%E6%9C%80%E5%A4%A7%E5%8A%A0%E5%8F%B7%E6%A0%87%E5%BF%97/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-摆动序列" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/12/12/%E6%91%86%E5%8A%A8%E5%BA%8F%E5%88%97/">摆动序列</a>
-    </h1>
-  
-
-        
-        <a href="/2020/12/12/%E6%91%86%E5%8A%A8%E5%BA%8F%E5%88%97/" class="archive-article-date">
-  	<time datetime="2020-12-12T11:40:21.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-12</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="376-摆动序列"><a href="#376-摆动序列" class="headerlink" title="376. 摆动序列"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/wiggle-subsequence/">376. 摆动序列</a></h4><p>难度：中等</p>
-<p>如果连续数字之间的差严格地在正数和负数之间交替，则数字序列称为<strong>摆动序列</strong>第一个差（如果存在的话）可能是正数或负数。少于两个元素的序列也是摆动序列。</p>
-<p>例如， <code>[1,7,4,9,2,5]</code> 是一个摆动序列，因为差值 <code>(6,-3,5,-7,3)</code> 是正负交替出现的。相反, <code>[1,4,7,2,5]</code> 和 <code>[1,7,4,5,5]</code> 不是摆动序列，第一个序列是因为它的前两个差值都是正数，第二个序列是因为它的最后一个差值为零。</p>
-<p>给定一个整数序列，返回作为摆动序列的最长子序列的长度。 通过从原始序列中删除一些（也可以不删除）元素来获得子序列，剩下的元素保持其原始顺序。</p>
-<p><strong>示例 1:</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入: [1,7,4,9,2,5]</span><br><span class="line">输出: 6 </span><br><span class="line">解释: 整个序列均为摆动序列。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2:</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入: [1,17,5,10,13,15,10,5,16,8]</span><br><span class="line">输出: 7</span><br><span class="line">解释: 这个序列包含几个长度为 7 摆动序列，其中一个可为[1,17,10,13,10,16,8]。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3:</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: [1,2,3,4,5,6,7,8,9]</span><br><span class="line">输出: 2</span><br></pre></td></tr></table></figure>
-
-<p><strong>进阶:</strong><br>你能否用 O(<em>n</em>) 时间复杂度完成此题?</p>
-<h2 id="动态规划"><a href="#动态规划" class="headerlink" title="动态规划"></a>动态规划</h2><ul>
-<li><p>up[i] 表示以前 i 个元素中的某一个为结尾的最长的「上升摆动序列」的长度。</p>
-</li>
-<li><p>down[i] 表示以前 i 个元素中的某一个为结尾的最长的「下降摆动序列」的长度。</p>
-</li>
-</ul>
-<p><img src="data:image/png;base64,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tpabRx55JJs5c2Z2ySWXZN9++21lqxBiMNGsNn333XfZDTfcEPblGJGfN954I5s4cWJ28cUXZ88991xla7khT5A3zj///OyJJ56obG0PGbMhAqJBZj/yyCOz4cOHhwJQJu66667svffeq7z7H3/88Ue2Zs2abPTo0dn27dsrW4vn559/DucS89NPP2W33HJL9s0331S2CCEGE3m1iX05RuTn5Zdfzh599NHKu4Hs2LEjO/7447OVK1dWthTPb7/9lu3fv7/ybiD1zj0vMmZDjNtvvz075ZRTsq+++qqypRzUEr9ff/01u/rqq7Nx48ZlX3zxRWVrcfz444/ZqlWrsksvvTSYsBgZMyEGN3m1qVljRgW/bNmybPPmzdnvv/9e2Tq0qWdunnrqqeyII47IXnrppcqW4uD+vP/++9mkSZPCOaaQMRMt8cMPP2TnnXdedsUVVwRRKRO1xA9opfAqEsLoEyZMyGbMmJEdd9xxIdooYybE0COvNjVrzGDfvn3ZunXrgtY8/fTT2S+//FL5ZGhSz9wQoawVreoW9DRdc8012VlnnRXqgkMOOUTGTHSWjz76KDv22GPD2KiyUU/8egnGC1MmYybE0CSvNuUxZgaGDGOGQcOoYdiGIp00N52Gc5MxEx2HjHP44YeXbnwZyJgJIcpIEcbMIPr2wgsvZGeffXZ2//33Z3v37q18MjSQMTuAjNkg5pNPPgmGgjFldGFef/31yfFl9J8jBuecc0528sknZ6eeemp4b4PdEYuHHnooDLxkxowdTyvv2muvze69997w/sknn6wOhOXYtWvXhm7AuXPnZl9//XXY74wzzgjbHnzwwQFdALH4+e+cMmVKT8aXgYyZEO3DWE10YMyYMUEXmMk2e/bs7LTTTgt68+qrr1b2PADvTz/99OyEE07IXn/99crWLNu5c2fY/5133gnvLV32W79+/YB06R3YtGlT9uWXX2bz588P6bHt8ccfP2giDxGqJUuWhLTRQK9PebWpHWNmoMlU9IxpWrx4cS59yau9jJ0699xzw7VBww10HoP4/PPPh/c+3RtvvHFAusccc0x25513Bj1cvXp16Ppj20033RTukYfvZtIEx3Gtb7755uo+KXNDXjjzzDOr97NXyJiJtnn33XezE088sWqwXnvttTAbMx5fhiBRMOg/37NnT9j25ptvZqNGjaoKIlOA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" alt="avatar"></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">wiggleMaxLength</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line">        <span class="keyword">if</span> (n &lt; <span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> n;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span>[] up = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">        <span class="keyword">int</span>[] down = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">        up[<span class="number">0</span>] = down[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (nums[i] &gt; nums[i - <span class="number">1</span>]) &#123;<span class="comment">//上升</span></span><br><span class="line">                up[i] = Math.max(up[i - <span class="number">1</span>], down[i - <span class="number">1</span>] + <span class="number">1</span>);</span><br><span class="line">                down[i] = down[i - <span class="number">1</span>];<span class="comment">//本次是上升，不再下降，所以下降序列的元素个数与前一次相同</span></span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (nums[i] &lt; nums[i - <span class="number">1</span>]) &#123;<span class="comment">//下降</span></span><br><span class="line">                up[i] = up[i - <span class="number">1</span>];<span class="comment">//本次是下降，不再上升，所以上升序列的元素个数与前一次相同</span></span><br><span class="line">                down[i] = Math.max(up[i - <span class="number">1</span>] + <span class="number">1</span>, down[i - <span class="number">1</span>]);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;<span class="comment">//相等</span></span><br><span class="line">                up[i] = up[i - <span class="number">1</span>];<span class="comment">//不升也不降，保持原来各自的元素数量</span></span><br><span class="line">                down[i] = down[i - <span class="number">1</span>];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> Math.max(up[n - <span class="number">1</span>], down[n - <span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="动态规划优化内存"><a href="#动态规划优化内存" class="headerlink" title="动态规划优化内存"></a>动态规划优化内存</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">wiggleMaxLength</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line">        <span class="keyword">if</span> (n &lt; <span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> n;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> up = <span class="number">1</span>, down = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (nums[i] &gt; nums[i - <span class="number">1</span>]) &#123;</span><br><span class="line">                up = Math.max(up, down + <span class="number">1</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (nums[i] &lt; nums[i - <span class="number">1</span>]) &#123;</span><br><span class="line">                down = Math.max(up + <span class="number">1</span>, down);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> Math.max(up, down);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="优化比较"><a href="#优化比较" class="headerlink" title="优化比较"></a>优化比较</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">wiggleMaxLength</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line">        <span class="keyword">if</span> (n &lt; <span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> n;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> up = <span class="number">1</span>, down = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (nums[i] &gt; nums[i - <span class="number">1</span>]) &#123;</span><br><span class="line">                up = down + <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (nums[i] &lt; nums[i - <span class="number">1</span>]) &#123;</span><br><span class="line">                down = up + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> Math.max(up, down);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="贪心算法"><a href="#贪心算法" class="headerlink" title="贪心算法"></a>贪心算法</h2><p>观察这个序列可以发现，我们不断地交错选择「峰」与「谷」，可以使得该序列尽可能长。</p>
-<p>证明非常简单：如果我们选择了一个「过渡元素」，那么在原序列中，这个「过渡元素」的两侧有一个「峰」和一个「谷」。不失一般性，我们假设在原序列中的出现顺序为「峰」「过渡元素」「谷」。如果「过渡元素」在选择的序列中小于其两侧的元素，那么「谷」一定没有在选择的序列中出现，我们可以将「过渡元素」替换成「谷」；同理，如果「过渡元素」在选择的序列中大于其两侧的元素，那么「峰」一定没有在选择的序列中出现，我们可以将「过渡元素」替换成「峰」。这样一来，我们总可以将任意满足要求的序列中的所有「过渡元素」替换成「峰」或「谷」。并且由于我们不断地交错选择「峰」与「谷」的方法就可以满足要求，因此这种选择方法就一定可以达到可选元素数量的最大值。</p>
-<p>这样，我们只需要统计该序列中「峰」与「谷」的数量即可（注意序列两端的数也是「峰」或「谷」），但需要注意处理相邻的相同元素。</p>
-<p>在实际代码中，我们记录当前序列的上升下降趋势。每次加入一个新元素时，用新的上升下降趋势与之前对比，如果出现了「峰」或「谷」，答案加一，并更新当前序列的上升下降趋势。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">wiggleMaxLength</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line">        <span class="keyword">if</span> (n &lt; <span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> n;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> prevdiff = nums[<span class="number">1</span>] - nums[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">int</span> ret = prevdiff != <span class="number">0</span> ? <span class="number">2</span> : <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">2</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> diff = nums[i] - nums[i - <span class="number">1</span>];</span><br><span class="line">            <span class="keyword">if</span> ((diff &gt; <span class="number">0</span> &amp;&amp; prevdiff &lt;= <span class="number">0</span>) || (diff &lt; <span class="number">0</span> &amp;&amp; prevdiff &gt;= <span class="number">0</span>)) &#123;</span><br><span class="line">                <span class="comment">//diff &gt; 0 &amp;&amp; prevdiff &lt;= 0是峰</span></span><br><span class="line">                <span class="comment">//diff &lt; 0 &amp;&amp; prevdiff &gt;= 0是谷</span></span><br><span class="line">                ret++;</span><br><span class="line">                prevdiff = diff;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;wiggle-subsequence&#x2F;solution&#x2F;bai-dong-xu-lie-by-leetcode-solution-yh2m&#x2F;</span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">动态规划</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/12/12/%E6%91%86%E5%8A%A8%E5%BA%8F%E5%88%97/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-矩阵区域和" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/12/12/%E7%9F%A9%E9%98%B5%E5%8C%BA%E5%9F%9F%E5%92%8C/">矩阵区域和(还没太搞明白)</a>
-    </h1>
-  
-
-        
-        <a href="/2020/12/12/%E7%9F%A9%E9%98%B5%E5%8C%BA%E5%9F%9F%E5%92%8C/" class="archive-article-date">
-  	<time datetime="2020-12-12T02:50:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-12</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">给你一个 m * n 的矩阵 mat 和一个整数 K ，请你返回一个矩阵 answer ，其中每个 answer[i][j] 是所有满足下述条件的元素 mat[r][c] 的和： </span><br><span class="line"></span><br><span class="line">i - K &lt;&#x3D; r &lt;&#x3D; i + K, j - K &lt;&#x3D; c &lt;&#x3D; j + K </span><br><span class="line">(r, c) 在矩阵内。</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">示例 1：</span><br><span class="line"></span><br><span class="line">输入：mat &#x3D; [[1,2,3],[4,5,6],[7,8,9]], K &#x3D; 1</span><br><span class="line">输出：[[12,21,16],[27,45,33],[24,39,28]]</span><br><span class="line">示例 2：</span><br><span class="line"></span><br><span class="line">输入：mat &#x3D; [[1,2,3],[4,5,6],[7,8,9]], K &#x3D; 2</span><br><span class="line">输出：[[45,45,45],[45,45,45],[45,45,45]]</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">提示：</span><br><span class="line"></span><br><span class="line">m &#x3D;&#x3D; mat.length</span><br><span class="line">n &#x3D;&#x3D; mat[i].length</span><br><span class="line">1 &lt;&#x3D; m, n, K &lt;&#x3D; 100</span><br><span class="line">1 &lt;&#x3D; mat[i][j] &lt;&#x3D; 100</span><br><span class="line">通过次数5,830提交次数8,042</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;matrix-block-sum</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-<!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<p><a target="_blank" rel="noopener" href="https://imvector.github.io/2020/12/12/%E4%BA%8C%E7%BB%B4%E5%89%8D%E7%BC%80%E5%92%8C/">二维前缀和</a></p>
-<p><strong>题目的意思是对于每个元素$(i,j)$，求其相邻范围上下左右范围为$i+k,i-k,j+k,j-k$的区域内所有元素的和</strong></p>
-<p>例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[1,2,3]     [12,21,16]</span><br><span class="line">[4,5,6]     [27,45,33]      </span><br><span class="line">[7,8,9]     [24,39,28]</span><br></pre></td></tr></table></figure>
-<p>其中：</p>
-<p><strong>5的相邻范围内的所有和为整个矩阵的所有元素的和</strong></p>
-<p><strong>1的相邻范围内的所有和为，1，2，4，5四个元素的和</strong></p>
-<p><strong>3的相邻范围内的所有和为，2，3，5，6四个元素的和</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[][] matrixBlockSum(<span class="keyword">int</span>[][] mat, <span class="keyword">int</span> K) &#123;</span><br><span class="line">        <span class="keyword">int</span> h = mat.length;</span><br><span class="line">        <span class="keyword">int</span> w = mat[<span class="number">0</span>].length;</span><br><span class="line">        <span class="keyword">int</span> dp[][] = <span class="keyword">new</span> <span class="keyword">int</span>[h + <span class="number">1</span>][w + <span class="number">1</span>];</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= h; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; j &lt;= w; j++) &#123;</span><br><span class="line">                dp[i][j] = dp[i - <span class="number">1</span>][j] + dp[i][j - <span class="number">1</span>] + mat[i - <span class="number">1</span>][j - <span class="number">1</span>] - dp[i - <span class="number">1</span>][j - <span class="number">1</span>];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; h; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; w; j++) &#123;</span><br><span class="line">                mat[i][j] = getSum(dp, h, w, i + K + <span class="number">1</span>, j + K + <span class="number">1</span>) -</span><br><span class="line">                        getSum(dp, h, w, i - K, j + K + <span class="number">1</span>) -</span><br><span class="line">                        getSum(dp, h, w, i + K + <span class="number">1</span>, j - K) +</span><br><span class="line">                        getSum(dp, h, w, i - K, j - K);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> mat;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getSum</span><span class="params">(<span class="keyword">int</span>[][] dp, <span class="keyword">int</span> h, <span class="keyword">int</span> w, <span class="keyword">int</span> y, <span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">        y = Math.max(Math.min(y, h), <span class="number">0</span>);</span><br><span class="line">        x = Math.max(Math.min(x, w), <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> dp[y][x];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">动态规划</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/12/12/%E7%9F%A9%E9%98%B5%E5%8C%BA%E5%9F%9F%E5%92%8C/">展开全文 >></a>
         </p>
       
 
@@ -1657,7 +1609,15 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面试</a>
+                <a href="javascript:void(0)" class="js-tag color5">面试真题</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">阿里</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">字节跳动</a>
               </li>
             
             <div class="clearfix"></div>
