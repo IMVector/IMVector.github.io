@@ -150,6 +150,166 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-不同的二叉搜索树的结构(重点)" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/01/07/%E4%B8%8D%E5%90%8C%E7%9A%84%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E7%9A%84%E7%BB%93%E6%9E%84(%E9%87%8D%E7%82%B9)/">不同的二叉搜索树</a>
+    </h1>
+  
+
+        
+        <a href="/2021/01/07/%E4%B8%8D%E5%90%8C%E7%9A%84%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E7%9A%84%E7%BB%93%E6%9E%84(%E9%87%8D%E7%82%B9)/" class="archive-article-date">
+  	<time datetime="2021-01-07T12:39:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-01-07</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="95-不同的二叉搜索树-II"><a href="#95-不同的二叉搜索树-II" class="headerlink" title="95. 不同的二叉搜索树 II"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/unique-binary-search-trees-ii/">95. 不同的二叉搜索树 II</a></h4><p>难度: 中等</p>
+<p>给定一个整数 <em>n</em>，生成所有由 1 … <em>n</em> 为节点所组成的 <strong>二叉搜索树</strong> 。</p>
+<p><strong>示例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">输入：3</span><br><span class="line">输出：</span><br><span class="line">[</span><br><span class="line">  [1,null,3,2],</span><br><span class="line">  [3,2,null,1],</span><br><span class="line">  [3,1,null,null,2],</span><br><span class="line">  [2,1,3],</span><br><span class="line">  [1,null,2,null,3]</span><br><span class="line">]</span><br><span class="line">解释：</span><br><span class="line">以上的输出对应以下 5 种不同结构的二叉搜索树：</span><br><span class="line"></span><br><span class="line">   1         3     3      2      1</span><br><span class="line">    \       &#x2F;     &#x2F;      &#x2F; \      \</span><br><span class="line">     3     2     1      1   3      2</span><br><span class="line">    &#x2F;     &#x2F;       \                 \</span><br><span class="line">   2     1         2                 3</span><br></pre></td></tr></table></figure>
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>0 &lt;= n &lt;= 8</code></li>
+</ul>
+<h1 id="递归"><a href="#递归" class="headerlink" title="递归"></a>递归</h1><p>枚举根节点，递归的生成左子树和右子树</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;TreeNode&gt; <span class="title">generateTrees</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (n == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> LinkedList&lt;TreeNode&gt;();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> generateTrees(<span class="number">1</span>, n);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;TreeNode&gt; <span class="title">generateTrees</span><span class="params">(<span class="keyword">int</span> start, <span class="keyword">int</span> end)</span> </span>&#123;</span><br><span class="line">        List&lt;TreeNode&gt; allTrees = <span class="keyword">new</span> LinkedList&lt;TreeNode&gt;();</span><br><span class="line">        <span class="keyword">if</span> (start &gt; end) &#123;</span><br><span class="line">            allTrees.add(<span class="keyword">null</span>);</span><br><span class="line">            <span class="keyword">return</span> allTrees;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 枚举可行根节点</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = start; i &lt;= end; i++) &#123;</span><br><span class="line">            <span class="comment">// 获得所有可行的左子树集合</span></span><br><span class="line">            List&lt;TreeNode&gt; leftTrees = generateTrees(start, i - <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 获得所有可行的右子树集合</span></span><br><span class="line">            List&lt;TreeNode&gt; rightTrees = generateTrees(i + <span class="number">1</span>, end);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 从左子树集合中选出一棵左子树，从右子树集合中选出一棵右子树，拼接到根节点上</span></span><br><span class="line">            <span class="keyword">for</span> (TreeNode left : leftTrees) &#123;</span><br><span class="line">                <span class="keyword">for</span> (TreeNode right : rightTrees) &#123;</span><br><span class="line">                    TreeNode currTree = <span class="keyword">new</span> TreeNode(i);</span><br><span class="line">                    currTree.left = left;</span><br><span class="line">                    currTree.right = right;</span><br><span class="line">                    allTrees.add(currTree);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> allTrees;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/unique-binary-search-trees-ii/solution/bu-tong-de-er-cha-sou-suo-shu-ii-by-leetcode-solut/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">递归</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/01/07/%E4%B8%8D%E5%90%8C%E7%9A%84%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E7%9A%84%E7%BB%93%E6%9E%84(%E9%87%8D%E7%82%B9)/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-BiNode" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/01/07/BiNode/">BiNode</a>
+    </h1>
+  
+
+        
+        <a href="/2021/01/07/BiNode/" class="archive-article-date">
+  	<time datetime="2021-01-07T08:48:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-01-07</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">二叉树数据结构TreeNode可用来表示单向链表（其中left置空，right为下一个链表节点）。实现一个方法，把二叉搜索树转换为单向链表，要求依然符合二叉搜索树的性质，转换操作应是原址的，也就是在原始的二叉搜索树上直接修改。</span><br><span class="line"></span><br><span class="line">返回转换后的单向链表的头节点。</span><br><span class="line"></span><br><span class="line">注意：本题相对原题稍作改动</span><br><span class="line"></span><br><span class="line">示例：</span><br><span class="line"></span><br><span class="line">输入： [4,2,5,1,3,null,6,0]</span><br><span class="line">输出： [0,null,1,null,2,null,3,null,4,null,5,null,6]</span><br><span class="line">提示：</span><br><span class="line"></span><br><span class="line">节点数量不会超过 100000。</span><br><span class="line">通过次数12,616提交次数20,220</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;binode-lcci</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Definition for a binary tree node.</span></span><br><span class="line"><span class="comment"> * public class TreeNode &#123;</span></span><br><span class="line"><span class="comment"> *     int val;</span></span><br><span class="line"><span class="comment"> *     TreeNode left;</span></span><br><span class="line"><span class="comment"> *     TreeNode right;</span></span><br><span class="line"><span class="comment"> *     TreeNode(int x) &#123; val = x; &#125;</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> TreeNode <span class="title">convertBiNode</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        midTraverse(root);</span><br><span class="line">        <span class="keyword">return</span> head;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    TreeNode pre = <span class="keyword">null</span>;</span><br><span class="line">    TreeNode head = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">midTraverse</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (root == <span class="keyword">null</span>) <span class="keyword">return</span>;</span><br><span class="line">        midTraverse(root.left);</span><br><span class="line">        <span class="keyword">if</span> (pre == <span class="keyword">null</span>) &#123;</span><br><span class="line">            pre = root;</span><br><span class="line">            head = root;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            pre.right = root;</span><br><span class="line">            pre.left = <span class="keyword">null</span>;</span><br><span class="line">            pre = root;</span><br><span class="line">            root.left = <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        midTraverse(root.right);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/01/07/BiNode/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-省份数量" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -831,165 +991,6 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/01/06/%E7%8F%A0%E7%8E%91%E5%A6%99%E7%AE%97/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-跳水板" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/01/06/%E8%B7%B3%E6%B0%B4%E6%9D%BF/">跳水板</a>
-    </h1>
-  
-
-        
-        <a href="/2021/01/06/%E8%B7%B3%E6%B0%B4%E6%9D%BF/" class="archive-article-date">
-  	<time datetime="2021-01-06T08:15:21.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-01-06</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">你正在使用一堆木板建造跳水板。有两种类型的木板，其中长度较短的木板长度为shorter，长度较长的木板长度为longer。你必须正好使用k块木板。编写一个方法，生成跳水板所有可能的长度。</span><br><span class="line"></span><br><span class="line">返回的长度需要从小到大排列。</span><br><span class="line"></span><br><span class="line">示例 1</span><br><span class="line"></span><br><span class="line">输入：</span><br><span class="line">shorter &#x3D; 1</span><br><span class="line">longer &#x3D; 2</span><br><span class="line">k &#x3D; 3</span><br><span class="line">输出： [3,4,5,6]</span><br><span class="line">解释：</span><br><span class="line">可以使用 3 次 shorter，得到结果 3；使用 2 次 shorter 和 1 次 longer，得到结果 4 。以此类推，得到最终结果。</span><br><span class="line">提示：</span><br><span class="line"></span><br><span class="line">0 &lt; shorter &lt;&#x3D; longer</span><br><span class="line">0 &lt;&#x3D; k &lt;&#x3D; 100000</span><br><span class="line">通过次数42,712提交次数96,595</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;diving-board-lcci</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] divingBoard(<span class="keyword">int</span> shorter, <span class="keyword">int</span> longer, <span class="keyword">int</span> k) &#123;</span><br><span class="line">        <span class="keyword">if</span> (k == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;&#125;;</span><br><span class="line">        List&lt;Integer&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">if</span> (longer == shorter) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;k * shorter&#125;;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = k; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            list.add(i * shorter + (k - i) * longer);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span>[] res = <span class="keyword">new</span> <span class="keyword">int</span>[list.size()];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; list.size(); i++) &#123;</span><br><span class="line">            res[i] = list.get(i);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] divingBoard(<span class="keyword">int</span> shorter, <span class="keyword">int</span> longer, <span class="keyword">int</span> k) &#123;</span><br><span class="line">        <span class="keyword">if</span> (k == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">0</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (shorter == longer) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;shorter * k&#125;;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span>[] lengths = <span class="keyword">new</span> <span class="keyword">int</span>[k + <span class="number">1</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= k; i++) &#123;</span><br><span class="line">            lengths[i] = shorter * (k - i) + longer * i;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> lengths;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/diving-board-lcci/solution/tiao-shui-ban-by-leetcode-solution/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/01/06/%E8%B7%B3%E6%B0%B4%E6%9D%BF/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-最大数值" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/01/06/%E6%9C%80%E5%A4%A7%E6%95%B0%E5%80%BC/">最大数值</a>
-    </h1>
-  
-
-        
-        <a href="/2021/01/06/%E6%9C%80%E5%A4%A7%E6%95%B0%E5%80%BC/" class="archive-article-date">
-  	<time datetime="2021-01-06T06:38:40.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-01-06</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">编写一个方法，找出两个数字a和b中最大的那一个。不得使用if-else或其他比较运算符。</span><br><span class="line"></span><br><span class="line">示例：</span><br><span class="line"></span><br><span class="line">输入： a &#x3D; 1, b &#x3D; 2</span><br><span class="line">输出： 2</span><br><span class="line">通过次数12,694提交次数17,294</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;maximum-lcci</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-<h1 id="数学中求最大值"><a href="#数学中求最大值" class="headerlink" title="数学中求最大值"></a>数学中求最大值</h1><p><img src="data:image/png;base64,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" alt="avatar"></p>
-<p>绝对值可以用下面的方法代替</p>
-<p><img src="data:image/png;base64,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" alt="avatar"></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">maximum</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> subtract = (<span class="keyword">long</span>)a - (<span class="keyword">long</span>)b;</span><br><span class="line">        <span class="keyword">double</span> abs = Math.sqrt(<span class="number">1.0</span> *subtract * subtract);</span><br><span class="line">        <span class="keyword">double</span> val = (abs + a + b) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">return</span> (<span class="keyword">int</span>) val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数学</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/01/06/%E6%9C%80%E5%A4%A7%E6%95%B0%E5%80%BC/">展开全文 >></a>
         </p>
       
 

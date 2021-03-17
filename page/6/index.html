@@ -150,6 +150,333 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-topK问题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MjM5ODYxMDA5OQ==&mid=2651961587&idx=1&sn=54bf39db7043cc638315caf70f24d94b&chksm=bd2d0d2f8a5a84395246be4522d10fbfc1f744658047d5fb3fad8e9f3c3d76baab3a2ce84867&scene=21#wechat_redirect">原文</a></p>
+<ul>
+<li><blockquote>
+<p>前言：本文将介绍随机选择，分治法，减治法的思想，以及TopK问题优化的来龙去脉，原理与细节，保证有收获。</p>
+</blockquote>
+</li>
+</ul>
+<p>  面试中，TopK，是问得比较多的几个问题之一，到底有几种方法，这些方案里蕴含的优化思路究竟是怎么样的，今天和大家聊一聊。</p>
+<p>  <em>画外音：**除非校招，我在面试过程中从不问TopK这个问题，默认大家都知道。</em></p>
+<p>  <strong>问题描述</strong>：</p>
+<p>  从arr[1, n]这n个数中，找出最大的k个数，这就是经典的TopK问题。</p>
+<p>  <strong>栗子</strong>：</p>
+<p>  从arr[1, 12]={5,3,7,1,8,2,9,4,7,2,6,6} 这n=12个数中，找出最大的k=5个。</p>
+<p>  <strong>一、排序</strong></p>
+<p>  <img src="https://mmbiz.qpic.cn/mmbiz_png/YrezxckhYOzzA7pbponFmibHaMYQ5Vkk9sq2dj1EBcJOILlsSEwEaaicRoxicVfmSya1Ka2TzTNa3yicBXuricq28Xg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
+<p>  排序是最容易想到的方法，将n个数排序之后，取出最大的k个，即为所得。</p>
+<p>  <strong>伪代码</strong>：</p>
+<p>  sort(arr, 1, n);</p>
+<p>  return arr[1, k];</p>
+<p>  <strong>时间复杂度</strong>：O(n*lg(n))</p>
+<p>  <strong>分析</strong>：明明只需要TopK，却将全局都排序了，这也是这个方法复杂度非常高的原因。那能不能不全局排序，而只局部排序呢？这就引出了第二个优化方法。</p>
+<p>  <strong>二、局部排序</strong></p>
+<p>  不再全局排序，只对最大的k个排序。</p>
+<p>  <img src="https://mmbiz.qpic.cn/mmbiz_png/YrezxckhYOzzA7pbponFmibHaMYQ5Vkk9pNPrxictUYvjERicF7DnvaJ4SZHdjVCSXJE3WJlUIVQ9ujPiaSOicTYOmw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
+<p>  冒泡是一个很常见的排序方法，每冒一个泡，找出最大值，冒k个泡，就得到TopK。</p>
+<p>  <strong>伪代码</strong>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">for(i&#x3D;1 to k)&#123;</span><br><span class="line"></span><br><span class="line">​     bubble_find_max(arr,i);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">return arr[1, k];</span><br></pre></td></tr></table></figure>
+
+
+<p>  <strong>时间复杂度</strong>：O(n*k)</p>
+<p>  <strong>分析</strong>：冒泡，将全局排序优化为了局部排序，非TopK的元素是不需要排序的，节省了计算资源。不少朋友会想到，需求是TopK，是不是这最大的k个元素也不需要排序呢？这就引出了第三个优化方法。</p>
+<p>  <strong>三、堆</strong></p>
+<p>  <strong>思路</strong>：只找到TopK，不排序TopK。</p>
+<p>  <img src="https://mmbiz.qpic.cn/mmbiz_png/YrezxckhYOzzA7pbponFmibHaMYQ5Vkk9EkBEbuOR4lfCTZYn7oVPY70G2JHhGwanicvB4DkgicYjxdDSsT7M3KVQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
+<p>  先用前k个元素生成一个小顶堆，这个小顶堆用于存储，当前最大的k个元素。</p>
+<p>  <img src="https://mmbiz.qpic.cn/mmbiz_png/YrezxckhYOzzA7pbponFmibHaMYQ5Vkk9fCKiazIwA0MaQMLhjr3NiavXDib6cSysEFlibGJg6uTZbUsXd3fy5NbCZA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
+<p>  接着，从第k+1个元素开始扫描，和堆顶（堆中最小的元素）比较，如果被扫描的元素大于堆顶，则替换堆顶的元素，并调整堆，以保证堆内的k个元素，总是当前最大的k个元素。</p>
+<p>  <img src="https://mmbiz.qpic.cn/mmbiz_png/YrezxckhYOzzA7pbponFmibHaMYQ5Vkk9xBxbWpznlYmMsItZ7Vd3B4MA0TzALhulicsNWrQ1icjaacibL19XOmicVg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
+<p>  直到，扫描完所有n-k个元素，最终堆中的k个元素，就是猥琐求的TopK。</p>
+<p>  <strong>伪代码</strong>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">heap[k] &#x3D; make_heap(arr[1, k]);</span><br><span class="line"></span><br><span class="line">for(i&#x3D;k+1 to n)&#123;</span><br><span class="line"></span><br><span class="line">​     adjust_heap(heep[k],arr[i]);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">return heap[k];</span><br></pre></td></tr></table></figure>
+
+
+<p>  <strong>时间复杂度</strong>：O(n*lg(k))</p>
+<p>  <em>画外音：n个元素扫一遍，假设运气很差，每次都入堆调整，调整时间复杂度为堆的高度，即lg(k)，故整体时间复杂度是n*lg(k)。</em></p>
+<p>  <strong>分析</strong>：堆，将冒泡的TopK排序优化为了TopK不排序，节省了计算资源。堆，是求TopK的经典算法，那还有没有更快的方案呢？</p>
+<p>  <strong>四、随机选择</strong></p>
+<p>  随机选择算在是《算法导论》中一个经典的算法，其时间复杂度为O(n)，是一个线性复杂度的方法。</p>
+<p>  这个方法并不是所有同学都知道，为了将算法讲透，先聊一些前序知识，一个所有程序员都应该烂熟于胸的经典算法：快速排序。</p>
+<p>  <em>画外音：</em></p>
+<p>  <em>（1）如果有朋友说，“不知道快速排序，也不妨碍我写业务代码呀”…额…</em></p>
+<p>  <em>（2）除非校招，我在面试过程中从不问快速排序，默认所有工程师都知道；</em></p>
+<p>  <strong>其伪代码是</strong>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">void quick_sort(int[]arr, int low, inthigh)&#123;</span><br><span class="line"></span><br><span class="line">​     if(low&#x3D;&#x3D; high) return;</span><br><span class="line"></span><br><span class="line">​     int i &#x3D; partition(arr, low, high);</span><br><span class="line"></span><br><span class="line">​     quick_sort(arr, low, i-1);</span><br><span class="line"></span><br><span class="line">​     quick_sort(arr, i+1, high);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>  其核心算法思想是，分治法。</p>
+<p>  <strong>分治法</strong>（Divide&amp;Conquer），把一个大的问题，转化为若干个子问题（Divide），每个子问题“<strong>都</strong>”解决，大的问题便随之解决（Conquer）。这里的关键词是<strong>“都”</strong>。从伪代码里可以看到，快速排序递归时，先通过partition把数组分隔为两个部分，两个部分“都”要再次递归。</p>
+<p>  分治法有一个特例，叫减治法。</p>
+<p>  <strong>减治法</strong>（Reduce&amp;Conquer），把一个大的问题，转化为若干个子问题（Reduce），这些子问题中“<strong>只</strong>”解决一个，大的问题便随之解决（Conquer）。这里的关键词是<strong>“只”</strong>。</p>
+<p>  <strong>二分查找binary_search</strong>，BS，是一个典型的运用减治法思想的算法，其伪代码是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">int BS(int[]arr, int low, inthigh, int target)&#123;</span><br><span class="line"></span><br><span class="line">​     if(low&gt; high) return -1;</span><br><span class="line"></span><br><span class="line">​     mid&#x3D; (low+high)&#x2F;2;</span><br><span class="line"></span><br><span class="line">​     if(arr[mid]&#x3D;&#x3D; target) return mid;</span><br><span class="line"></span><br><span class="line">​     if(arr[mid]&gt; target)</span><br><span class="line"></span><br><span class="line">​          return BS(arr, low, mid-1, target);</span><br><span class="line"></span><br><span class="line">​     else</span><br><span class="line"></span><br><span class="line">​          return BS(arr, mid+1, high, target);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>  从伪代码可以看到，二分查找，一个大的问题，可以用一个mid元素，分成左半区，右半区两个子问题。而左右两个子问题，只需要解决其中一个，递归一次，就能够解决二分查找全局的问题。</p>
+<p>  通过分治法与减治法的描述，可以发现，分治法的复杂度一般来说是大于减治法的：</p>
+<p>  快速排序：O(n*lg(n))</p>
+<p>  二分查找：O(lg(n))</p>
+<p>  话题收回来，<strong>快速排序</strong>的核心是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">i &#x3D; partition(arr, low, high);</span><br></pre></td></tr></table></figure>
+
+
+<p>  <strong>这个partition是干嘛的呢？</strong></p>
+<p>  顾名思义，partition会把整体分为两个部分。</p>
+<p>  更具体的，会用数组arr中的一个元素（默认是第一个元素t=arr[low]）为划分依据，将数据arr[low, high]划分成左右两个子数组：</p>
+<ul>
+<li><p>左半部分，都比t大</p>
+</li>
+<li><p>右半部分，都比t小</p>
+</li>
+<li><p>中间位置i是划分元素</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_png/YrezxckhYOzzA7pbponFmibHaMYQ5Vkk9ic4TjkicnCpTAVJJqq4WgbE6tQhl5XORGiaJnZj3UboKBpUhTq1kad5Ng/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
+<p>以上述TopK的数组为例，先用第一个元素t=arr[low]为划分依据，扫描一遍数组，把数组分成了两个半区：</p>
+</li>
+<li><p>左半区比t大</p>
+</li>
+<li><p>右半区比t小</p>
+</li>
+<li><p>中间是t</p>
+<p>partition返回的是t最终的位置i。</p>
+</li>
+</ul>
+<p>  很容易知道，partition的时间复杂度是O(n)。</p>
+<p>  <em>画外音：把整个数组扫一遍，比t大的放左边，比t小的放右边，最后t放在中间N[i]。</em></p>
+<p>  <strong>partition和TopK问题有什么关系呢？</strong></p>
+<p>  TopK是希望求出arr[1,n]中最大的k个数，那如果找到了<strong>第k大</strong>的数，做一次partition，不就一次性找到最大的k个数了么？</p>
+<p>  <em>画外音：即partition后左半区的k个数。</em></p>
+<p>  问题变成了arr[1, n]中找到第k大的数。</p>
+<p>  再回过头来看看<strong>第一次</strong>partition，划分之后：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">i &#x3D; partition(arr, 1, n);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果i大于k，则说明arr[i]左边的元素都大于k，于是只递归arr[1, i-1]里第k大的元素即可；</li>
+<li>如果i小于k，则说明说明第k大的元素在arr[i]的右边，于是只递归arr[i+1, n]里第k-i大的元素即可；</li>
+</ul>
+<p>  <em>画外音：这一段非常重要，多读几遍。</em></p>
+<p>  这就是<strong>随机选择</strong>算法randomized_select，RS，其伪代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">int RS(arr, low, high, k)&#123;</span><br><span class="line"></span><br><span class="line"> if(low&#x3D;&#x3D; high) return arr[low];</span><br><span class="line"></span><br><span class="line"> i&#x3D; partition(arr, low, high);</span><br><span class="line"></span><br><span class="line"> temp&#x3D; i-low; &#x2F;&#x2F;数组前半部分元素个数</span><br><span class="line"></span><br><span class="line"> if(temp&gt;&#x3D;k)</span><br><span class="line"></span><br><span class="line">   return RS(arr, low, i-1, k); &#x2F;&#x2F;求前半部分第k大</span><br><span class="line"></span><br><span class="line"> else</span><br><span class="line"></span><br><span class="line">   return RS(arr, i+1, high, k-i); &#x2F;&#x2F;求后半部分第k-i大</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>  <img src="https://mmbiz.qpic.cn/mmbiz_png/YrezxckhYOzzA7pbponFmibHaMYQ5Vkk9kb1JqQdt0av8kK59VvicibDNOrbIXsZicaHAFhk8u1A7BQW1aYIr84pQg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
+<p>  这是一个典型的减治算法，递归内的两个分支，最终只会执行一个，它的时间复杂度是O(n)。</p>
+<p>  再次强调一下：</p>
+<ul>
+<li><strong>分治法</strong>，大问题分解为小问题，小问题都要递归各个分支，例如：快速排序</li>
+<li><strong>减治法</strong>，大问题分解为小问题，小问题只要递归一个分支，例如：二分查找，随机选择</li>
+</ul>
+<p>  通过随机选择（randomized_select），找到arr[1, n]中第k大的数，再进行一次partition，就能得到TopK的结果。</p>
+<p>  <strong>五、总结</strong></p>
+<p>  TopK，不难；其思路优化过程，不简单：</p>
+<ul>
+<li><strong>全局排序</strong>，O(n*lg(n))</li>
+<li><strong>局部排序</strong>，只排序TopK个数，O(n*k)</li>
+<li><strong>堆</strong>，TopK个数也不排序了，O(n*lg(k))</li>
+<li>分治法，每个分支“都要”递归，例如：快速排序，O(n*lg(n))</li>
+<li>减治法，“只要”递归一个分支，例如：二分查找O(lg(n))，随机选择O(n)</li>
+<li>TopK的另一个解法：<strong>随机选择</strong>+partition</li>
+</ul>
+<p><strong>bitmap解法</strong><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/sDjCBFXoWajqvgBFdDoSrA">原文</a></p>
+<p>《<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MjM5ODYxMDA5OQ==&mid=2651961587&idx=1&sn=54bf39db7043cc638315caf70f24d94b&chksm=bd2d0d2f8a5a84395246be4522d10fbfc1f744658047d5fb3fad8e9f3c3d76baab3a2ce84867&scene=21#wechat_redirect">TopK到底怎么答？</a>》介绍了TopK的四种解法，其中<strong>随机选择</strong> (randomized select) 最为经典，用<strong>减治法</strong> (Reduce &amp; Conquer) 的思想，将数据规模急速降低，总体复杂度为O(n)。</p>
+<p>结尾挖了一个坑：求TopK，<strong>有没有比随机选择更快的方法呢？</strong></p>
+<p><strong>空间换时间</strong>，是算法优化中最常见的手段，如果有相对充裕的内存，可以有更快的算法。</p>
+<p><em>画外音：即使内存不够，也可以水平切分，使用分段的方法来操作，减少每次内存使用量。</em></p>
+<p><strong>TopK问题描述</strong></p>
+<p>从arr[1, 12]={5,3,7,1,8,2,9,4,7,2,6,6} 这n=12个数中，找出最大的k=5个。</p>
+<p><strong>比特位图</strong>(bitmap)<strong>法</strong></p>
+<p>bitmap，是空间换时间的典型代表。它是一种，用若干个bit来表示集合的数据结构。</p>
+<p><strong>例如</strong>，集合S={1,3,5,7,9}，容易发现，S中所有元素都在1-16之间，于是，可以用16个bit来表示这个集合：存在于集合中的元素，对应bit置1，否则置0。</p>
+<p><em>画外音：究竟需要多少存存储空间，取决于集合中元素的值域，在什么范围之内。</em></p>
+<p>上述集合S，可以用1010101010000000这样一个16bit的bitmap来表示，其中，第1, 3, 5, 7, 9个bit位置是1。</p>
+<p>假设TopK的n个元素都是int，且元素之间没有重复，只需要申请2^32个bit，即4G的内存，就能够用bitmap表示这n元素。</p>
+<p>扫描一次所有n个元素，以生成bitmap，其时间复杂度是O(n)。生成后，取TopK只需要找到最高位的k个bit即可。算法总时间复杂度也是O(n)。</p>
+<p>伪代码为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bitmap[4G] &#x3D; make_bitmap(arr[1, n]);</span><br><span class="line">return bitmap[top k bits];</span><br></pre></td></tr></table></figure>
+
+
+<p>bitmap算法有个缺点，如果集合元素有重复，相同的元素会被去重，假设集合S中有5个1，最终S制作成bitmap后，这5个1只对应1个bit位，相当于4个元素被丢掉了，这样会导致，找到的TopK不准。<strong>该怎么优化呢？</strong></p>
+<p><strong>比特位图计数</strong></p>
+<p>优化方法是，每个元素的1个bit变成1个计数。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_jpg/YrezxckhYOxyjTHsJnqyMvp4peu6NiaXESzU0WNiaUjvAwXZNjLuyicktn7fl7Y48D34ib5r4cv0WlMicjA5dScK4oA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
+<p>如上图所示，TopK的集合经过比特位图计数处理后，会记录每个bit对应在集合S中出现过多少次。</p>
+<p>接下来，找TopK的过程，就是bitmap从高位的计数开始，往低位的计数扫描，得到count之和等于k，对应的bit就是TopK所求。</p>
+<p><img src="https://mmbiz.qpic.cn/mmbiz_jpg/YrezxckhYOxyjTHsJnqyMvp4peu6NiaXEY1hhFg7yJ9DF30oeg2Y6lQM7ztxUyMOypBDgtjdO9GLAtyQUlcZl7w/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
+<p>如上图所示，k=5：</p>
+<p>（1）第一个非0的count是1，对应的bit是9；</p>
+<p>（2）第二个非0的count也是1，对应的bit是8；</p>
+<p>（3）第三个非0的count是2，对应的bit是7；</p>
+<p>（4）第四个非0的count是2，对应的bit是6，但TopK只缺1个数字了，故只有1个6入选；</p>
+<p>故，最终的TopK={9, 8, 7, 7, 6}。</p>
+<p><strong>结论</strong>：通过比特位图精准计数的方式，求解TopK，算法整体只需要不到2次扫描，时间复杂度为O(n)，比减治法的随机选择会更快。</p>
+<p>为了巩固今天的内容，例行挖个坑。</p>
+<p>面试中，还有个问题问得比较多：<strong>求一个正整数的二进制表示包含多少个1？</strong></p>
+<p>例如：7的二进制表示是111，即7的二进制表示包含3个1。</p>
+<p><em>画外音：我面试过程中从不问这个问题。</em></p>
+<p>最常见的解法是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">uint32_t count_one(uint32_t n)&#123;</span><br><span class="line">  uint32_t count&#x3D;0;</span><br><span class="line">  while(n)&#123;</span><br><span class="line">​    count ++;</span><br><span class="line">​    n &amp;&#x3D; (n-1);</span><br><span class="line">  &#125;</span><br><span class="line">  return count;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/02/27/topK%E9%97%AE%E9%A2%98/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-猜字谜" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/26/%E7%8C%9C%E5%AD%97%E8%B0%9C/">猜字谜</a>
+    </h1>
+  
+
+        
+        <a href="/2021/02/26/%E7%8C%9C%E5%AD%97%E8%B0%9C/" class="archive-article-date">
+  	<time datetime="2021-02-26T08:49:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="1178-猜字谜"><a href="#1178-猜字谜" class="headerlink" title="1178. 猜字谜"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/number-of-valid-words-for-each-puzzle/">1178. 猜字谜</a></h4><p>难度困难141收藏分享切换为英文接收动态反馈</p>
+<p>外国友人仿照中国字谜设计了一个英文版猜字谜小游戏，请你来猜猜看吧。</p>
+<p>字谜的迷面 <code>puzzle</code> 按字符串形式给出，如果一个单词 <code>word</code> 符合下面两个条件，那么它就可以算作谜底：</p>
+<ul>
+<li>单词 <code>word</code> 中包含谜面 <code>puzzle</code> 的第一个字母。</li>
+<li>单词 <code>word</code> 中的每一个字母都可以在谜面 <code>puzzle</code> 中找到。<br>例如，如果字谜的谜面是 “abcdefg”，那么可以作为谜底的单词有 “faced”, “cabbage”, 和 “baggage”；而 “beefed”（不含字母 “a”）以及 “based”（其中的 “s” 没有出现在谜面中）都不能作为谜底。</li>
+</ul>
+<p>返回一个答案数组 <code>answer</code>，数组中的每个元素 <code>answer[i]</code> 是在给出的单词列表 <code>words</code> 中可以作为字谜迷面 <code>puzzles[i]</code> 所对应的谜底的单词数目。</p>
+<p><strong>示例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">输入：</span><br><span class="line">words &#x3D; [&quot;aaaa&quot;,&quot;asas&quot;,&quot;able&quot;,&quot;ability&quot;,&quot;actt&quot;,&quot;actor&quot;,&quot;access&quot;], </span><br><span class="line">puzzles &#x3D; [&quot;aboveyz&quot;,&quot;abrodyz&quot;,&quot;abslute&quot;,&quot;absoryz&quot;,&quot;actresz&quot;,&quot;gaswxyz&quot;]</span><br><span class="line">输出：[1,1,3,2,4,0]</span><br><span class="line">解释：</span><br><span class="line">1 个单词可以作为 &quot;aboveyz&quot; 的谜底 : &quot;aaaa&quot; </span><br><span class="line">1 个单词可以作为 &quot;abrodyz&quot; 的谜底 : &quot;aaaa&quot;</span><br><span class="line">3 个单词可以作为 &quot;abslute&quot; 的谜底 : &quot;aaaa&quot;, &quot;asas&quot;, &quot;able&quot;</span><br><span class="line">2 个单词可以作为 &quot;absoryz&quot; 的谜底 : &quot;aaaa&quot;, &quot;asas&quot;</span><br><span class="line">4 个单词可以作为 &quot;actresz&quot; 的谜底 : &quot;aaaa&quot;, &quot;asas&quot;, &quot;actt&quot;, &quot;access&quot;</span><br><span class="line">没有单词可以作为 &quot;gaswxyz&quot; 的谜底，因为列表中的单词都不含字母 &#39;g&#39;。</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>1 &lt;= words.length &lt;= 10^5</code></li>
+<li><code>4 &lt;= words[i].length &lt;= 50</code></li>
+<li><code>1 &lt;= puzzles.length &lt;= 10^4</code></li>
+<li><code>puzzles[i].length == 7</code></li>
+<li><code>words[i][j]</code>, <code>puzzles[i][j]</code> 都是小写英文字母。</li>
+<li>每个 <code>puzzles[i]</code> 所包含的字符都不重复。</li>
+</ul>
+<h1 id="哈希表-枚举二进制数子集"><a href="#哈希表-枚举二进制数子集" class="headerlink" title="哈希表+枚举二进制数子集"></a>哈希表+枚举二进制数子集</h1><p>将words中的每一个单词使用哈希转换成对应的二进制数字，例如一个单词是<code>abc</code>，生成的二进制数字为</p>
+<p><code>00000000 00000000 00000000 00000111</code></p>
+<p>其对应的十进制数字为<code>7</code>，将<code>7</code>作为<code>Map</code>的键，将单词出现的次数作为<code>Map</code>的值统计所有单词出现的次数。</p>
+<p>对于puzzle中的单词同样将数字转化成二进制的数字，枚举每个puzzle的二进制数字的子集，判断子集的数字是否在<code>Map</code>中出现来计算谜底的数量。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">findNumOfValidWords</span><span class="params">(String[] words, String[] puzzles)</span> </span>&#123;</span><br><span class="line">        Map&lt;Integer,Integer&gt; wMap=<span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> m=words.length;</span><br><span class="line">        <span class="keyword">int</span> n=puzzles.length;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;m;i++)&#123;</span><br><span class="line">            String w=words[i];</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> mask=<span class="number">0</span>;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>;j&lt;w.length();j++)&#123;</span><br><span class="line">                mask|=(<span class="number">1</span>&lt;&lt;w.charAt(j)-<span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(Integer.bitCount(mask)&lt;=<span class="number">7</span>)&#123;</span><br><span class="line">                wMap.put(mask,wMap.getOrDefault(mask,<span class="number">0</span>)+<span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        List&lt;Integer&gt; res=<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;n;i++)&#123;</span><br><span class="line">            <span class="keyword">int</span> total=<span class="number">0</span>;</span><br><span class="line">            String p=puzzles[i];</span><br><span class="line">            <span class="keyword">int</span> mask=<span class="number">0</span>;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">1</span>;j&lt;<span class="number">7</span>;j++)&#123;</span><br><span class="line">                mask|=(<span class="number">1</span>&lt;&lt;p.charAt(j)-<span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">int</span> subset=mask;</span><br><span class="line">            <span class="keyword">do</span>&#123;</span><br><span class="line">                <span class="keyword">int</span> s= subset|(<span class="number">1</span>&lt;&lt;p.charAt(<span class="number">0</span>)-<span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">                <span class="keyword">if</span>(wMap.containsKey(s))total+=wMap.get(s);</span><br><span class="line">                subset=(subset-<span class="number">1</span>)&amp;mask;</span><br><span class="line">            &#125;<span class="keyword">while</span>(subset!=mask);</span><br><span class="line"></span><br><span class="line">            res.add(total);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="哈希表-枚举二进制数子集-1"><a href="#哈希表-枚举二进制数子集-1" class="headerlink" title="哈希表+枚举二进制数子集"></a>哈希表+枚举二进制数子集</h1><p>枚举二进制子集方法有两种如下代码所示</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">findNumOfValidWords</span><span class="params">(String[] words, String[] puzzles)</span> </span>&#123;</span><br><span class="line">        Map&lt;Integer, Integer&gt; frequency = <span class="keyword">new</span> HashMap&lt;Integer, Integer&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (String word : words) &#123;</span><br><span class="line">            <span class="keyword">int</span> mask = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; word.length(); ++i) &#123;</span><br><span class="line">                <span class="keyword">char</span> ch = word.charAt(i);</span><br><span class="line">                mask |= (<span class="number">1</span> &lt;&lt; (ch - <span class="string">&#x27;a&#x27;</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (Integer.bitCount(mask) &lt;= <span class="number">7</span>) &#123;</span><br><span class="line">                frequency.put(mask, frequency.getOrDefault(mask, <span class="number">0</span>) + <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        List&lt;Integer&gt; ans = <span class="keyword">new</span> ArrayList&lt;Integer&gt;();</span><br><span class="line">        <span class="keyword">for</span> (String puzzle : puzzles) &#123;</span><br><span class="line">            <span class="keyword">int</span> total = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 枚举子集方法一</span></span><br><span class="line">            <span class="comment">// for (int choose = 0; choose &lt; (1 &lt;&lt; 6); ++choose) &#123;</span></span><br><span class="line">            <span class="comment">//     int mask = 0;</span></span><br><span class="line">            <span class="comment">//     for (int i = 0; i &lt; 6; ++i) &#123;</span></span><br><span class="line">            <span class="comment">//         if ((choose &amp; (1 &lt;&lt; i)) != 0) &#123;</span></span><br><span class="line">            <span class="comment">//             mask |= (1 &lt;&lt; (puzzle.charAt(i + 1) - &#x27;a&#x27;));</span></span><br><span class="line">            <span class="comment">//         &#125;</span></span><br><span class="line">            <span class="comment">//     &#125;</span></span><br><span class="line">            <span class="comment">//     mask |= (1 &lt;&lt; (puzzle.charAt(0) - &#x27;a&#x27;));</span></span><br><span class="line">            <span class="comment">//     if (frequency.containsKey(mask)) &#123;</span></span><br><span class="line">            <span class="comment">//         total += frequency.get(mask);</span></span><br><span class="line">            <span class="comment">//     &#125;</span></span><br><span class="line">            <span class="comment">// &#125;</span></span><br><span class="line"></span><br><span class="line">            <span class="comment">// 枚举子集方法二</span></span><br><span class="line">            <span class="keyword">int</span> mask = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; <span class="number">7</span>; ++i) &#123;</span><br><span class="line">                mask |= (<span class="number">1</span> &lt;&lt; (puzzle.charAt(i) - <span class="string">&#x27;a&#x27;</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">int</span> subset = mask;</span><br><span class="line">            <span class="keyword">do</span> &#123;</span><br><span class="line">                <span class="keyword">int</span> s = subset | (<span class="number">1</span> &lt;&lt; (puzzle.charAt(<span class="number">0</span>) - <span class="string">&#x27;a&#x27;</span>));</span><br><span class="line">                <span class="keyword">if</span> (frequency.containsKey(s)) &#123;</span><br><span class="line">                    total += frequency.get(s);</span><br><span class="line">                &#125;</span><br><span class="line">                subset = (subset - <span class="number">1</span>) &amp; mask;</span><br><span class="line">            &#125; <span class="keyword">while</span> (subset != mask);</span><br><span class="line">            </span><br><span class="line">            ans.add(total);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/number-of-valid-words-for-each-puzzle/solution/cai-zi-mi-by-leetcode-solution-345u/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+<h1 id="字典树"><a href="#字典树" class="headerlink" title="字典树"></a>字典树</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    TrieNode root;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">findNumOfValidWords</span><span class="params">(String[] words, String[] puzzles)</span> </span>&#123;</span><br><span class="line">        root = <span class="keyword">new</span> TrieNode();</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> (String word : words) &#123;</span><br><span class="line">            <span class="comment">// 将 word 中的字母按照字典序排序并去重</span></span><br><span class="line">            <span class="keyword">char</span>[] arr = word.toCharArray();</span><br><span class="line">            Arrays.sort(arr);</span><br><span class="line">            StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; arr.length; ++i) &#123;</span><br><span class="line">                <span class="keyword">if</span> (i == <span class="number">0</span> || arr[i] != arr[i - <span class="number">1</span>]) &#123;</span><br><span class="line">                    sb.append(arr[i]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 加入字典树中</span></span><br><span class="line">            add(root, sb.toString());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        List&lt;Integer&gt; ans = <span class="keyword">new</span> ArrayList&lt;Integer&gt;();</span><br><span class="line">        <span class="keyword">for</span> (String puzzle : puzzles) &#123;</span><br><span class="line">            <span class="keyword">char</span> required = puzzle.charAt(<span class="number">0</span>);</span><br><span class="line">            <span class="keyword">char</span>[] arr = puzzle.toCharArray();</span><br><span class="line">            Arrays.sort(arr);</span><br><span class="line">            ans.add(find(<span class="keyword">new</span> String(arr), required, root, <span class="number">0</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(TrieNode root, String word)</span> </span>&#123;</span><br><span class="line">        TrieNode cur = root;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; word.length(); ++i) &#123;</span><br><span class="line">            <span class="keyword">char</span> ch = word.charAt(i);</span><br><span class="line">            <span class="keyword">if</span> (cur.child[ch - <span class="string">&#x27;a&#x27;</span>] == <span class="keyword">null</span>) &#123;</span><br><span class="line">                cur.child[ch - <span class="string">&#x27;a&#x27;</span>] = <span class="keyword">new</span> TrieNode();</span><br><span class="line">            &#125;</span><br><span class="line">            cur = cur.child[ch - <span class="string">&#x27;a&#x27;</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        ++cur.frequency;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在回溯的过程中枚举 puzzle 的所有子集并统计答案</span></span><br><span class="line">    <span class="comment">// find(puzzle, required, cur, pos) 表示 puzzle 的首字母为 required, 当前搜索到字典树上的 cur 节点，并且准备枚举 puzzle 的第 pos 个字母是否选择（放入子集中）</span></span><br><span class="line">    <span class="comment">// find 函数的返回值即为谜底的数量</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">find</span><span class="params">(String puzzle, <span class="keyword">char</span> required, TrieNode cur, <span class="keyword">int</span> pos)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 搜索到空节点，不合法，返回 0</span></span><br><span class="line">        <span class="keyword">if</span> (cur == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 整个 puzzle 搜索完毕，返回谜底的数量</span></span><br><span class="line">        <span class="keyword">if</span> (pos == <span class="number">7</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> cur.frequency;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 选择第 pos 个字母</span></span><br><span class="line">        <span class="keyword">int</span> ret = find(puzzle, required, cur.child[puzzle.charAt(pos) - <span class="string">&#x27;a&#x27;</span>], pos + <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 当 puzzle.charAt(pos) 不为首字母时，可以不选择第 pos 个字母</span></span><br><span class="line">        <span class="keyword">if</span> (puzzle.charAt(pos) != required) &#123;</span><br><span class="line">            ret += find(puzzle, required, cur, pos + <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TrieNode</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> frequency;</span><br><span class="line">    TrieNode[] child;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TrieNode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        frequency = <span class="number">0</span>;</span><br><span class="line">        child = <span class="keyword">new</span> TrieNode[<span class="number">26</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/number-of-valid-words-for-each-puzzle/solution/cai-zi-mi-by-leetcode-solution-345u/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+<h1 id="字典树-1"><a href="#字典树-1" class="headerlink" title="字典树"></a>字典树</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    TrieNode root = <span class="keyword">new</span> TrieNode();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">findNumOfValidWords</span><span class="params">(String[] words, String[] puzzles)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (String word : words) &#123;</span><br><span class="line">            <span class="keyword">char</span>[] w = word.toCharArray();</span><br><span class="line">            Arrays.sort(w);</span><br><span class="line">            StringBuilder bd = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">            TrieNode temp = root;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span> ; i &lt; w.length ; i++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (bd.length() == <span class="number">0</span> || bd.charAt(bd.length() - <span class="number">1</span>) != w[i]) &#123;</span><br><span class="line">                    bd.append(w[i]);</span><br><span class="line">                    temp = temp.add(w[i]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            temp.count++;</span><br><span class="line">        &#125;</span><br><span class="line">        List&lt;Integer&gt; ans = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span>(String puzzle : puzzles) &#123;</span><br><span class="line">            <span class="keyword">char</span>[] p = puzzle.toCharArray();</span><br><span class="line">            Arrays.sort(p);</span><br><span class="line">            ans.add(find(p,root,<span class="number">0</span>,puzzle.charAt(<span class="number">0</span>)));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">Integer <span class="title">find</span><span class="params">(<span class="keyword">char</span>[] puzzle,TrieNode cur,<span class="keyword">int</span> index,<span class="keyword">char</span> pre)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (cur == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span> (index == <span class="number">7</span>)</span><br><span class="line">            <span class="keyword">return</span> cur.count;</span><br><span class="line">        <span class="keyword">int</span> ans = find(puzzle,cur.dect[puzzle[index] - <span class="string">&#x27;a&#x27;</span>],index + <span class="number">1</span>,pre);</span><br><span class="line">        <span class="keyword">if</span> (pre != puzzle[index])</span><br><span class="line">            ans += find(puzzle,cur,index + <span class="number">1</span>,pre); </span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">TrieNode</span> </span>&#123;</span><br><span class="line">        TrieNode[] dect = <span class="keyword">new</span> TrieNode[<span class="number">26</span>];</span><br><span class="line">        <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">        TrieNode () &#123;   </span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function">TrieNode <span class="title">add</span><span class="params">(<span class="keyword">char</span> ch)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.dect[ch - <span class="string">&#x27;a&#x27;</span>] == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">this</span>.dect[ch - <span class="string">&#x27;a&#x27;</span>] = <span class="keyword">new</span> TrieNode();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.dect[ch - <span class="string">&#x27;a&#x27;</span>];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>参考文献</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/number-of-valid-words-for-each-puzzle/solution/cai-zi-mi-by-leetcode-solution-345u/">LeetCode-Solution</a></p>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/number-of-valid-words-for-each-puzzle/comments/803752">かなみ的评论</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/02/26/%E7%8C%9C%E5%AD%97%E8%B0%9C/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-操作系统" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -3539,221 +3866,6 @@ tex2jax: {
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/02/22/%E6%95%B0%E6%8D%AE%E5%BA%93/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-托普利茨矩阵" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/22/%E6%89%98%E6%99%AE%E5%88%A9%E8%8C%A8%E7%9F%A9%E9%98%B5/">托普利茨矩阵</a>
-    </h1>
-  
-
-        
-        <a href="/2021/02/22/%E6%89%98%E6%99%AE%E5%88%A9%E8%8C%A8%E7%9F%A9%E9%98%B5/" class="archive-article-date">
-  	<time datetime="2021-02-22T14:01:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-22</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="766-托普利茨矩阵"><a href="#766-托普利茨矩阵" class="headerlink" title="766. 托普利茨矩阵"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/toeplitz-matrix/">766. 托普利茨矩阵</a></h4><p>难度简单206收藏分享切换为英文接收动态反馈</p>
-<p>给你一个 <code>m x n</code> 的矩阵 <code>matrix</code> 。如果这个矩阵是托普利茨矩阵，返回 <code>true</code> ；否则，返回 <code>false</code> <em>。</em></p>
-<p>如果矩阵上每一条由左上到右下的对角线上的元素都相同，那么这个矩阵是 <strong>托普利茨矩阵</strong> 。</p>
-<p><strong>示例 1：</strong></p>
-<p><img src="https://assets.leetcode.com/uploads/2020/11/04/ex1.jpg" alt="img"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">输入：matrix &#x3D; [[1,2,3,4],[5,1,2,3],[9,5,1,2]]</span><br><span class="line">输出：true</span><br><span class="line">解释：</span><br><span class="line">在上述矩阵中, 其对角线为: </span><br><span class="line">&quot;[9]&quot;, &quot;[5, 5]&quot;, &quot;[1, 1, 1]&quot;, &quot;[2, 2, 2]&quot;, &quot;[3, 3]&quot;, &quot;[4]&quot;。 </span><br><span class="line">各条对角线上的所有元素均相同, 因此答案是 True 。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<p><img src="https://assets.leetcode.com/uploads/2020/11/04/ex2.jpg" alt="img"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：matrix &#x3D; [[1,2],[2,2]]</span><br><span class="line">输出：false</span><br><span class="line">解释：</span><br><span class="line">对角线 &quot;[1, 2]&quot; 上的元素不同。</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>m == matrix.length</code></li>
-<li><code>n == matrix[i].length</code></li>
-<li><code>1 &lt;= m, n &lt;= 20</code></li>
-<li><code>0 &lt;= matrix[i][j] &lt;= 99</code></li>
-</ul>
-<p><strong>进阶：</strong></p>
-<ul>
-<li><p>如果矩阵存储在磁盘上，并且内存有限，以至于一次最多只能将矩阵的一行加载到内存中，该怎么办？</p>
-</li>
-<li><p>如果矩阵太大，以至于一次只能将不完整的一行加载到内存中，该怎么办？</p>
-</li>
-</ul>
-<h1 id="对角线-hashMap"><a href="#对角线-hashMap" class="headerlink" title="对角线+hashMap"></a>对角线+hashMap</h1><p>  矩阵的正对角线的上的元素的 <code>i-j</code> 相同,利用map记录<code>i-j</code>的值，如果下次遇到这个对角线上的元素并且值不与这个对角线上应有的值相同，那么不满足条件，否则满足条件</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isToeplitzMatrix</span><span class="params">(<span class="keyword">int</span>[][] matrix)</span> </span>&#123;</span><br><span class="line">        Map&lt;Integer,Integer&gt; map=<span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">60</span>);</span><br><span class="line">        <span class="keyword">int</span> m = matrix.length;</span><br><span class="line">        <span class="keyword">int</span> n = matrix[<span class="number">0</span>].length;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;m;i++)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>;j&lt;n;j++)&#123;</span><br><span class="line">                <span class="keyword">if</span>(map.containsKey(i-j))&#123;</span><br><span class="line">                    <span class="keyword">int</span> val=map.get(i-j);</span><br><span class="line">                    <span class="keyword">if</span>(val!=matrix[i][j])<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">                &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                    map.put(i-j,matrix[i][j]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h1 id="遍历"><a href="#遍历" class="headerlink" title="遍历"></a>遍历</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isToeplitzMatrix</span><span class="params">(<span class="keyword">int</span>[][] matrix)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> m = matrix.length, n = matrix[<span class="number">0</span>].length;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; m; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; j &lt; n; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (matrix[i][j] != matrix[i - <span class="number">1</span>][j - <span class="number">1</span>]) &#123;</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/toeplitz-matrix/solution/tuo-pu-li-ci-ju-zhen-by-leetcode-solutio-57bb/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/02/22/%E6%89%98%E6%99%AE%E5%88%A9%E8%8C%A8%E7%9F%A9%E9%98%B5/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-绝对值不超过限制的最长连续数组" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/21/%E7%BB%9D%E5%AF%B9%E5%80%BC%E4%B8%8D%E8%B6%85%E8%BF%87%E9%99%90%E5%88%B6%E7%9A%84%E6%9C%80%E9%95%BF%E8%BF%9E%E7%BB%AD%E6%95%B0%E7%BB%84/">绝对值不超过限制的最长连续数组</a>
-    </h1>
-  
-
-        
-        <a href="/2021/02/21/%E7%BB%9D%E5%AF%B9%E5%80%BC%E4%B8%8D%E8%B6%85%E8%BF%87%E9%99%90%E5%88%B6%E7%9A%84%E6%9C%80%E9%95%BF%E8%BF%9E%E7%BB%AD%E6%95%B0%E7%BB%84/" class="archive-article-date">
-  	<time datetime="2021-02-21T09:30:12.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-21</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="1438-绝对差不超过限制的最长连续子数组"><a href="#1438-绝对差不超过限制的最长连续子数组" class="headerlink" title="1438. 绝对差不超过限制的最长连续子数组"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/">1438. 绝对差不超过限制的最长连续子数组</a></h4><p>难度中等</p>
-<p>给你一个整数数组 <code>nums</code> ，和一个表示限制的整数 <code>limit</code>，请你返回最长连续子数组的长度，该子数组中的任意两个元素之间的绝对差必须小于或者等于 <code>limit</code> <em>。</em></p>
-<p>如果不存在满足条件的子数组，则返回 <code>0</code> 。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [8,2,4,7], limit &#x3D; 4</span><br><span class="line">输出：2 </span><br><span class="line">解释：所有子数组如下：</span><br><span class="line">[8] 最大绝对差 |8-8| &#x3D; 0 &lt;&#x3D; 4.</span><br><span class="line">[8,2] 最大绝对差 |8-2| &#x3D; 6 &gt; 4. </span><br><span class="line">[8,2,4] 最大绝对差 |8-2| &#x3D; 6 &gt; 4.</span><br><span class="line">[8,2,4,7] 最大绝对差 |8-2| &#x3D; 6 &gt; 4.</span><br><span class="line">[2] 最大绝对差 |2-2| &#x3D; 0 &lt;&#x3D; 4.</span><br><span class="line">[2,4] 最大绝对差 |2-4| &#x3D; 2 &lt;&#x3D; 4.</span><br><span class="line">[2,4,7] 最大绝对差 |2-7| &#x3D; 5 &gt; 4.</span><br><span class="line">[4] 最大绝对差 |4-4| &#x3D; 0 &lt;&#x3D; 4.</span><br><span class="line">[4,7] 最大绝对差 |4-7| &#x3D; 3 &lt;&#x3D; 4.</span><br><span class="line">[7] 最大绝对差 |7-7| &#x3D; 0 &lt;&#x3D; 4. </span><br><span class="line">因此，满足题意的最长子数组的长度为 2 。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [10,1,2,4,7,2], limit &#x3D; 5</span><br><span class="line">输出：4 </span><br><span class="line">解释：满足题意的最长子数组是 [2,4,7,2]，其最大绝对差 |2-7| &#x3D; 5 &lt;&#x3D; 5 。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [4,2,2,2,4,4,2,2], limit &#x3D; 0</span><br><span class="line">输出：3</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= nums.length &lt;= 10^5</code></li>
-<li><code>1 &lt;= nums[i] &lt;= 10^9</code></li>
-<li><code>0 &lt;= limit &lt;= 10^9</code></li>
-</ul>
-<h1 id="红黑树-滑动窗口"><a href="#红黑树-滑动窗口" class="headerlink" title="红黑树+滑动窗口"></a>红黑树+滑动窗口</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">longestSubarray</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> limit)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n=nums.length;</span><br><span class="line">        <span class="keyword">if</span>(n==<span class="number">0</span>)<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> l=<span class="number">0</span>,r=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> res=<span class="number">0</span>;</span><br><span class="line">        TreeMap&lt;Integer,Integer&gt; map=<span class="keyword">new</span> TreeMap();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(r&lt;n)&#123;</span><br><span class="line">            map.put(nums[r],map.getOrDefault(nums[r],<span class="number">0</span>)+<span class="number">1</span>);</span><br><span class="line">            <span class="keyword">while</span>(map.lastKey()-map.firstKey()&gt;limit)&#123;</span><br><span class="line">                <span class="keyword">int</span> val=map.get(nums[l])-<span class="number">1</span>;</span><br><span class="line">                <span class="keyword">if</span>(val&lt;=<span class="number">0</span>)&#123;</span><br><span class="line">                    map.remove(nums[l]);</span><br><span class="line">                &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                    map.put(nums[l],val);</span><br><span class="line">                &#125;</span><br><span class="line">                l++;                </span><br><span class="line">            &#125;</span><br><span class="line">            res=Math.max(r-l+<span class="number">1</span>,res);</span><br><span class="line">            r++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>方法二：滑动窗口 + 单调队列</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">longestSubarray</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> limit)</span> </span>&#123;</span><br><span class="line">        Deque&lt;Integer&gt; queMax = <span class="keyword">new</span> LinkedList&lt;Integer&gt;();</span><br><span class="line">        Deque&lt;Integer&gt; queMin = <span class="keyword">new</span> LinkedList&lt;Integer&gt;();</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>, right = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> ret = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (right &lt; n) &#123;</span><br><span class="line">            <span class="keyword">while</span> (!queMax.isEmpty() &amp;&amp; queMax.peekLast() &lt; nums[right]) &#123;</span><br><span class="line">                queMax.pollLast();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">while</span> (!queMin.isEmpty() &amp;&amp; queMin.peekLast() &gt; nums[right]) &#123;</span><br><span class="line">                queMin.pollLast();</span><br><span class="line">            &#125;</span><br><span class="line">            queMax.offerLast(nums[right]);</span><br><span class="line">            queMin.offerLast(nums[right]);</span><br><span class="line">            <span class="keyword">while</span> (!queMax.isEmpty() &amp;&amp; !queMin.isEmpty() &amp;&amp; queMax.peekFirst() - queMin.peekFirst() &gt; limit) &#123;</span><br><span class="line">                <span class="keyword">if</span> (nums[left] == queMin.peekFirst()) &#123;</span><br><span class="line">                    queMin.pollFirst();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (nums[left] == queMax.peekFirst()) &#123;</span><br><span class="line">                    queMax.pollFirst();</span><br><span class="line">                &#125;</span><br><span class="line">                left++;</span><br><span class="line">            &#125;</span><br><span class="line">            ret = Math.max(ret, right - left + <span class="number">1</span>);</span><br><span class="line">            right++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/solution/jue-dui-chai-bu-chao-guo-xian-zhi-de-zui-5bki/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">滑动窗口</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">红黑树</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/02/21/%E7%BB%9D%E5%AF%B9%E5%80%BC%E4%B8%8D%E8%B6%85%E8%BF%87%E9%99%90%E5%88%B6%E7%9A%84%E6%9C%80%E9%95%BF%E8%BF%9E%E7%BB%AD%E6%95%B0%E7%BB%84/">展开全文 >></a>
         </p>
       
 
