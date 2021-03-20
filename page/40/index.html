@@ -150,6 +150,404 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-最接近的三数之和" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/12/29/%E6%9C%80%E6%8E%A5%E8%BF%91%E7%9A%84%E4%B8%89%E6%95%B0%E4%B9%8B%E5%92%8C/">最接近的三数之和</a>
+    </h1>
+  
+
+        
+        <a href="/2020/12/29/%E6%9C%80%E6%8E%A5%E8%BF%91%E7%9A%84%E4%B8%89%E6%95%B0%E4%B9%8B%E5%92%8C/" class="archive-article-date">
+  	<time datetime="2020-12-29T13:45:36.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">给定一个包括 n 个整数的数组 nums 和 一个目标值 target。找出 nums 中的三个整数，使得它们的和与 target 最接近。返回这三个数的和。假定每组输入只存在唯一答案。</span><br><span class="line"></span><br><span class="line">示例：</span><br><span class="line"></span><br><span class="line">输入：nums &#x3D; [-1,2,1,-4], target &#x3D; 1</span><br><span class="line">输出：2</span><br><span class="line">解释：与 target 最接近的和是 2 (-1 + 2 + 1 &#x3D; 2) 。</span><br><span class="line"></span><br><span class="line">提示：</span><br><span class="line"></span><br><span class="line">3 &lt;&#x3D; nums.length &lt;&#x3D; 10^3</span><br><span class="line">-10^3 &lt;&#x3D; nums[i] &lt;&#x3D; 10^3</span><br><span class="line">-10^4 &lt;&#x3D; target &lt;&#x3D; 10^4</span><br><span class="line">通过次数175,828提交次数383,553</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;3sum-closest</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h1 id="先排序"><a href="#先排序" class="headerlink" title="先排序"></a>先排序</h1><p><strong><em>然后从开始固定一个数字，对于另外的两个数字从第一个数字之后使用双指针，一个在第一个数字之后，一个在数组的最后。如果三个数的和大于target,右指针right–，如果和小于target，左指针left++，同时记录每个与target差值最小的sum，返回</em></strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">threeSumClosest</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">        Arrays.sort(nums);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> minSum = Integer.MAX_VALUE;</span><br><span class="line">        <span class="keyword">int</span> minDiff = Integer.MAX_VALUE;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">            left = i + <span class="number">1</span>;</span><br><span class="line">            right = nums.length - <span class="number">1</span>;</span><br><span class="line">            <span class="keyword">while</span> (left &lt; right) &#123;</span><br><span class="line">                <span class="keyword">int</span> sum = nums[i] + nums[left] + nums[right];</span><br><span class="line"></span><br><span class="line">                <span class="keyword">int</span> diff = Math.abs(sum - target);</span><br><span class="line">                <span class="keyword">if</span> (diff &lt; minDiff) &#123;</span><br><span class="line">                    minDiff = diff;</span><br><span class="line">                    minSum = sum;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (target &lt; sum) &#123;</span><br><span class="line">                    right--;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (target &gt; sum) &#123;</span><br><span class="line">                    left++;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">return</span> sum;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> minSum;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">双指针</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/12/29/%E6%9C%80%E6%8E%A5%E8%BF%91%E7%9A%84%E4%B8%89%E6%95%B0%E4%B9%8B%E5%92%8C/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-特定深度节点链表" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/12/29/%E7%89%B9%E5%AE%9A%E6%B7%B1%E5%BA%A6%E8%8A%82%E7%82%B9%E9%93%BE%E8%A1%A8/">特定深度节点链表</a>
+    </h1>
+  
+
+        
+        <a href="/2020/12/29/%E7%89%B9%E5%AE%9A%E6%B7%B1%E5%BA%A6%E8%8A%82%E7%82%B9%E9%93%BE%E8%A1%A8/" class="archive-article-date">
+  	<time datetime="2020-12-29T12:50:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">给定一棵二叉树，设计一个算法，创建含有某一深度上所有节点的链表（比如，若一棵树的深度为 D，则会创建出 D 个链表）。返回一个包含所有深度的链表的数组。</span><br><span class="line"></span><br><span class="line">示例：</span><br><span class="line"></span><br><span class="line">输入：[1,2,3,4,5,null,7,8]</span><br><span class="line"></span><br><span class="line">        1</span><br><span class="line">       &#x2F;  \ </span><br><span class="line">      2    3</span><br><span class="line">     &#x2F; \    \ </span><br><span class="line">    4   5    7</span><br><span class="line">   &#x2F;</span><br><span class="line">  8</span><br><span class="line"></span><br><span class="line">输出：[[1],[2,3],[4,5,7],[8]]</span><br><span class="line">通过次数13,806提交次数17,179</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;list-of-depth-lcci</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Definition for a binary tree node.</span></span><br><span class="line"><span class="comment"> * public class TreeNode &#123;</span></span><br><span class="line"><span class="comment"> *     int val;</span></span><br><span class="line"><span class="comment"> *     TreeNode left;</span></span><br><span class="line"><span class="comment"> *     TreeNode right;</span></span><br><span class="line"><span class="comment"> *     TreeNode(int x) &#123; val = x; &#125;</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Definition for singly-linked list.</span></span><br><span class="line"><span class="comment"> * public class ListNode &#123;</span></span><br><span class="line"><span class="comment"> *     int val;</span></span><br><span class="line"><span class="comment"> *     ListNode next;</span></span><br><span class="line"><span class="comment"> *     ListNode(int x) &#123; val = x; &#125;</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> ListNode[] listOfDepth(TreeNode tree) &#123;</span><br><span class="line">        <span class="keyword">if</span> (tree == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">new</span> ListNode[]&#123;&#125;;</span><br><span class="line"></span><br><span class="line">        Queue&lt;TreeNode&gt; queue = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        queue.offer(tree);</span><br><span class="line"></span><br><span class="line">        List&lt;ListNode&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (!queue.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">int</span> size = queue.size();</span><br><span class="line"></span><br><span class="line">            TreeNode root = queue.poll();</span><br><span class="line">            ListNode node = <span class="keyword">new</span> ListNode(root.val);</span><br><span class="line">            list.add(node);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (root.left != <span class="keyword">null</span>) queue.offer(root.left);</span><br><span class="line">            <span class="keyword">if</span> (root.right != <span class="keyword">null</span>) queue.offer(root.right);</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; size; i++) &#123;</span><br><span class="line">                root = queue.poll();</span><br><span class="line">                node.next = <span class="keyword">new</span> ListNode(root.val);</span><br><span class="line">                node = node.next;</span><br><span class="line">                <span class="keyword">if</span> (root.left != <span class="keyword">null</span>) queue.offer(root.left);</span><br><span class="line">                <span class="keyword">if</span> (root.right != <span class="keyword">null</span>) queue.offer(root.right);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ListNode[] res = <span class="keyword">new</span> ListNode[list.size()];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; list.size(); i++) &#123;</span><br><span class="line">            res[i] = list.get(i);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">二叉树</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/12/29/%E7%89%B9%E5%AE%9A%E6%B7%B1%E5%BA%A6%E8%8A%82%E7%82%B9%E9%93%BE%E8%A1%A8/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-按要求补齐数组(重点)" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/12/29/%E6%8C%89%E8%A6%81%E6%B1%82%E8%A1%A5%E9%BD%90%E6%95%B0%E7%BB%84(%E9%87%8D%E7%82%B9)/">按要求补齐数组</a>
+    </h1>
+  
+
+        
+        <a href="/2020/12/29/%E6%8C%89%E8%A6%81%E6%B1%82%E8%A1%A5%E9%BD%90%E6%95%B0%E7%BB%84(%E9%87%8D%E7%82%B9)/" class="archive-article-date">
+  	<time datetime="2020-12-29T02:31:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="330-按要求补齐数组"><a href="#330-按要求补齐数组" class="headerlink" title="330. 按要求补齐数组"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/patching-array/">330. 按要求补齐数组</a></h4><p>难度：困难</p>
+<p>给定一个已排序的正整数数组 <em>nums<em>和一个正整数 *n</em>，从 <code>[1, n]</code> 区间内选取任意个数字补充到 *nums</em> 中，使得 <code>[1, n]</code> 区间内的任何数字都可以用 <em>nums</em> 中某几个数字的和来表示。请输出满足上述要求的最少需要补充的数字个数。</p>
+<p><strong>示例 1:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">输入: nums &#x3D; [1,3], n &#x3D; 6</span><br><span class="line">输出: 1 </span><br><span class="line">解释:</span><br><span class="line">根据 nums 里现有的组合 [1], [3], [1,3]，可以得出 1, 3, 4。</span><br><span class="line">现在如果我们将 2 添加到 nums 中， 组合变为: [1], [2], [3], [1,3], [2,3], [1,2,3]。</span><br><span class="line">其和可以表示数字 1, 2, 3, 4, 5, 6，能够覆盖 [1, 6] 区间里所有的数。</span><br><span class="line">所以我们最少需要添加一个数字。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入: nums &#x3D; [1,5,10], n &#x3D; 20</span><br><span class="line">输出: 2</span><br><span class="line">解释: 我们需要添加 [2, 4]。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 3:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: nums &#x3D; [1,2,2], n &#x3D; 5</span><br><span class="line">输出: 0</span><br></pre></td></tr></table></figure>
+<h1 id="贪心"><a href="#贪心" class="headerlink" title="贪心"></a>贪心</h1><p>对于正整数 <code>x</code>，如果区间 <code>[1,x-1]</code> 内的所有数字都已经被覆盖，且 <code>x</code> 在数组中，则区间 <code>[1,2x-1]</code> 内的所有数字也都被覆盖。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">minPatches</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> addNum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">long</span> x = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> length = nums.length, index = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (x &lt;= n) &#123;</span><br><span class="line">            <span class="keyword">if</span> (index &lt; length &amp;&amp; nums[index] &lt;= x) &#123;</span><br><span class="line">                x += nums[index];</span><br><span class="line">                index++;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                x *= <span class="number">2</span>;</span><br><span class="line">                addNum++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> addNum;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>参考文献</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/patching-array/solution/an-yao-qiu-bu-qi-shu-zu-by-leetcode-solu-klp1/">按要求补齐数组<br>力扣官方题解</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;patching-array&#x2F;solution&#x2F;an-yao-qiu-bu-qi-shu-zu-by-leetcode-solu-klp1&#x2F;</span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">贪心</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/12/29/%E6%8C%89%E8%A6%81%E6%B1%82%E8%A1%A5%E9%BD%90%E6%95%B0%E7%BB%84(%E9%87%8D%E7%82%B9)/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-节点间通路" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/12/29/%E8%8A%82%E7%82%B9%E9%97%B4%E9%80%9A%E8%B7%AF/">节点间通路</a>
+    </h1>
+  
+
+        
+        <a href="/2020/12/29/%E8%8A%82%E7%82%B9%E9%97%B4%E9%80%9A%E8%B7%AF/" class="archive-article-date">
+  	<time datetime="2020-12-29T01:20:44.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">节点间通路。给定有向图，设计一个算法，找出两个节点之间是否存在一条路径。</span><br><span class="line"></span><br><span class="line">示例1:</span><br><span class="line"> 输入：n &#x3D; 3, graph &#x3D; [[0, 1], [0, 2], [1, 2], [1, 2]], start &#x3D; 0, target &#x3D; 2</span><br><span class="line"> 输出：true</span><br><span class="line"></span><br><span class="line">示例2:</span><br><span class="line"> 输入：n &#x3D; 5, graph &#x3D; [[0, 1], [0, 2], [0, 4], [0, 4], [0, 1], [1, 3], [1, 4], [1, 3], [2, 3], [3, 4]], start &#x3D; 0, target &#x3D; 4</span><br><span class="line"> 输出 true</span><br><span class="line">提示：</span><br><span class="line"></span><br><span class="line">节点数量n在[0, 1e5]范围内。</span><br><span class="line">节点编号大于等于 0 小于 n。</span><br><span class="line">图中可能存在自环和平行边。</span><br><span class="line">通过次数9,562提交次数18,034</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;route-between-nodes-lcci</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">findWhetherExistsPath</span><span class="params">(<span class="keyword">int</span> n, <span class="keyword">int</span>[][] graph, <span class="keyword">int</span> start, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">        Map&lt;Integer, Set&lt;Integer&gt;&gt; neiTable = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; graph.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (graph[i][<span class="number">0</span>] == graph[i][<span class="number">1</span>]) <span class="keyword">continue</span>;</span><br><span class="line">            neiTable.computeIfAbsent(graph[i][<span class="number">0</span>], k -&gt; <span class="keyword">new</span> HashSet&lt;&gt;()).add(graph[i][<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> dfs(neiTable, start, target);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">dfs</span><span class="params">(Map&lt;Integer, Set&lt;Integer&gt;&gt; neiTable, <span class="keyword">int</span> start, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (start == target) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">for</span> (Integer nei : neiTable.getOrDefault(start, <span class="keyword">new</span> HashSet&lt;&gt;())) &#123;</span><br><span class="line">            <span class="keyword">if</span> (dfs(neiTable, nei, target)) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>参考文献</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/route-between-nodes-lcci/solution/shen-du-you-xian-sou-suo-by-supermanblue-oxrn/">深度优先搜索作者：王小强</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">图</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/12/29/%E8%8A%82%E7%82%B9%E9%97%B4%E9%80%9A%E8%B7%AF/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-堆盘子" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/12/28/%E5%A0%86%E7%9B%98%E5%AD%90/">堆盘子</a>
+    </h1>
+  
+
+        
+        <a href="/2020/12/28/%E5%A0%86%E7%9B%98%E5%AD%90/" class="archive-article-date">
+  	<time datetime="2020-12-28T12:55:43.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-28</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">堆盘子。设想有一堆盘子，堆太高可能会倒下来。因此，在现实生活中，盘子堆到一定高度时，我们就会另外堆一堆盘子。请实现数据结构SetOfStacks，模拟这种行为。SetOfStacks应该由多个栈组成，并且在前一个栈填满时新建一个栈。此外，SetOfStacks.push()和SetOfStacks.pop()应该与普通栈的操作方法相同（也就是说，pop()返回的值，应该跟只有一个栈时的情况一样）。 进阶：实现一个popAt(int index)方法，根据指定的子栈，执行pop操作。</span><br><span class="line"></span><br><span class="line">当某个栈为空时，应当删除该栈。当栈中没有元素或不存在该栈时，pop，popAt 应返回 -1.</span><br><span class="line"></span><br><span class="line">示例1:</span><br><span class="line"></span><br><span class="line"> 输入：</span><br><span class="line">[&quot;StackOfPlates&quot;, &quot;push&quot;, &quot;push&quot;, &quot;popAt&quot;, &quot;pop&quot;, &quot;pop&quot;]</span><br><span class="line">[[1], [1], [2], [1], [], []]</span><br><span class="line"> 输出：</span><br><span class="line">[null, null, null, 2, 1, -1]</span><br><span class="line">示例2:</span><br><span class="line"></span><br><span class="line"> 输入：</span><br><span class="line">[&quot;StackOfPlates&quot;, &quot;push&quot;, &quot;push&quot;, &quot;push&quot;, &quot;popAt&quot;, &quot;popAt&quot;, &quot;popAt&quot;]</span><br><span class="line">[[2], [1], [2], [3], [0], [0], [0]]</span><br><span class="line"> 输出：</span><br><span class="line">[null, null, null, null, 2, 1, 3]</span><br><span class="line">通过次数3,995提交次数10,710</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;stack-of-plates-lcci</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StackOfPlates</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">MStack</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> cap = <span class="number">0</span>;</span><br><span class="line">        List&lt;Integer&gt; stack = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">MStack</span><span class="params">(<span class="keyword">int</span> cap)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.cap = cap;</span><br><span class="line">            stack = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">pop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (!stack.isEmpty()) &#123;</span><br><span class="line">                <span class="keyword">int</span> index = stack.size() - <span class="number">1</span>;</span><br><span class="line">                <span class="keyword">int</span> res = stack.get(index);</span><br><span class="line">                stack.remove(index);</span><br><span class="line">                <span class="keyword">return</span> res;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">push</span><span class="params">(Integer val)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (stack.size() &lt; cap) &#123;</span><br><span class="line">                stack.add(val);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getSize</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> stack.size();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> cap = <span class="number">0</span>;</span><br><span class="line">    List&lt;MStack&gt; stackList = <span class="keyword">null</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">StackOfPlates</span><span class="params">(<span class="keyword">int</span> cap)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.cap = cap;</span><br><span class="line">        <span class="keyword">this</span>.stackList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">push</span><span class="params">(<span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (stackList.isEmpty()) &#123;</span><br><span class="line">            MStack s = <span class="keyword">new</span> MStack(cap);</span><br><span class="line">            s.push(val);</span><br><span class="line">            stackList.add(s);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">boolean</span> isSucc = stackList.get(stackList.size() - <span class="number">1</span>).push(val);</span><br><span class="line">            <span class="keyword">if</span> (!isSucc) &#123;</span><br><span class="line">                MStack s = <span class="keyword">new</span> MStack(cap);</span><br><span class="line">                s.push(val);</span><br><span class="line">                stackList.add(s);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">pop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> res = -<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (!stackList.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">int</span> index = stackList.size() - <span class="number">1</span>;</span><br><span class="line">            MStack s = stackList.get(index);</span><br><span class="line">            res = s.pop();</span><br><span class="line">            <span class="keyword">if</span> (s.getSize() == <span class="number">0</span>) &#123;</span><br><span class="line">                stackList.remove(index);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> res;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">popAt</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> res = -<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (index &lt; stackList.size()) &#123;</span><br><span class="line">            MStack s = stackList.get(index);</span><br><span class="line">            res = s.pop();</span><br><span class="line">            <span class="keyword">if</span> (s.getSize() == <span class="number">0</span>) &#123;</span><br><span class="line">                stackList.remove(index);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Your StackOfPlates object will be instantiated and called as such:</span></span><br><span class="line"><span class="comment"> * StackOfPlates obj = new StackOfPlates(cap);</span></span><br><span class="line"><span class="comment"> * obj.push(val);</span></span><br><span class="line"><span class="comment"> * int param_2 = obj.pop();</span></span><br><span class="line"><span class="comment"> * int param_3 = obj.popAt(index);</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/12/28/%E5%A0%86%E7%9B%98%E5%AD%90/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-环路检测" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -594,451 +992,9 @@
 
 
   
-    <article id="post-吃苹果的最大数目" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/12/27/%E5%90%83%E8%8B%B9%E6%9E%9C%E7%9A%84%E6%9C%80%E5%A4%A7%E6%95%B0%E7%9B%AE/">吃苹果的最大数目</a>
-    </h1>
-  
-
-        
-        <a href="/2020/12/27/%E5%90%83%E8%8B%B9%E6%9E%9C%E7%9A%84%E6%9C%80%E5%A4%A7%E6%95%B0%E7%9B%AE/" class="archive-article-date">
-  	<time datetime="2020-12-27T06:00:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-27</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="1705-吃苹果的最大数目"><a href="#1705-吃苹果的最大数目" class="headerlink" title="1705. 吃苹果的最大数目"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/maximum-number-of-eaten-apples/">1705. 吃苹果的最大数目</a></h4><p>难度：中等</p>
-<p>有一棵特殊的苹果树，一连 <code>n</code> 天，每天都可以长出若干个苹果。在第 <code>i</code> 天，树上会长出 <code>apples[i]</code> 个苹果，这些苹果将会在 <code>days[i]</code> 天后（也就是说，第 <code>i + days[i]</code> 天时）腐烂，变得无法食用。也可能有那么几天，树上不会长出新的苹果，此时用 <code>apples[i] == 0</code> 且 <code>days[i] == 0</code> 表示。</p>
-<p>你打算每天 <strong>最多</strong> 吃一个苹果来保证营养均衡。注意，你可以在这 <code>n</code> 天之后继续吃苹果。</p>
-<p>给你两个长度为 <code>n</code> 的整数数组 <code>days</code> 和 <code>apples</code> ，返回你可以吃掉的苹果的最大数目<em>。</em></p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">输入：apples &#x3D; [1,2,3,5,2], days &#x3D; [3,2,1,4,2]</span><br><span class="line">输出：7</span><br><span class="line">解释：你可以吃掉 7 个苹果：</span><br><span class="line">- 第一天，你吃掉第一天长出来的苹果。</span><br><span class="line">- 第二天，你吃掉一个第二天长出来的苹果。</span><br><span class="line">- 第三天，你吃掉一个第二天长出来的苹果。过了这一天，第三天长出来的苹果就已经腐烂了。</span><br><span class="line">- 第四天到第七天，你吃的都是第四天长出来的苹果。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">输入：apples &#x3D; [3,0,0,0,0,2], days &#x3D; [3,0,0,0,0,2]</span><br><span class="line">输出：5</span><br><span class="line">解释：你可以吃掉 5 个苹果：</span><br><span class="line">- 第一天到第三天，你吃的都是第一天长出来的苹果。</span><br><span class="line">- 第四天和第五天不吃苹果。</span><br><span class="line">- 第六天和第七天，你吃的都是第六天长出来的苹果。</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>apples.length == n</code></li>
-<li><code>days.length == n</code></li>
-<li><code>1 &lt;= n &lt;= 2 * 104</code></li>
-<li><code>0 &lt;= apples[i], days[i] &lt;= 2 * 104</code></li>
-<li>只有在 <code>apples[i] = 0</code> 时，<code>days[i] = 0</code> 才成立</li>
-</ul>
-<h1 id="优先队列"><a href="#优先队列" class="headerlink" title="优先队列"></a>优先队列</h1><p><strong>新产生的和过期日期早的相比，过期日期早的先吃掉</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">eatenApples</span><span class="params">(<span class="keyword">int</span>[] apples, <span class="keyword">int</span>[] days)</span> </span>&#123;</span><br><span class="line">        PriorityQueue&lt;<span class="keyword">int</span>[]&gt; q = <span class="keyword">new</span> PriorityQueue&lt;&gt;(Comparator.comparingInt(x -&gt; x[<span class="number">0</span>]));</span><br><span class="line">        <span class="keyword">int</span> day = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; ; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (i &lt; apples.length &amp;&amp; apples[i] &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                q.offer(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;i + days[i], apples[i]&#125;);                     <span class="comment">//在i+days[i]过期日期有apples[i]个苹果</span></span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (i &gt;= apples.length &amp;&amp; q.isEmpty()) &#123;                     <span class="comment">//当没有苹果产生时，队列为空就不会再有苹果了</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">while</span> (!q.isEmpty() &amp;&amp; (q.peek()[<span class="number">0</span>] &lt;= i || q.peek()[<span class="number">1</span>] &lt;= <span class="number">0</span>)) &#123;    <span class="comment">//如果已经过期或者当前index有0个苹果</span></span><br><span class="line">                q.poll();                                                       <span class="comment">//取出</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (!q.isEmpty()) &#123;                                                 <span class="comment">//如果队列不为空</span></span><br><span class="line">                q.peek()[<span class="number">1</span>] -= <span class="number">1</span>;                                               <span class="comment">//把过期日期早的苹果吃掉</span></span><br><span class="line">                day++;                                                          <span class="comment">//天数+1</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> day;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>参考文献</p>
-</blockquote>
-<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/maximum-number-of-eaten-apples/solution/you-xian-dui-lie-fang-fa-by-xhldtc-t8t5/">作者：xhldtc，优先队列方法</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/12/27/%E5%90%83%E8%8B%B9%E6%9E%9C%E7%9A%84%E6%9C%80%E5%A4%A7%E6%95%B0%E7%9B%AE/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-平均等待时间" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/12/27/%E5%B9%B3%E5%9D%87%E7%AD%89%E5%BE%85%E6%97%B6%E9%97%B4/">平均等待时间</a>
-    </h1>
-  
-
-        
-        <a href="/2020/12/27/%E5%B9%B3%E5%9D%87%E7%AD%89%E5%BE%85%E6%97%B6%E9%97%B4/" class="archive-article-date">
-  	<time datetime="2020-12-27T02:07:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-27</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">有一个餐厅，只有一位厨师。你有一个顾客数组 customers ，其中 customers[i] &#x3D; [arrivali, timei] ：</span><br><span class="line"></span><br><span class="line">arrivali 是第 i 位顾客到达的时间，到达时间按 [非递减] 顺序排列。</span><br><span class="line">timei 是给第 i 位顾客做菜需要的时间。</span><br><span class="line">当一位顾客到达时，他将他的订单给厨师，厨师一旦空闲的时候就开始做这位顾客的菜。每位顾客会一直等待到厨师完成他的订单。厨师同时只能做一个人的订单。厨师会[严格按照 订单给他的顺序 ]做菜。</span><br><span class="line"></span><br><span class="line">请你返回所有顾客需要等待的 [平均] 时间。与标准答案误差在 10-5 范围以内，都视为正确结果。</span><br><span class="line"></span><br><span class="line">示例 1：</span><br><span class="line"></span><br><span class="line">输入：customers &#x3D; [[1,2],[2,5],[4,3]]</span><br><span class="line">输出：5.00000</span><br><span class="line">解释：</span><br><span class="line">1) 第一位顾客在时刻 1 到达，厨师拿到他的订单并在时刻 1 立马开始做菜，并在时刻 3 完成，第一位顾客等待时间为 3 - 1 &#x3D; 2 。</span><br><span class="line">2) 第二位顾客在时刻 2 到达，厨师在时刻 3 开始为他做菜，并在时刻 8 完成，第二位顾客等待时间为 8 - 2 &#x3D; 6 。</span><br><span class="line">3) 第三位顾客在时刻 4 到达，厨师在时刻 8 开始为他做菜，并在时刻 11 完成，第三位顾客等待时间为 11 - 4 &#x3D; 7 。</span><br><span class="line">平均等待时间为 (2 + 6 + 7) &#x2F; 3 &#x3D; 5 。</span><br><span class="line">示例 2：</span><br><span class="line"></span><br><span class="line">输入：customers &#x3D; [[5,2],[5,4],[10,3],[20,1]]</span><br><span class="line">输出：3.25000</span><br><span class="line">解释：</span><br><span class="line">1) 第一位顾客在时刻 5 到达，厨师拿到他的订单并在时刻 5 立马开始做菜，并在时刻 7 完成，第一位顾客等待时间为 7 - 5 &#x3D; 2 。</span><br><span class="line">2) 第二位顾客在时刻 5 到达，厨师在时刻 7 开始为他做菜，并在时刻 11 完成，第二位顾客等待时间为 11 - 5 &#x3D; 6 。</span><br><span class="line">3) 第三位顾客在时刻 10 到达，厨师在时刻 11 开始为他做菜，并在时刻 14 完成，第三位顾客等待时间为 14 - 10 &#x3D; 4 。</span><br><span class="line">4) 第四位顾客在时刻 20 到达，厨师拿到他的订单并在时刻 20 立马开始做菜，并在时刻 21 完成，第四位顾客等待时间为 21 - 20 &#x3D; 1 。</span><br><span class="line">平均等待时间为 (2 + 6 + 4 + 1) &#x2F; 4 &#x3D; 3.25 。</span><br><span class="line"></span><br><span class="line">提示：</span><br><span class="line"></span><br><span class="line">1 &lt;&#x3D; customers.length &lt;&#x3D; 105</span><br><span class="line">1 &lt;&#x3D; arrivali, timei &lt;&#x3D; 104</span><br><span class="line">arrivali &lt;&#x3D; arrivali+1</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;average-waiting-time</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-<h2 id="其实是一道简单题，需要注意是否出现溢出"><a href="#其实是一道简单题，需要注意是否出现溢出" class="headerlink" title="其实是一道简单题，需要注意是否出现溢出"></a>其实是一道简单题，需要注意是否出现溢出</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">double</span> <span class="title">averageWaitingTime</span><span class="params">(<span class="keyword">int</span>[][] customers)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (customers.length == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> curTime = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">long</span> sumWait = <span class="number">0</span>;</span><br><span class="line">        curTime = customers[<span class="number">0</span>][<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; customers.length; i++) &#123;</span><br><span class="line"></span><br><span class="line">            curTime = Math.max(customers[i][<span class="number">0</span>], curTime);</span><br><span class="line">            curTime = curTime + customers[i][<span class="number">1</span>];</span><br><span class="line">            <span class="keyword">int</span> wait = curTime - customers[i][<span class="number">0</span>];</span><br><span class="line">            sumWait += wait;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> sumWait * <span class="number">1.0</span> / customers.length;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/12/27/%E5%B9%B3%E5%9D%87%E7%AD%89%E5%BE%85%E6%97%B6%E9%97%B4/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-无法吃午餐的学生数量" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/12/27/%E6%97%A0%E6%B3%95%E5%90%83%E5%8D%88%E9%A4%90%E7%9A%84%E5%AD%A6%E7%94%9F%E6%95%B0%E9%87%8F/">无法吃午餐的学生数量</a>
-    </h1>
-  
-
-        
-        <a href="/2020/12/27/%E6%97%A0%E6%B3%95%E5%90%83%E5%8D%88%E9%A4%90%E7%9A%84%E5%AD%A6%E7%94%9F%E6%95%B0%E9%87%8F/" class="archive-article-date">
-  	<time datetime="2020-12-27T01:41:34.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-27</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">学校的自助午餐提供圆形和方形的三明治，分别用数字 0 和 1 表示。所有学生站在一个队列里，每个学生要么喜欢圆形的要么喜欢方形的。</span><br><span class="line">餐厅里三明治的数量与学生的数量相同。所有三明治都放在一个 栈 里，每一轮：</span><br><span class="line"></span><br><span class="line">如果队列最前面的学生 喜欢 栈顶的三明治，那么会 拿走它 并离开队列。</span><br><span class="line">否则，这名学生会 放弃这个三明治 并回到队列的尾部。</span><br><span class="line">这个过程会一直持续到队列里所有学生都不喜欢栈顶的三明治为止。</span><br><span class="line"></span><br><span class="line">给你两个整数数组 students 和 sandwiches ，其中 sandwiches[i] 是栈里面第 i​​​​​​ 个三明治的类型（i &#x3D; 0 是栈的顶部）， students[j] 是初始队列里第 j​​​​​​ 名学生对三明治的喜好（j &#x3D; 0 是队列的最开始位置）。请你返回无法吃午餐的学生数量。</span><br><span class="line"></span><br><span class="line">示例 1：</span><br><span class="line"></span><br><span class="line">输入：students &#x3D; [1,1,0,0], sandwiches &#x3D; [0,1,0,1]</span><br><span class="line">输出：0 </span><br><span class="line">解释：</span><br><span class="line">- 最前面的学生放弃最顶上的三明治，并回到队列的末尾，学生队列变为 students &#x3D; [1,0,0,1]。</span><br><span class="line">- 最前面的学生放弃最顶上的三明治，并回到队列的末尾，学生队列变为 students &#x3D; [0,0,1,1]。</span><br><span class="line">- 最前面的学生拿走最顶上的三明治，剩余学生队列为 students &#x3D; [0,1,1]，三明治栈为 sandwiches &#x3D; [1,0,1]。</span><br><span class="line">- 最前面的学生放弃最顶上的三明治，并回到队列的末尾，学生队列变为 students &#x3D; [1,1,0]。</span><br><span class="line">- 最前面的学生拿走最顶上的三明治，剩余学生队列为 students &#x3D; [1,0]，三明治栈为 sandwiches &#x3D; [0,1]。</span><br><span class="line">- 最前面的学生放弃最顶上的三明治，并回到队列的末尾，学生队列变为 students &#x3D; [0,1]。</span><br><span class="line">- 最前面的学生拿走最顶上的三明治，剩余学生队列为 students &#x3D; [1]，三明治栈为 sandwiches &#x3D; [1]。</span><br><span class="line">- 最前面的学生拿走最顶上的三明治，剩余学生队列为 students &#x3D; []，三明治栈为 sandwiches &#x3D; []。</span><br><span class="line">所以所有学生都有三明治吃。</span><br><span class="line">示例 2：</span><br><span class="line"></span><br><span class="line">输入：students &#x3D; [1,1,1,0,0,1], sandwiches &#x3D; [1,0,0,0,1,1]</span><br><span class="line">输出：3</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">提示：</span><br><span class="line"></span><br><span class="line">1 &lt;&#x3D; students.length, sandwiches.length &lt;&#x3D; 100</span><br><span class="line">students.length &#x3D;&#x3D; sandwiches.length</span><br><span class="line">sandwiches[i] 要么是 0 ，要么是 1 。</span><br><span class="line">students[i] 要么是 0 ，要么是 1 。</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;number-of-students-unable-to-eat-lunch</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-
-
-<p><strong>因为学生的数量比较少，所以直接暴力模拟，不新建队列</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">countStudents</span><span class="params">(<span class="keyword">int</span>[] students, <span class="keyword">int</span>[] sandwiches)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (students.length == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span> (sandwiches.length == <span class="number">0</span> &amp;&amp; students.length &gt; <span class="number">0</span>) <span class="keyword">return</span> students.length;</span><br><span class="line">        <span class="keyword">boolean</span>[] stu = <span class="keyword">new</span> <span class="keyword">boolean</span>[students.length];                               <span class="comment">//指示是否已经吃到午餐</span></span><br><span class="line">        <span class="keyword">int</span> stuPoint = <span class="number">0</span>;                                                           <span class="comment">//当前学生的指针</span></span><br><span class="line">        <span class="keyword">int</span> sanPoint = <span class="number">0</span>;                                                           <span class="comment">//当前午餐的指针</span></span><br><span class="line">        <span class="keyword">int</span> stuLen = students.length;                                               <span class="comment">//学生的数量</span></span><br><span class="line">        <span class="keyword">int</span> sanLen = sandwiches.length;                                             <span class="comment">//午餐的数量</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> stuCount = stuLen;                                                      <span class="comment">//当前没吃到午餐的学生的数量</span></span><br><span class="line">        <span class="keyword">boolean</span> stepFlag = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">int</span> step = <span class="number">0</span>;                                                               <span class="comment">//指示是否走了一圈但是没人能吃到午餐，如果大于stuLen就说明这一圈谁也没吃到</span></span><br><span class="line">        <span class="keyword">while</span> (stepFlag) &#123;</span><br><span class="line">            <span class="keyword">if</span> (step &gt; stuLen) &#123;                                                    <span class="comment">//走了一圈没人吃到，那么结束         </span></span><br><span class="line">                <span class="keyword">return</span> stuCount;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">int</span> stuIndex = stuPoint % stuLen;                                       <span class="comment">//当前学生的index</span></span><br><span class="line">            <span class="keyword">int</span> sanIndex = sanPoint % sanLen;                                       <span class="comment">//当前午餐的index</span></span><br><span class="line">            <span class="keyword">while</span> (stu[stuIndex]) &#123;                                                 <span class="comment">//如果已经吃到午餐了，就换下一个</span></span><br><span class="line">                stuPoint++;</span><br><span class="line">                stuIndex = stuPoint % stuLen;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (!stu[stuIndex] &amp;&amp; students[stuIndex] == sandwiches[sanIndex]) &#123;     <span class="comment">//如果这个午餐符合学生的胃口，就被吃掉</span></span><br><span class="line"></span><br><span class="line">                stu[stuIndex] = <span class="keyword">true</span>;</span><br><span class="line">                stuPoint++;                                                         <span class="comment">//学生和午餐指针同时步进1</span></span><br><span class="line">                sanPoint++;</span><br><span class="line">                step = <span class="number">0</span>;                                                           <span class="comment">//走的数量归0</span></span><br><span class="line">                stuCount--;                                                         <span class="comment">//没吃到午餐的人的数量减1</span></span><br><span class="line">                <span class="keyword">if</span> (stuCount == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;                                        <span class="comment">//所有学生都吃到午餐了，那么结束</span></span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                stuPoint++;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            step++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="维护喜欢每种三明治的人的数量，当喜欢某个种类的三明治的人的数量为0时，所有的人都不喜欢栈顶部的三明治，剩下的人都吃不长了"><a href="#维护喜欢每种三明治的人的数量，当喜欢某个种类的三明治的人的数量为0时，所有的人都不喜欢栈顶部的三明治，剩下的人都吃不长了" class="headerlink" title="维护喜欢每种三明治的人的数量，当喜欢某个种类的三明治的人的数量为0时，所有的人都不喜欢栈顶部的三明治，剩下的人都吃不长了"></a>维护喜欢每种三明治的人的数量，当喜欢某个种类的三明治的人的数量为0时，所有的人都不喜欢栈顶部的三明治，剩下的人都吃不长了</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">countStudents</span><span class="params">(<span class="keyword">int</span>[] students, <span class="keyword">int</span>[] sandwiches)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (students == <span class="keyword">null</span> || students.length == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span> (sandwiches == <span class="keyword">null</span> || sandwiches.length == <span class="number">0</span>) <span class="keyword">return</span> students.length;</span><br><span class="line">        <span class="comment">// stuLike[0] 喜欢圆形的学生数，stuLike[1]喜欢方形的学生数</span></span><br><span class="line">        <span class="keyword">int</span>[] stuLike = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">2</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> student : students) &#123;</span><br><span class="line">            stuLike[student]++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; sandwiches.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (stuLike[sandwiches[i]] == <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">// 学生是转圈来的，此时说明喜欢圆形或者方形的学生已经没有了，顶部的三明治没人取走了。</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 对应的学生满足一个，减少一个</span></span><br><span class="line">            stuLike[sandwiches[i]]--;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> stuLike[<span class="number">0</span>] + stuLike[<span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>参考文献</p>
-</blockquote>
-<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/number-of-students-unable-to-eat-lunch/solution/java-1msshuang-bai-zhi-jie-fan-yi-by-bo-vb263/">作者：bo-he-f 来源：力扣（LeetCode）著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/12/27/%E6%97%A0%E6%B3%95%E5%90%83%E5%8D%88%E9%A4%90%E7%9A%84%E5%AD%A6%E7%94%9F%E6%95%B0%E9%87%8F/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-同构字符串" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/12/27/%E5%90%8C%E6%9E%84%E5%AD%97%E7%AC%A6%E4%B8%B2/">同构字符串</a>
-    </h1>
-  
-
-        
-        <a href="/2020/12/27/%E5%90%8C%E6%9E%84%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="archive-article-date">
-  	<time datetime="2020-12-27T01:19:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-27</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">给定两个字符串 s 和 t，判断它们是否是同构的。</span><br><span class="line"></span><br><span class="line">如果 s 中的字符可以被替换得到 t ，那么这两个字符串是同构的。</span><br><span class="line"></span><br><span class="line">所有出现的字符都必须用另一个字符替换，同时保留字符的顺序。两个字符不能映射到同一个字符上，但字符可以映射自己本身。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: s &#x3D; &quot;egg&quot;, t &#x3D; &quot;add&quot;</span><br><span class="line">输出: true</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: s &#x3D; &quot;foo&quot;, t &#x3D; &quot;bar&quot;</span><br><span class="line">输出: false</span><br><span class="line">示例 3:</span><br><span class="line"></span><br><span class="line">输入: s &#x3D; &quot;paper&quot;, t &#x3D; &quot;title&quot;</span><br><span class="line">输出: true</span><br><span class="line">说明:</span><br><span class="line">你可以假设 s 和 t 具有相同的长度。</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;isomorphic-strings</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-
-<h1 id="一个哈希表一个集合"><a href="#一个哈希表一个集合" class="headerlink" title="一个哈希表一个集合"></a>一个哈希表一个集合</h1><h2 id="只要保证t中每个字符到s中的每个字符的映射可以还原s，并且t中的键对应的值是唯一的，就可以保证s和t是同构的。"><a href="#只要保证t中每个字符到s中的每个字符的映射可以还原s，并且t中的键对应的值是唯一的，就可以保证s和t是同构的。" class="headerlink" title="只要保证t中每个字符到s中的每个字符的映射可以还原s，并且t中的键对应的值是唯一的，就可以保证s和t是同构的。"></a>只要保证t中每个字符到s中的每个字符的映射可以还原s，并且t中的键对应的值是唯一的，就可以保证s和t是同构的。</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">s：    egg</span><br><span class="line">       |||</span><br><span class="line">t:     add</span><br><span class="line"></span><br><span class="line">映射为e-a,g-d.  通过遍历t,再用map映射回去可以得到egg,并且t中的每个键值的对应都是双向唯一的，所以是同构的字符串</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">s:    foo</span><br><span class="line">      |||</span><br><span class="line">t:    bar</span><br><span class="line"></span><br><span class="line">映射为b-f,a-o,r-o  通过遍历t，再用map映射回去可以得到foo，但是t中的每个键值的对应不是双向唯一的，所以不是同构的字符串</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isIsomorphic</span><span class="params">(String s, String t)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (s == <span class="keyword">null</span> || t == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">if</span> (s.length() != t.length()) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        Map&lt;Character, Character&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; s.length(); i++) &#123;                      <span class="comment">//将t的每个字符映射到s</span></span><br><span class="line">            <span class="keyword">char</span> sc = s.charAt(i);</span><br><span class="line">            <span class="keyword">char</span> st = t.charAt(i);</span><br><span class="line">            map.put(st, sc);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Set&lt;Character&gt; set = <span class="keyword">new</span> HashSet&lt;&gt;();                       <span class="comment">//保证t的每个键对应的值是唯一的</span></span><br><span class="line">        StringBuilder bd = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; t.length(); i++) &#123;</span><br><span class="line">            <span class="keyword">char</span> tChar = t.charAt(i);</span><br><span class="line">            <span class="keyword">char</span> sChar = map.get(tChar);</span><br><span class="line">            bd.append(sChar);</span><br><span class="line">            set.add(sChar);</span><br><span class="line">        &#125;</span><br><span class="line">        String tTos = bd.toString();                                <span class="comment">//查看通过t的映射可不可以得到s</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (set.size() == map.size() &amp;&amp; tTos.equals(s)) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h1 id="双哈希表"><a href="#双哈希表" class="headerlink" title="双哈希表"></a>双哈希表</h1><p><strong>需要我们判断 s 和 t 每个位置上的字符是否都一一对应，即 s 的任意一个字符被 t 中唯一的字符对应，同时 t 的任意一个字符被 s 中唯一的字符对应。这也被称为「双射」的关系。</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isIsomorphic</span><span class="params">(String s, String t)</span> </span>&#123;</span><br><span class="line">        Map&lt;Character, Character&gt; s2t = <span class="keyword">new</span> HashMap&lt;Character, Character&gt;();</span><br><span class="line">        Map&lt;Character, Character&gt; t2s = <span class="keyword">new</span> HashMap&lt;Character, Character&gt;();</span><br><span class="line">        <span class="keyword">int</span> len = s.length();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; ++i) &#123;</span><br><span class="line">            <span class="keyword">char</span> x = s.charAt(i), y = t.charAt(i);</span><br><span class="line">            <span class="keyword">if</span> ((s2t.containsKey(x) &amp;&amp; s2t.get(x) != y) || (t2s.containsKey(y) &amp;&amp; t2s.get(y) != x)) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            s2t.put(x, y);</span><br><span class="line">            t2s.put(y, x);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-
-<blockquote>
-<p>参考文献</p>
-</blockquote>
-<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/isomorphic-strings/solution/tong-gou-zi-fu-chuan-by-leetcode-solutio-s6fd/">作者：LeetCode-Solution来源：力扣（LeetCode）著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/12/27/%E5%90%8C%E6%9E%84%E5%AD%97%E7%AC%A6%E4%B8%B2/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-1至n整数中1出现的次数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/12/26/1%E8%87%B3n%E6%95%B4%E6%95%B0%E4%B8%AD1%E5%87%BA%E7%8E%B0%E7%9A%84%E6%AC%A1%E6%95%B0/">1至n整数中1出现的次数</a>
-    </h1>
-  
-
-        
-        <a href="/2020/12/26/1%E8%87%B3n%E6%95%B4%E6%95%B0%E4%B8%AD1%E5%87%BA%E7%8E%B0%E7%9A%84%E6%AC%A1%E6%95%B0/" class="archive-article-date">
-  	<time datetime="2020-12-26T12:02:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-26</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">输入一个整数 n ，求1～n这n个整数的十进制表示中1出现的次数。</span><br><span class="line"></span><br><span class="line">例如，输入12，1～12这些整数中包含1 的数字有1、10、11和12，1一共出现了5次。</span><br><span class="line"></span><br><span class="line">示例 1：</span><br><span class="line"></span><br><span class="line">输入：n &#x3D; 12</span><br><span class="line">输出：5</span><br><span class="line">示例 2：</span><br><span class="line"></span><br><span class="line">输入：n &#x3D; 13</span><br><span class="line">输出：6</span><br><span class="line"></span><br><span class="line">限制：</span><br><span class="line"></span><br><span class="line">1 &lt;&#x3D; n &lt; 2^31</span><br><span class="line">注意：本题与主站 233 题相同：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;number-of-digit-one&#x2F;</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;1nzheng-shu-zhong-1chu-xian-de-ci-shu-lcof</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-
-<p>1<br>10,11,12,13,14,15,16,17,18,19,</p>
-<p>1</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<!-- 
-1位数中只有1
-
-2位数中有10-19，21，31，41，51，61，71，81，91
-
-共有19个=[1]+[18]
-
-3位数中有100-199，（201，210-219，221，231，241，251，261，271，281，291）*8
-
-共有271个=19*9+100
-
-4位数共有3439个=271*9+1000
-
-5位数共有40951个=3439*9+10000
-
-6位数共有468559个40951*9+100000
-
-n位数共有num(n-1)*9+Math.pow(10,n-1)个数字含有1 -->
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/12/26/1%E8%87%B3n%E6%95%B4%E6%95%B0%E4%B8%AD1%E5%87%BA%E7%8E%B0%E7%9A%84%E6%AC%A1%E6%95%B0/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/39/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/38/">38</a><a class="page-number" href="/page/39/">39</a><span class="page-number current">40</span><a class="page-number" href="/page/41/">41</a><a class="page-number" href="/page/42/">42</a><span class="space">&hellip;</span><a class="page-number" href="/page/61/">61</a><a class="extend next" rel="next" href="/page/41/">Next &amp;raquo;</a>
+      <a class="extend prev" rel="prev" href="/page/39/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/38/">38</a><a class="page-number" href="/page/39/">39</a><span class="page-number current">40</span><a class="page-number" href="/page/41/">41</a><a class="page-number" href="/page/42/">42</a><span class="space">&hellip;</span><a class="page-number" href="/page/62/">62</a><a class="extend next" rel="next" href="/page/41/">Next &amp;raquo;</a>
     </nav>
   
 
