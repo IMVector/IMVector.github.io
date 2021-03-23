@@ -150,6 +150,136 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-python调用C" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/07/python%E8%B0%83%E7%94%A8C/">python调用C++</a>
+    </h1>
+  
+
+        
+        <a href="/2021/02/07/python%E8%B0%83%E7%94%A8C/" class="archive-article-date">
+  	<time datetime="2021-02-07T13:58:47.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-07</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+<ul>
+<li>利用python来调用c的静态链接库</li>
+<li>利用python获取c库返回的字符串</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// test.h ///</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">get_func_name</span><span class="params">(<span class="built_in">string</span> &amp;data)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// test.cpp ///</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;test.h&quot;</span></span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">get_func_name</span><span class="params">(<span class="built_in">string</span> &amp;data)</span></span>&#123;</span><br><span class="line">    data = <span class="string">&quot;get_func_name&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// test_wrap.cpp ///</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;test.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;string.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> &#123;</span><br><span class="line">  <span class="function"><span class="keyword">char</span> * <span class="title">get_func_name_wrap</span><span class="params">()</span></span>&#123;</span><br><span class="line">      <span class="keyword">static</span> <span class="built_in">string</span> name;</span><br><span class="line">      get_func_name(name);</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">const_cast</span>&lt;<span class="keyword">char</span>*&gt;(name.c_str());</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/// compile sh</span><br><span class="line">g++ -fpermissive -fpic -c test.cpp -o test.o</span><br><span class="line">ar rcs libtest.a test.o</span><br><span class="line">g++ -fpermissive -fpic -shared test_wrap.cpp -o libtest.so libtest.a</span><br></pre></td></tr></table></figure>
+
+<!-- 这个是编译专门用的
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"> g++ -O2 -std=c++14 -msse2 -mssse3 -msse4.1 -msse4.2 -mavx -march=native -o test.so -shared -fPIC elastic.cpp</span><br><span class="line">​``` --&gt;</span><br><span class="line"></span><br><span class="line">- shared 该选项指定生成动态连接库（让连接器生成T类型的导出符号表，有时候也生成弱连接W类型的导出符号），不用该标志外部程序无法连接。相当于一个可执行文件。</span><br><span class="line"></span><br><span class="line">- fPIC：表示编译为位置独立的代码，不用此选项的话编译后的代码是位置相关的所以动态载入时是通过代码拷贝的方式来满足不同进程的需要，而不能达到真正代码段共享的目的。</span><br><span class="line"></span><br><span class="line">会生产一个test.so 动态链接库文件。</span><br><span class="line"></span><br><span class="line">```python</span><br><span class="line"><span class="comment">## test.py</span></span><br><span class="line">import ctypes</span><br><span class="line">obj = ctypes.CDLL(<span class="string">&quot;./libtest.so&quot;</span>)</span><br><span class="line">rst = obj.get_func_name_wrap()</span><br><span class="line"></span><br><span class="line">data = ctypes.string_at(rst, -1).decode(<span class="string">&quot;utf-8&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(data)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$python</span> test.py</span><br><span class="line">get_func_name12</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意事项:</strong></p>
+<ul>
+<li><strong>静态编译的时候别忘记加-fpic</strong></li>
+</ul>
+<hr>
+<h1 id="实例："><a href="#实例：" class="headerlink" title="实例："></a>实例：</h1><h1 id="python脚本"><a href="#python脚本" class="headerlink" title="python脚本"></a>python脚本</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> ctypes <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> ctypes</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">_file = <span class="string">&#x27;./elastic_test.so&#x27;</span></span><br><span class="line">_path = os.path.join(*(os.path.split(__file__)[:-<span class="number">1</span>] + (_file,)))</span><br><span class="line"><span class="comment"># 动态调用</span></span><br><span class="line">lib = CDLL(_path)</span><br><span class="line"></span><br><span class="line">myfunction=lib.funtest</span><br><span class="line"><span class="comment"># 定义返回类型： 字符指针</span></span><br><span class="line">myfunction.restype = ctypes.POINTER(ctypes.c_char)</span><br><span class="line"><span class="comment"># 获取返回值</span></span><br><span class="line">val=myfunction()</span><br><span class="line"><span class="comment"># 处理返回值</span></span><br><span class="line">val=ctypes.string_at(val, -<span class="number">1</span>).decode(<span class="string">&quot;utf-8&quot;</span>)</span><br><span class="line">print(val)</span><br></pre></td></tr></table></figure>
+<h1 id="C语言脚本"><a href="#C语言脚本" class="headerlink" title="C语言脚本"></a>C语言脚本</h1><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> g_s[<span class="number">100</span>];</span><br><span class="line"><span class="comment">// c内部函数</span></span><br><span class="line"><span class="function"><span class="keyword">char</span> * <span class="title">func</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">    <span class="built_in">strcpy</span>(g_s, <span class="string">&quot;abcdefdasfasdfasdfasfd &quot;</span>); </span><br><span class="line">    <span class="keyword">return</span> g_s; </span><br><span class="line">&#125; </span><br><span class="line"><span class="comment">// 暴露给python的接口</span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">char</span> * <span class="title">funtest</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> func();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="g-编译"><a href="#g-编译" class="headerlink" title="g++编译"></a>g++编译</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -O2 -std=c++14 -msse2 -mssse3 -msse4.1 -msse4.2 -mavx -march=native -o elastic_test.so -shared -fPIC elastic_test.cpp</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="处理结构体"><a href="#处理结构体" class="headerlink" title="处理结构体"></a>处理结构体</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">StructPointerTest</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">   <span class="keyword">char</span> packets[<span class="number">40</span>][<span class="number">13</span>];</span><br><span class="line">&#125;StructTest, *StructPointer;</span><br><span class="line"></span><br><span class="line">StructPointer p = (StructPointer)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(StructTest));</span><br><span class="line"><span class="function">StructPointer <span class="title">getPacket</span><span class="params">(<span class="keyword">int</span> fileCount)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i=curIndex;i&lt;curIndex+<span class="number">40</span>;i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>;j&lt;<span class="number">13</span>;j++)</span><br><span class="line">		&#123;</span><br><span class="line">			p-&gt;packets[i-curIndex][j]=traces[fileCount][i].key[j];</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 定义结构体</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StructPointer</span>(<span class="params">ctypes.Structure</span>):</span>  <span class="comment">#Structure在ctypes中是基于类的结构体</span></span><br><span class="line">    _fields_ = [(<span class="string">&quot;packets&quot;</span>, (ctypes.c_int * <span class="number">13</span>) * <span class="number">40</span>)] <span class="comment">#定义二维数组（结构体中的一个二维数组）</span></span><br><span class="line"><span class="comment"># 获取40个数据包</span></span><br><span class="line">getPacketFunction=lib.getPacketPy</span><br><span class="line">getPacketFunction.restype=ctypes.POINTER(StructPointer) </span><br><span class="line">getPacketFunction.argtypes=(ctypes.c_int,)</span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>参考文献</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/Pythoncxy/article/details/94010764?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.control&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.control">改写程序太麻烦？看Python如何直接调用C++程序 ！</a></p>
+<p><a target="_blank" rel="noopener" href="https://python3-cookbook.readthedocs.io/zh_CN/latest/c15/p01_access_ccode_using_ctypes.html">使用ctypes访问C代码</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/u013179327/article/details/43735963">python脚本利用ctypes调用c模块返回字符串</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/02/07/python%E8%B0%83%E7%94%A8C/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-非递减数列" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1167,134 +1297,9 @@ tex2jax: {
 
 
   
-    <article id="post-统计作战单位数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/06/%E7%BB%9F%E8%AE%A1%E4%BD%9C%E6%88%98%E5%8D%95%E4%BD%8D%E6%95%B0/">统计作战单位数</a>
-    </h1>
-  
-
-        
-        <a href="/2021/02/06/%E7%BB%9F%E8%AE%A1%E4%BD%9C%E6%88%98%E5%8D%95%E4%BD%8D%E6%95%B0/" class="archive-article-date">
-  	<time datetime="2021-02-06T13:29:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-06</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="1395-统计作战单位数"><a href="#1395-统计作战单位数" class="headerlink" title="1395. 统计作战单位数"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/count-number-of-teams/">1395. 统计作战单位数</a></h4><p>难度中等54收藏分享切换为英文接收动态反馈</p>
-<p> <code>n</code> 名士兵站成一排。每个士兵都有一个 <strong>独一无二</strong> 的评分 <code>rating</code> 。</p>
-<p>每 <strong>3</strong> 个士兵可以组成一个作战单位，分组规则如下：</p>
-<ul>
-<li>从队伍中选出下标分别为 <code>i</code>、<code>j</code>、<code>k</code> 的 3 名士兵，他们的评分分别为 <code>rating[i]</code>、<code>rating[j]</code>、<code>rating[k]</code></li>
-<li>作战单位需满足： <code>rating[i] &lt; rating[j] &lt; rating[k]</code> 或者 <code>rating[i] &gt; rating[j] &gt; rating[k]</code> ，其中 <code>0 &lt;= i &lt; j &lt; k &lt; n</code></li>
-</ul>
-<p>请你返回按上述条件可以组建的作战单位数量。每个士兵都可以是多个作战单位的一部分。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：rating &#x3D; [2,5,3,4,1]</span><br><span class="line">输出：3</span><br><span class="line">解释：我们可以组建三个作战单位 (2,3,4)、(5,4,1)、(5,3,1) 。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：rating &#x3D; [2,1,3]</span><br><span class="line">输出：0</span><br><span class="line">解释：根据题目条件，我们无法组建作战单位。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：rating &#x3D; [1,2,3,4]</span><br><span class="line">输出：4</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>n == rating.length</code></li>
-<li><code>3 &lt;= n &lt;= 1000</code></li>
-<li><code>1 &lt;= rating[i] &lt;= 10^5</code></li>
-<li><code>rating</code> 中的元素都是唯一的</li>
-</ul>
-<h1 id="枚举所有的三元组"><a href="#枚举所有的三元组" class="headerlink" title="枚举所有的三元组"></a>枚举所有的三元组</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">numTeams</span><span class="params">(<span class="keyword">int</span>[] rating)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = rating.length;</span><br><span class="line">        <span class="keyword">int</span> ans = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j &lt; n; ++j) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> k = j + <span class="number">1</span>; k &lt; n; ++k) &#123;</span><br><span class="line">                    <span class="keyword">if</span> ((rating[i] &lt; rating[j] &amp;&amp; rating[j] &lt; rating[k]) || (rating[i] &gt; rating[j] &amp;&amp; rating[j] &gt; rating[k])) &#123;</span><br><span class="line">                        ++ans;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/count-number-of-teams/solution/tong-ji-zuo-zhan-dan-wei-shu-by-leetcode-solution/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-<h1 id="枚举中间的那个数字"><a href="#枚举中间的那个数字" class="headerlink" title="枚举中间的那个数字"></a>枚举中间的那个数字</h1><ul>
-<li>枚举中间的那个数字 $x$，然后统计左边小于 $x$, 右边大于 $x$ 的数字的组合数目，以及右边小于 $x$ 的数字，左边大于 $x$ 的数字的组合数目。</li>
-<li>统计左边小于 $rating[index]$ 的数量和大于 $rating[index]$ 的数量</li>
-<li>统计右边大于小于 $rating[index]$ 的数量和小于 $rating[index]$ 的数量</li>
-<li>计算组合的数量</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">numTeams</span><span class="params">(<span class="keyword">int</span>[] rating)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = rating.length;</span><br><span class="line">        <span class="keyword">int</span> ans = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 枚举三元组中的 j</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; j &lt; n - <span class="number">1</span>; ++j) &#123;</span><br><span class="line">            <span class="keyword">int</span> iless = <span class="number">0</span>, imore = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">int</span> kless = <span class="number">0</span>, kmore = <span class="number">0</span>;</span><br><span class="line">            <span class="comment">// 统计左边</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; j; ++i) &#123;</span><br><span class="line">                <span class="keyword">if</span> (rating[i] &lt; rating[j]) &#123;</span><br><span class="line">                    ++iless;</span><br><span class="line">                &#125;<span class="keyword">else</span> <span class="keyword">if</span> (rating[i] &gt; rating[j]) &#123;</span><br><span class="line">                    <span class="comment">// 注意这里不能直接写成 else</span></span><br><span class="line">                    <span class="comment">// 因为可能有评分相同的情况</span></span><br><span class="line">                    ++imore;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 统计右边</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> k = j + <span class="number">1</span>; k &lt; n; ++k) &#123;</span><br><span class="line">                <span class="keyword">if</span> (rating[k] &lt; rating[j]) &#123;</span><br><span class="line">                    ++kless;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (rating[k] &gt; rating[j]) &#123;</span><br><span class="line">                    ++kmore;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 因为是组合，所以是乘积</span></span><br><span class="line">            ans += iless * kmore + imore * kless;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/count-number-of-teams/solution/tong-ji-zuo-zhan-dan-wei-shu-by-leetcode-solution/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-
-
-<h1 id="树状数组（待填坑）"><a href="#树状数组（待填坑）" class="headerlink" title="树状数组（待填坑）"></a>树状数组（待填坑）</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> maxN;</span><br><span class="line">    <span class="keyword">int</span>[] tree;</span><br><span class="line">    List&lt;Integer&gt; disc;</span><br><span class="line">    <span class="keyword">int</span>[] iLess;</span><br><span class="line">    <span class="keyword">int</span>[] iMore;</span><br><span class="line">    <span class="keyword">int</span>[] kLess;</span><br><span class="line">    <span class="keyword">int</span>[] kMore;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">numTeams</span><span class="params">(<span class="keyword">int</span>[] rating)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = rating.length;</span><br><span class="line">        maxN = n + <span class="number">2</span>;</span><br><span class="line">        tree = <span class="keyword">new</span> <span class="keyword">int</span>[maxN];</span><br><span class="line"></span><br><span class="line">        disc = <span class="keyword">new</span> ArrayList&lt;Integer&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">            disc.add(rating[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        disc.add(-<span class="number">1</span>);</span><br><span class="line">        Collections.sort(disc);</span><br><span class="line"></span><br><span class="line">        iLess = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">        iMore = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">        kLess = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">        kMore = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">            <span class="comment">// 计算排序后的index</span></span><br><span class="line">            <span class="keyword">int</span> id = getId(rating[i]);</span><br><span class="line">            iLess[i] = query(id);</span><br><span class="line">            iMore[i] = query(n + <span class="number">1</span>) - query(id); </span><br><span class="line">            update(id, <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        tree = <span class="keyword">new</span> <span class="keyword">int</span>[maxN];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = n - <span class="number">1</span>; i &gt;= <span class="number">0</span>; --i) &#123;</span><br><span class="line">            <span class="keyword">int</span> id = getId(rating[i]);</span><br><span class="line">            kLess[i] = query(id);</span><br><span class="line">            kMore[i] = query(n + <span class="number">1</span>) - query(id); </span><br><span class="line">            update(id, <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">int</span> ans = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">            ans += iLess[i] * kMore[i] + iMore[i] * kLess[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getId</span><span class="params">(<span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> low = <span class="number">0</span>, high = disc.size() - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span> (low &lt; high) &#123;</span><br><span class="line">            <span class="keyword">int</span> mid = (high - low) / <span class="number">2</span> + low;</span><br><span class="line">            <span class="keyword">if</span> (disc.get(mid) &lt; target) &#123;</span><br><span class="line">                low = mid + <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                high = mid;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> low;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">query</span><span class="params">(<span class="keyword">int</span> p)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (p &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            sum += tree[p];</span><br><span class="line">            p -= lowbit(p);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sum;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(<span class="keyword">int</span> p, <span class="keyword">int</span> v)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (p &lt; maxN) &#123;</span><br><span class="line">            tree[p] += v;</span><br><span class="line">            p += lowbit(p);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">lowbit</span><span class="params">(<span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> x &amp; (-x);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/count-number-of-teams/solution/tong-ji-zuo-zhan-dan-wei-shu-by-leetcode-solution/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">树状数组</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">枚举</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/02/06/%E7%BB%9F%E8%AE%A1%E4%BD%9C%E6%88%98%E5%8D%95%E4%BD%8D%E6%95%B0/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/13/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/63/">63</a><a class="extend next" rel="next" href="/page/15/">Next &amp;raquo;</a>
+      <a class="extend prev" rel="prev" href="/page/13/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/64/">64</a><a class="extend next" rel="next" href="/page/15/">Next &amp;raquo;</a>
     </nav>
   
 
