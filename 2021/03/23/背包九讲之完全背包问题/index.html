@@ -16,7 +16,7 @@
 <meta property="og:description" content="MathJax.Hub.Config({ tex2jax: {   inlineMath: [[&#39;$&#39;,&#39;$&#39;], [&#39;\\(&#39;,&#39;\\)&#39;]],   processEscapes: true   } });       [toc] 说明:本文所讲内容摘录自崔添翼:背包九讲,并对其中的数学内容和一些较为复杂的内容进行了删减,增加了基础的例题,只是面向初学者或者不需要深入理解背包及其衍生问题的读">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-03-23T12:29:18.000Z">
-<meta property="article:modified_time" content="2021-03-24T09:22:11.423Z">
+<meta property="article:modified_time" content="2021-03-24T11:26:16.194Z">
 <meta property="article:author" content="Vector">
 <meta property="article:tag" content="背包九讲">
 <meta property="article:tag" content="完全背包">
@@ -195,7 +195,7 @@ tex2jax: {
 <p>按照01背包的思路，<strong>令 $F[i, v]$ 表示前 $i$ 种物品恰放入一个容量为 $v$的背包的最大价值(收益)</strong>。仍然可以按照每种物品不同的策略写出状态转移方程：<br>$$<br>F[i, v] = max{F[i − 1, v − kC_i] + kW_i \space\space| \space\space 0 ≤ kC_i ≤ v}<br>$$</p>
 <p>这跟 01 背包问题一样有 $O(VN)$ 个状态需要求解，但求解每个状态的时间已经不是常数了,因为需要遍历<code>k</code>为$1、2、3… \frac{v}{c_{i}}$ 时的状态，求解状态 $F[i, v]$ 的时间是$O\left(\frac{v}{C_{i}}\right)$ . 总的复杂度可以认为是 $O\left(N V \sum \frac{V}{C_{i}}\right)$</p>
 <p><strong>上述问题的伪代码</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> N, V;</span><br><span class="line"><span class="comment">// cv[i][0]是放第i件物品消耗的费用,cv[i][1]是放第i件物品的收益价值,其中i从1开始</span></span><br><span class="line"><span class="keyword">int</span>[][] cv = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][<span class="number">2</span>];</span><br><span class="line"><span class="keyword">int</span> dp[][] = <span class="keyword">new</span> <span class="keyword">int</span>[V + <span class="number">1</span>][V + <span class="number">1</span>];</span><br><span class="line">dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= V; j++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k * cv[i][<span class="number">0</span>] &lt;= j; k++) &#123;</span><br><span class="line">            dp[i][j] = Math.max(dp[i][j], dp[i - <span class="number">1</span>][j - k * cv[i][<span class="number">0</span>]] + k * cv[i][<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> dp[N][V];</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> N, V;</span><br><span class="line"><span class="comment">// cv[i][0]是放第i件物品消耗的费用,cv[i][1]是放第i件物品的收益价值,其中i从1开始</span></span><br><span class="line"><span class="keyword">int</span>[][] cv = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][<span class="number">2</span>];</span><br><span class="line"><span class="keyword">int</span> dp[][] = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][V + <span class="number">1</span>];</span><br><span class="line">dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= V; j++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k * cv[i][<span class="number">0</span>] &lt;= j; k++) &#123;</span><br><span class="line">            dp[i][j] = Math.max(dp[i][j], dp[i - <span class="number">1</span>][j - k * cv[i][<span class="number">0</span>]] + k * cv[i][<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> dp[N][V];</span><br></pre></td></tr></table></figure>
 
 <p><strong>注意❗: 外层<code>i</code>枚举物品的数量,内层<code>j</code>枚举背包的容量，最内层<code>k</code>枚举选择i的件数</strong></p>
 <p><strong>注意❗❗❗: 转移方程为<code>dp[i][j] = Math.max(dp[i][j], dp[i - 1][j - k * cv[i][0]] + k * cv[i][1])</code> max函数里面是<code>dp[i][j]</code>和<code>dp[i - 1][j - k * cv[i][0]] + k * cv[i][1]</code>这两项,  切记!切记!</strong></p>
@@ -1097,7 +1097,19 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">二维费用的背包问题</a>
+                <a href="javascript:void(0)" class="js-tag color5">分组背包</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">二维费用的背包</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">有依赖的背包</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">混合背包</a>
               </li>
             
             <div class="clearfix"></div>
