@@ -150,6 +150,226 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-二维区域和检索-矩阵不可变" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/02/%E4%BA%8C%E7%BB%B4%E5%8C%BA%E5%9F%9F%E5%92%8C%E6%A3%80%E7%B4%A2-%E7%9F%A9%E9%98%B5%E4%B8%8D%E5%8F%AF%E5%8F%98/">二维区域和检索_矩阵不可变</a>
+    </h1>
+  
+
+        
+        <a href="/2021/03/02/%E4%BA%8C%E7%BB%B4%E5%8C%BA%E5%9F%9F%E5%92%8C%E6%A3%80%E7%B4%A2-%E7%9F%A9%E9%98%B5%E4%B8%8D%E5%8F%AF%E5%8F%98/" class="archive-article-date">
+  	<time datetime="2021-03-02T06:36:14.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-02</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="304-二维区域和检索-矩阵不可变"><a href="#304-二维区域和检索-矩阵不可变" class="headerlink" title="304. 二维区域和检索 - 矩阵不可变"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/range-sum-query-2d-immutable/">304. 二维区域和检索 - 矩阵不可变</a></h4><p>难度中等195</p>
+<p>给定一个二维矩阵，计算其子矩形范围内元素的总和，该子矩阵的左上角为 <code>(row1, col1)</code> ，右下角为 <code>(row2, col2)</code> 。</p>
+<p><img src="https://assets.leetcode-cn.com/aliyun-lc-upload/images/304.png" alt="Range Sum Query 2D"><br>上图子矩阵左上角 (row1, col1) = <strong>(2, 1)</strong> ，右下角(row2, col2) = <strong>(4, 3)，</strong>该子矩形内元素的总和为 8。</p>
+<p><strong>示例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">给定 matrix &#x3D; [</span><br><span class="line">  [3, 0, 1, 4, 2],</span><br><span class="line">  [5, 6, 3, 2, 1],</span><br><span class="line">  [1, 2, 0, 1, 5],</span><br><span class="line">  [4, 1, 0, 1, 7],</span><br><span class="line">  [1, 0, 3, 0, 5]</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">sumRegion(2, 1, 4, 3) -&gt; 8</span><br><span class="line">sumRegion(1, 1, 2, 2) -&gt; 11</span><br><span class="line">sumRegion(1, 2, 2, 4) -&gt; 12</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><p>你可以假设矩阵不可变。</p>
+</li>
+<li><p>会多次调用 <code>sumRegion</code> 方法<em>。</em></p>
+</li>
+<li><p>你可以假设 <code>row1 ≤ row2</code> 且 <code>col1 ≤ col2</code> 。</p>
+</li>
+</ul>
+<h1 id="二维矩阵前缀和"><a href="#二维矩阵前缀和" class="headerlink" title="二维矩阵前缀和"></a>二维矩阵前缀和</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NumMatrix</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span>[][]sum;</span><br><span class="line">    <span class="keyword">int</span> m=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> n=<span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NumMatrix</span><span class="params">(<span class="keyword">int</span>[][] matrix)</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">        m=matrix.length;</span><br><span class="line">        <span class="keyword">if</span>(m==<span class="number">0</span>)<span class="keyword">return</span>;</span><br><span class="line">        n=matrix[<span class="number">0</span>].length;</span><br><span class="line">        <span class="keyword">if</span>(n==<span class="number">0</span>)<span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">        sum = <span class="keyword">new</span> <span class="keyword">int</span>[m][n];</span><br><span class="line">        sum[<span class="number">0</span>][<span class="number">0</span>]=matrix[<span class="number">0</span>][<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;m;i++)&#123;</span><br><span class="line">            sum[i][<span class="number">0</span>]=sum[i-<span class="number">1</span>][<span class="number">0</span>]+matrix[i][<span class="number">0</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;i++)&#123;</span><br><span class="line">            sum[<span class="number">0</span>][i]=sum[<span class="number">0</span>][i-<span class="number">1</span>]+matrix[<span class="number">0</span>][i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;m;i++)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">1</span>;j&lt;n;j++)&#123;</span><br><span class="line">                sum[i][j]=sum[i-<span class="number">1</span>][j]+sum[i][j-<span class="number">1</span>]+matrix[i][j]-sum[i-<span class="number">1</span>][j-<span class="number">1</span>];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sumRegion</span><span class="params">(<span class="keyword">int</span> row1, <span class="keyword">int</span> col1, <span class="keyword">int</span> row2, <span class="keyword">int</span> col2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(m==<span class="number">0</span>||n==<span class="number">0</span>)<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 上边的行的row坐标</span></span><br><span class="line">        <span class="keyword">int</span> dRow1=row1-<span class="number">1</span>;</span><br><span class="line">        <span class="comment">// 左边的列的col坐标</span></span><br><span class="line">        <span class="keyword">int</span> dCol2=col1-<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> ds1=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> ds2=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> reD=<span class="number">0</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">boolean</span> flag1=<span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">boolean</span> flag2=<span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">if</span>(dRow1&gt;=<span class="number">0</span>)&#123;</span><br><span class="line">            ds1=sum[dRow1][col2];</span><br><span class="line">            flag1=<span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(dCol2&gt;=<span class="number">0</span>)&#123;</span><br><span class="line">            ds2=sum[row2][dCol2];</span><br><span class="line">            flag2=<span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 下边和左边都有元素说明重复减去了一个sum[dRow1][dCol2]的区域</span></span><br><span class="line">        <span class="keyword">if</span>(flag1&amp;&amp;flag2)&#123;</span><br><span class="line">            reD=sum[dRow1][dCol2];</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">		<span class="comment">// 右下角的和-上边的和-左边的和+上边和左边重叠的和</span></span><br><span class="line">        <span class="keyword">int</span> res=sum[row2][col2]-ds1-ds2+reD;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Your NumMatrix object will be instantiated and called as such:</span></span><br><span class="line"><span class="comment"> * NumMatrix obj = new NumMatrix(matrix);</span></span><br><span class="line"><span class="comment"> * int param_1 = obj.sumRegion(row1,col1,row2,col2);</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+
+<h1 id="二维前缀和"><a href="#二维前缀和" class="headerlink" title="二维前缀和"></a>二维前缀和</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NumMatrix</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span>[][] sums;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NumMatrix</span><span class="params">(<span class="keyword">int</span>[][] matrix)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> m = matrix.length;</span><br><span class="line">        <span class="keyword">if</span> (m &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> n = matrix[<span class="number">0</span>].length;</span><br><span class="line">            sums = <span class="keyword">new</span> <span class="keyword">int</span>[m + <span class="number">1</span>][n + <span class="number">1</span>];</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; m; i++) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; n; j++) &#123;</span><br><span class="line">                    sums[i + <span class="number">1</span>][j + <span class="number">1</span>] = sums[i][j + <span class="number">1</span>] + sums[i + <span class="number">1</span>][j] - sums[i][j] + matrix[i][j];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sumRegion</span><span class="params">(<span class="keyword">int</span> row1, <span class="keyword">int</span> col1, <span class="keyword">int</span> row2, <span class="keyword">int</span> col2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sums[row2 + <span class="number">1</span>][col2 + <span class="number">1</span>] - sums[row1][col2 + <span class="number">1</span>] - sums[row2 + <span class="number">1</span>][col1] + sums[row1][col1];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/range-sum-query-2d-immutable/solution/er-wei-qu-yu-he-jian-suo-ju-zhen-bu-ke-b-2z5n/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">前缀和</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">二维矩阵前缀和</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/03/02/%E4%BA%8C%E7%BB%B4%E5%8C%BA%E5%9F%9F%E5%92%8C%E6%A3%80%E7%B4%A2-%E7%9F%A9%E9%98%B5%E4%B8%8D%E5%8F%AF%E5%8F%98/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-区域检索和-数组不可变" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/01/%E5%8C%BA%E5%9F%9F%E6%A3%80%E7%B4%A2%E5%92%8C-%E6%95%B0%E7%BB%84%E4%B8%8D%E5%8F%AF%E5%8F%98/">区域检索和_数组不可变</a>
+    </h1>
+  
+
+        
+        <a href="/2021/03/01/%E5%8C%BA%E5%9F%9F%E6%A3%80%E7%B4%A2%E5%92%8C-%E6%95%B0%E7%BB%84%E4%B8%8D%E5%8F%AF%E5%8F%98/" class="archive-article-date">
+  	<time datetime="2021-03-01T11:37:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-01</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="303-区域和检索-数组不可变"><a href="#303-区域和检索-数组不可变" class="headerlink" title="303. 区域和检索 - 数组不可变"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/range-sum-query-immutable/">303. 区域和检索 - 数组不可变</a></h4><p>难度简单282收藏分享切换为英文接收动态反馈</p>
+<p>给定一个整数数组  <code>nums</code>，求出数组从索引 <code>i</code> 到 <code>j</code><em>（</em><code>i ≤ j</code>）范围内元素的总和，包含 <code>i</code>、<code>j</code>两点。</p>
+<p>实现 <code>NumArray</code> 类：</p>
+<ul>
+<li><code>NumArray(int[] nums)</code> 使用数组 <code>nums</code> 初始化对象</li>
+<li><code>int sumRange(int i, int j)</code> 返回数组 <code>nums</code> 从索引 <code>i</code> 到 <code>j</code><em>（</em><code>i ≤ j</code>）范围内元素的总和，包含 <code>i</code>、<code>j</code>两点（也就是 <code>sum(nums[i], nums[i + 1], ... , nums[j])</code>）</li>
+</ul>
+<p><strong>示例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">输入：</span><br><span class="line">[&quot;NumArray&quot;, &quot;sumRange&quot;, &quot;sumRange&quot;, &quot;sumRange&quot;]</span><br><span class="line">[[[-2, 0, 3, -5, 2, -1]], [0, 2], [2, 5], [0, 5]]</span><br><span class="line">输出：</span><br><span class="line">[null, 1, -1, -3]</span><br><span class="line"></span><br><span class="line">解释：</span><br><span class="line">NumArray numArray &#x3D; new NumArray([-2, 0, 3, -5, 2, -1]);</span><br><span class="line">numArray.sumRange(0, 2); &#x2F;&#x2F; return 1 ((-2) + 0 + 3)</span><br><span class="line">numArray.sumRange(2, 5); &#x2F;&#x2F; return -1 (3 + (-5) + 2 + (-1)) </span><br><span class="line">numArray.sumRange(0, 5); &#x2F;&#x2F; return -3 ((-2) + 0 + 3 + (-5) + 2 + (-1))</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><p><code>0 &lt;= nums.length &lt;= 104</code></p>
+</li>
+<li><p><code>-105 &lt;= nums[i] &lt;= 105</code></p>
+</li>
+<li><p><code>0 &lt;= i &lt;= j &lt; nums.length</code></p>
+</li>
+<li><p>最多调用 <code>104</code> 次 <code>sumRange</code> 方法</p>
+</li>
+</ul>
+<h1 id="前缀和"><a href="#前缀和" class="headerlink" title="前缀和"></a>前缀和</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NumArray</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> []preSum;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NumArray</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n=nums.length;</span><br><span class="line">        preSum=<span class="keyword">new</span> <span class="keyword">int</span>[n+<span class="number">1</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;=n;i++)&#123;</span><br><span class="line">            preSum[i]=preSum[i-<span class="number">1</span>]+nums[i-<span class="number">1</span>];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sumRange</span><span class="params">(<span class="keyword">int</span> i, <span class="keyword">int</span> j)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> preSum[j+<span class="number">1</span>]-preSum[i];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Your NumArray object will be instantiated and called as such:</span></span><br><span class="line"><span class="comment"> * NumArray obj = new NumArray(nums);</span></span><br><span class="line"><span class="comment"> * int param_1 = obj.sumRange(i,j);</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">前缀和</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/03/01/%E5%8C%BA%E5%9F%9F%E6%A3%80%E7%B4%A2%E5%92%8C-%E6%95%B0%E7%BB%84%E4%B8%8D%E5%8F%AF%E5%8F%98/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Java文件与流" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1266,327 +1486,6 @@ tex2jax: {
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/02/27/%E4%BB%8E%E6%95%B0%E5%AD%97%E4%B8%AD%E5%88%87%E5%88%86%E5%87%BA3/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-至少有k个重复字符的最长字串" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/27/%E8%87%B3%E5%B0%91%E6%9C%89k%E4%B8%AA%E9%87%8D%E5%A4%8D%E5%AD%97%E7%AC%A6%E7%9A%84%E6%9C%80%E9%95%BF%E5%AD%97%E4%B8%B2/">至少有k个重复字符的最长字串</a>
-    </h1>
-  
-
-        
-        <a href="/2021/02/27/%E8%87%B3%E5%B0%91%E6%9C%89k%E4%B8%AA%E9%87%8D%E5%A4%8D%E5%AD%97%E7%AC%A6%E7%9A%84%E6%9C%80%E9%95%BF%E5%AD%97%E4%B8%B2/" class="archive-article-date">
-  	<time datetime="2021-02-27T12:12:32.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-27</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="395-至少有-K-个重复字符的最长子串"><a href="#395-至少有-K-个重复字符的最长子串" class="headerlink" title="395. 至少有 K 个重复字符的最长子串"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/longest-substring-with-at-least-k-repeating-characters/">395. 至少有 K 个重复字符的最长子串</a></h4><p>难度中等379收藏分享切换为英文接收动态反馈</p>
-<p>给你一个字符串 <code>s</code> 和一个整数 <code>k</code> ，请你找出 <code>s</code> 中的最长子串， 要求该子串中的每一字符出现次数都不少于 <code>k</code> 。返回这一子串的长度。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;aaabb&quot;, k &#x3D; 3</span><br><span class="line">输出：3</span><br><span class="line">解释：最长子串为 &quot;aaa&quot; ，其中 &#39;a&#39; 重复了 3 次。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;ababbc&quot;, k &#x3D; 2</span><br><span class="line">输出：5</span><br><span class="line">解释：最长子串为 &quot;ababb&quot; ，其中 &#39;a&#39; 重复了 2 次， &#39;b&#39; 重复了 3 次。</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= s.length &lt;= 104</code></li>
-<li><code>s</code> 仅由小写英文字母组成</li>
-<li><code>1 &lt;= k &lt;= 105</code></li>
-</ul>
-<h1 id="分治思想"><a href="#分治思想" class="headerlink" title="分治思想"></a>分治思想</h1><p>统计每个字符的数量，如果某个字符的数量小于k那么它一定不能在满足条件的最长字符串里面，因此我们可以通过某个不满足条件的字符<code>ch</code>将整个字符串划分为若干个子字符串，对于每个子字符串，分别递归的查找不满足条件的字符<code>ch</code>分割字符串，记录满足条件的子字符串的长度。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">longestSubstring</span><span class="params">(String s, <span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> dfs(s,<span class="number">0</span>,s.length()-<span class="number">1</span>,k);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">dfs</span><span class="params">(String s,<span class="keyword">int</span> l,<span class="keyword">int</span> r,<span class="keyword">int</span> k)</span></span>&#123;</span><br><span class="line">        <span class="keyword">int</span> []hash=<span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">26</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=l;i&lt;=r;i++)&#123;</span><br><span class="line">            hash[s.charAt(i)-<span class="string">&#x27;a&#x27;</span>]++;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">char</span> split=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">26</span>;i++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(<span class="number">0</span>&lt;hash[i]&amp;&amp;hash[i]&lt;k)&#123;</span><br><span class="line">                split=(<span class="keyword">char</span>) (i+<span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(split==<span class="number">0</span>)<span class="keyword">return</span> r-l+<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> cur=l;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> res=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(cur&lt;=r)&#123;</span><br><span class="line">            <span class="keyword">while</span>(cur&lt;=r&amp;&amp;s.charAt(cur)==split)&#123;</span><br><span class="line">                cur++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(cur&gt;r)<span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">int</span> strat=cur;</span><br><span class="line">            <span class="keyword">while</span>(cur&lt;=r&amp;&amp;s.charAt(cur)!=split)&#123;</span><br><span class="line">                cur++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">int</span> val=dfs(s,strat,cur-<span class="number">1</span>,k);</span><br><span class="line">            res=Math.max(res,val);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="分治思想-1"><a href="#分治思想-1" class="headerlink" title="分治思想"></a>分治思想</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">longestSubstring</span><span class="params">(String s, <span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = s.length();</span><br><span class="line">        <span class="keyword">return</span> dfs(s, <span class="number">0</span>, n - <span class="number">1</span>, k);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">dfs</span><span class="params">(String s, <span class="keyword">int</span> l, <span class="keyword">int</span> r, <span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] cnt = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">26</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = l; i &lt;= r; i++) &#123;</span><br><span class="line">            cnt[s.charAt(i) - <span class="string">&#x27;a&#x27;</span>]++;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">char</span> split = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">26</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (cnt[i] &gt; <span class="number">0</span> &amp;&amp; cnt[i] &lt; k) &#123;</span><br><span class="line">                split = (<span class="keyword">char</span>) (i + <span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (split == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> r - l + <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> i = l;</span><br><span class="line">        <span class="keyword">int</span> ret = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (i &lt;= r) &#123;</span><br><span class="line">            <span class="keyword">while</span> (i &lt;= r &amp;&amp; s.charAt(i) == split) &#123;</span><br><span class="line">                i++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (i &gt; r) &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">int</span> start = i;</span><br><span class="line">            <span class="keyword">while</span> (i &lt;= r &amp;&amp; s.charAt(i) != split) &#123;</span><br><span class="line">                i++;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> length = dfs(s, start, i - <span class="number">1</span>, k);</span><br><span class="line">            ret = Math.max(ret, length);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/longest-substring-with-at-least-k-repeating-characters/solution/zhi-shao-you-kge-zhong-fu-zi-fu-de-zui-c-o6ww/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-
-<h1 id="枚举所有字符-滑动窗口"><a href="#枚举所有字符-滑动窗口" class="headerlink" title="枚举所有字符+滑动窗口"></a>枚举所有字符+滑动窗口</h1><p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/longest-substring-with-at-least-k-repeating-characters/solution/zhi-shao-you-kge-zhong-fu-zi-fu-de-zui-c-o6ww/">解析</a></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">longestSubstring</span><span class="params">(String s, <span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> ret = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> n = s.length();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> t = <span class="number">1</span>; t &lt;= <span class="number">26</span>; t++) &#123;</span><br><span class="line">            <span class="keyword">int</span> l = <span class="number">0</span>, r = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">int</span>[] cnt = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">26</span>];</span><br><span class="line">            <span class="keyword">int</span> tot = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">int</span> less = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">while</span> (r &lt; n) &#123;</span><br><span class="line">                cnt[s.charAt(r) - <span class="string">&#x27;a&#x27;</span>]++;</span><br><span class="line">                <span class="keyword">if</span> (cnt[s.charAt(r) - <span class="string">&#x27;a&#x27;</span>] == <span class="number">1</span>) &#123;</span><br><span class="line">                    tot++;</span><br><span class="line">                    less++;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (cnt[s.charAt(r) - <span class="string">&#x27;a&#x27;</span>] == k) &#123;</span><br><span class="line">                    less--;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">while</span> (tot &gt; t) &#123;</span><br><span class="line">                    cnt[s.charAt(l) - <span class="string">&#x27;a&#x27;</span>]--;</span><br><span class="line">                    <span class="keyword">if</span> (cnt[s.charAt(l) - <span class="string">&#x27;a&#x27;</span>] == k - <span class="number">1</span>) &#123;</span><br><span class="line">                        less++;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (cnt[s.charAt(l) - <span class="string">&#x27;a&#x27;</span>] == <span class="number">0</span>) &#123;</span><br><span class="line">                        tot--;</span><br><span class="line">                        less--;</span><br><span class="line">                    &#125;</span><br><span class="line">                    l++;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (less == <span class="number">0</span>) &#123;</span><br><span class="line">                    ret = Math.max(ret, r - l + <span class="number">1</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                r++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/longest-substring-with-at-least-k-repeating-characters/solution/zhi-shao-you-kge-zhong-fu-zi-fu-de-zui-c-o6ww/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">滑动窗口</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">分治</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/02/27/%E8%87%B3%E5%B0%91%E6%9C%89k%E4%B8%AA%E9%87%8D%E5%A4%8D%E5%AD%97%E7%AC%A6%E7%9A%84%E6%9C%80%E9%95%BF%E5%AD%97%E4%B8%B2/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-topK问题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MjM5ODYxMDA5OQ==&mid=2651961587&idx=1&sn=54bf39db7043cc638315caf70f24d94b&chksm=bd2d0d2f8a5a84395246be4522d10fbfc1f744658047d5fb3fad8e9f3c3d76baab3a2ce84867&scene=21#wechat_redirect">原文</a></p>
-<ul>
-<li><blockquote>
-<p>前言：本文将介绍随机选择，分治法，减治法的思想，以及TopK问题优化的来龙去脉，原理与细节，保证有收获。</p>
-</blockquote>
-</li>
-</ul>
-<p>  面试中，TopK，是问得比较多的几个问题之一，到底有几种方法，这些方案里蕴含的优化思路究竟是怎么样的，今天和大家聊一聊。</p>
-<p>  <em>画外音：**除非校招，我在面试过程中从不问TopK这个问题，默认大家都知道。</em></p>
-<p>  <strong>问题描述</strong>：</p>
-<p>  从arr[1, n]这n个数中，找出最大的k个数，这就是经典的TopK问题。</p>
-<p>  <strong>栗子</strong>：</p>
-<p>  从arr[1, 12]={5,3,7,1,8,2,9,4,7,2,6,6} 这n=12个数中，找出最大的k=5个。</p>
-<p>  <strong>一、排序</strong></p>
-<p>  <img src="https://mmbiz.qpic.cn/mmbiz_png/YrezxckhYOzzA7pbponFmibHaMYQ5Vkk9sq2dj1EBcJOILlsSEwEaaicRoxicVfmSya1Ka2TzTNa3yicBXuricq28Xg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
-<p>  排序是最容易想到的方法，将n个数排序之后，取出最大的k个，即为所得。</p>
-<p>  <strong>伪代码</strong>：</p>
-<p>  sort(arr, 1, n);</p>
-<p>  return arr[1, k];</p>
-<p>  <strong>时间复杂度</strong>：O(n*lg(n))</p>
-<p>  <strong>分析</strong>：明明只需要TopK，却将全局都排序了，这也是这个方法复杂度非常高的原因。那能不能不全局排序，而只局部排序呢？这就引出了第二个优化方法。</p>
-<p>  <strong>二、局部排序</strong></p>
-<p>  不再全局排序，只对最大的k个排序。</p>
-<p>  <img src="https://mmbiz.qpic.cn/mmbiz_png/YrezxckhYOzzA7pbponFmibHaMYQ5Vkk9pNPrxictUYvjERicF7DnvaJ4SZHdjVCSXJE3WJlUIVQ9ujPiaSOicTYOmw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
-<p>  冒泡是一个很常见的排序方法，每冒一个泡，找出最大值，冒k个泡，就得到TopK。</p>
-<p>  <strong>伪代码</strong>：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">for(i&#x3D;1 to k)&#123;</span><br><span class="line"></span><br><span class="line">​     bubble_find_max(arr,i);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">return arr[1, k];</span><br></pre></td></tr></table></figure>
-
-
-<p>  <strong>时间复杂度</strong>：O(n*k)</p>
-<p>  <strong>分析</strong>：冒泡，将全局排序优化为了局部排序，非TopK的元素是不需要排序的，节省了计算资源。不少朋友会想到，需求是TopK，是不是这最大的k个元素也不需要排序呢？这就引出了第三个优化方法。</p>
-<p>  <strong>三、堆</strong></p>
-<p>  <strong>思路</strong>：只找到TopK，不排序TopK。</p>
-<p>  <img src="https://mmbiz.qpic.cn/mmbiz_png/YrezxckhYOzzA7pbponFmibHaMYQ5Vkk9EkBEbuOR4lfCTZYn7oVPY70G2JHhGwanicvB4DkgicYjxdDSsT7M3KVQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
-<p>  先用前k个元素生成一个小顶堆，这个小顶堆用于存储，当前最大的k个元素。</p>
-<p>  <img src="https://mmbiz.qpic.cn/mmbiz_png/YrezxckhYOzzA7pbponFmibHaMYQ5Vkk9fCKiazIwA0MaQMLhjr3NiavXDib6cSysEFlibGJg6uTZbUsXd3fy5NbCZA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
-<p>  接着，从第k+1个元素开始扫描，和堆顶（堆中最小的元素）比较，如果被扫描的元素大于堆顶，则替换堆顶的元素，并调整堆，以保证堆内的k个元素，总是当前最大的k个元素。</p>
-<p>  <img src="https://mmbiz.qpic.cn/mmbiz_png/YrezxckhYOzzA7pbponFmibHaMYQ5Vkk9xBxbWpznlYmMsItZ7Vd3B4MA0TzALhulicsNWrQ1icjaacibL19XOmicVg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
-<p>  直到，扫描完所有n-k个元素，最终堆中的k个元素，就是猥琐求的TopK。</p>
-<p>  <strong>伪代码</strong>：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">heap[k] &#x3D; make_heap(arr[1, k]);</span><br><span class="line"></span><br><span class="line">for(i&#x3D;k+1 to n)&#123;</span><br><span class="line"></span><br><span class="line">​     adjust_heap(heep[k],arr[i]);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">return heap[k];</span><br></pre></td></tr></table></figure>
-
-
-<p>  <strong>时间复杂度</strong>：O(n*lg(k))</p>
-<p>  <em>画外音：n个元素扫一遍，假设运气很差，每次都入堆调整，调整时间复杂度为堆的高度，即lg(k)，故整体时间复杂度是n*lg(k)。</em></p>
-<p>  <strong>分析</strong>：堆，将冒泡的TopK排序优化为了TopK不排序，节省了计算资源。堆，是求TopK的经典算法，那还有没有更快的方案呢？</p>
-<p>  <strong>四、随机选择</strong></p>
-<p>  随机选择算在是《算法导论》中一个经典的算法，其时间复杂度为O(n)，是一个线性复杂度的方法。</p>
-<p>  这个方法并不是所有同学都知道，为了将算法讲透，先聊一些前序知识，一个所有程序员都应该烂熟于胸的经典算法：快速排序。</p>
-<p>  <em>画外音：</em></p>
-<p>  <em>（1）如果有朋友说，“不知道快速排序，也不妨碍我写业务代码呀”…额…</em></p>
-<p>  <em>（2）除非校招，我在面试过程中从不问快速排序，默认所有工程师都知道；</em></p>
-<p>  <strong>其伪代码是</strong>：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">void quick_sort(int[]arr, int low, inthigh)&#123;</span><br><span class="line"></span><br><span class="line">​     if(low&#x3D;&#x3D; high) return;</span><br><span class="line"></span><br><span class="line">​     int i &#x3D; partition(arr, low, high);</span><br><span class="line"></span><br><span class="line">​     quick_sort(arr, low, i-1);</span><br><span class="line"></span><br><span class="line">​     quick_sort(arr, i+1, high);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<p>  其核心算法思想是，分治法。</p>
-<p>  <strong>分治法</strong>（Divide&amp;Conquer），把一个大的问题，转化为若干个子问题（Divide），每个子问题“<strong>都</strong>”解决，大的问题便随之解决（Conquer）。这里的关键词是<strong>“都”</strong>。从伪代码里可以看到，快速排序递归时，先通过partition把数组分隔为两个部分，两个部分“都”要再次递归。</p>
-<p>  分治法有一个特例，叫减治法。</p>
-<p>  <strong>减治法</strong>（Reduce&amp;Conquer），把一个大的问题，转化为若干个子问题（Reduce），这些子问题中“<strong>只</strong>”解决一个，大的问题便随之解决（Conquer）。这里的关键词是<strong>“只”</strong>。</p>
-<p>  <strong>二分查找binary_search</strong>，BS，是一个典型的运用减治法思想的算法，其伪代码是：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">int BS(int[]arr, int low, inthigh, int target)&#123;</span><br><span class="line"></span><br><span class="line">​     if(low&gt; high) return -1;</span><br><span class="line"></span><br><span class="line">​     mid&#x3D; (low+high)&#x2F;2;</span><br><span class="line"></span><br><span class="line">​     if(arr[mid]&#x3D;&#x3D; target) return mid;</span><br><span class="line"></span><br><span class="line">​     if(arr[mid]&gt; target)</span><br><span class="line"></span><br><span class="line">​          return BS(arr, low, mid-1, target);</span><br><span class="line"></span><br><span class="line">​     else</span><br><span class="line"></span><br><span class="line">​          return BS(arr, mid+1, high, target);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<p>  从伪代码可以看到，二分查找，一个大的问题，可以用一个mid元素，分成左半区，右半区两个子问题。而左右两个子问题，只需要解决其中一个，递归一次，就能够解决二分查找全局的问题。</p>
-<p>  通过分治法与减治法的描述，可以发现，分治法的复杂度一般来说是大于减治法的：</p>
-<p>  快速排序：O(n*lg(n))</p>
-<p>  二分查找：O(lg(n))</p>
-<p>  话题收回来，<strong>快速排序</strong>的核心是：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">i &#x3D; partition(arr, low, high);</span><br></pre></td></tr></table></figure>
-
-
-<p>  <strong>这个partition是干嘛的呢？</strong></p>
-<p>  顾名思义，partition会把整体分为两个部分。</p>
-<p>  更具体的，会用数组arr中的一个元素（默认是第一个元素t=arr[low]）为划分依据，将数据arr[low, high]划分成左右两个子数组：</p>
-<ul>
-<li><p>左半部分，都比t大</p>
-</li>
-<li><p>右半部分，都比t小</p>
-</li>
-<li><p>中间位置i是划分元素</p>
-<p><img src="https://mmbiz.qpic.cn/mmbiz_png/YrezxckhYOzzA7pbponFmibHaMYQ5Vkk9ic4TjkicnCpTAVJJqq4WgbE6tQhl5XORGiaJnZj3UboKBpUhTq1kad5Ng/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
-<p>以上述TopK的数组为例，先用第一个元素t=arr[low]为划分依据，扫描一遍数组，把数组分成了两个半区：</p>
-</li>
-<li><p>左半区比t大</p>
-</li>
-<li><p>右半区比t小</p>
-</li>
-<li><p>中间是t</p>
-<p>partition返回的是t最终的位置i。</p>
-</li>
-</ul>
-<p>  很容易知道，partition的时间复杂度是O(n)。</p>
-<p>  <em>画外音：把整个数组扫一遍，比t大的放左边，比t小的放右边，最后t放在中间N[i]。</em></p>
-<p>  <strong>partition和TopK问题有什么关系呢？</strong></p>
-<p>  TopK是希望求出arr[1,n]中最大的k个数，那如果找到了<strong>第k大</strong>的数，做一次partition，不就一次性找到最大的k个数了么？</p>
-<p>  <em>画外音：即partition后左半区的k个数。</em></p>
-<p>  问题变成了arr[1, n]中找到第k大的数。</p>
-<p>  再回过头来看看<strong>第一次</strong>partition，划分之后：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">i &#x3D; partition(arr, 1, n);</span><br></pre></td></tr></table></figure>
-<ul>
-<li>如果i大于k，则说明arr[i]左边的元素都大于k，于是只递归arr[1, i-1]里第k大的元素即可；</li>
-<li>如果i小于k，则说明说明第k大的元素在arr[i]的右边，于是只递归arr[i+1, n]里第k-i大的元素即可；</li>
-</ul>
-<p>  <em>画外音：这一段非常重要，多读几遍。</em></p>
-<p>  这就是<strong>随机选择</strong>算法randomized_select，RS，其伪代码如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">int RS(arr, low, high, k)&#123;</span><br><span class="line"></span><br><span class="line"> if(low&#x3D;&#x3D; high) return arr[low];</span><br><span class="line"></span><br><span class="line"> i&#x3D; partition(arr, low, high);</span><br><span class="line"></span><br><span class="line"> temp&#x3D; i-low; &#x2F;&#x2F;数组前半部分元素个数</span><br><span class="line"></span><br><span class="line"> if(temp&gt;&#x3D;k)</span><br><span class="line"></span><br><span class="line">   return RS(arr, low, i-1, k); &#x2F;&#x2F;求前半部分第k大</span><br><span class="line"></span><br><span class="line"> else</span><br><span class="line"></span><br><span class="line">   return RS(arr, i+1, high, k-i); &#x2F;&#x2F;求后半部分第k-i大</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<p>  <img src="https://mmbiz.qpic.cn/mmbiz_png/YrezxckhYOzzA7pbponFmibHaMYQ5Vkk9kb1JqQdt0av8kK59VvicibDNOrbIXsZicaHAFhk8u1A7BQW1aYIr84pQg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
-<p>  这是一个典型的减治算法，递归内的两个分支，最终只会执行一个，它的时间复杂度是O(n)。</p>
-<p>  再次强调一下：</p>
-<ul>
-<li><strong>分治法</strong>，大问题分解为小问题，小问题都要递归各个分支，例如：快速排序</li>
-<li><strong>减治法</strong>，大问题分解为小问题，小问题只要递归一个分支，例如：二分查找，随机选择</li>
-</ul>
-<p>  通过随机选择（randomized_select），找到arr[1, n]中第k大的数，再进行一次partition，就能得到TopK的结果。</p>
-<p>  <strong>五、总结</strong></p>
-<p>  TopK，不难；其思路优化过程，不简单：</p>
-<ul>
-<li><strong>全局排序</strong>，O(n*lg(n))</li>
-<li><strong>局部排序</strong>，只排序TopK个数，O(n*k)</li>
-<li><strong>堆</strong>，TopK个数也不排序了，O(n*lg(k))</li>
-<li>分治法，每个分支“都要”递归，例如：快速排序，O(n*lg(n))</li>
-<li>减治法，“只要”递归一个分支，例如：二分查找O(lg(n))，随机选择O(n)</li>
-<li>TopK的另一个解法：<strong>随机选择</strong>+partition</li>
-</ul>
-<p><strong>bitmap解法</strong><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/sDjCBFXoWajqvgBFdDoSrA">原文</a></p>
-<p>《<a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MjM5ODYxMDA5OQ==&mid=2651961587&idx=1&sn=54bf39db7043cc638315caf70f24d94b&chksm=bd2d0d2f8a5a84395246be4522d10fbfc1f744658047d5fb3fad8e9f3c3d76baab3a2ce84867&scene=21#wechat_redirect">TopK到底怎么答？</a>》介绍了TopK的四种解法，其中<strong>随机选择</strong> (randomized select) 最为经典，用<strong>减治法</strong> (Reduce &amp; Conquer) 的思想，将数据规模急速降低，总体复杂度为O(n)。</p>
-<p>结尾挖了一个坑：求TopK，<strong>有没有比随机选择更快的方法呢？</strong></p>
-<p><strong>空间换时间</strong>，是算法优化中最常见的手段，如果有相对充裕的内存，可以有更快的算法。</p>
-<p><em>画外音：即使内存不够，也可以水平切分，使用分段的方法来操作，减少每次内存使用量。</em></p>
-<p><strong>TopK问题描述</strong></p>
-<p>从arr[1, 12]={5,3,7,1,8,2,9,4,7,2,6,6} 这n=12个数中，找出最大的k=5个。</p>
-<p><strong>比特位图</strong>(bitmap)<strong>法</strong></p>
-<p>bitmap，是空间换时间的典型代表。它是一种，用若干个bit来表示集合的数据结构。</p>
-<p><strong>例如</strong>，集合S={1,3,5,7,9}，容易发现，S中所有元素都在1-16之间，于是，可以用16个bit来表示这个集合：存在于集合中的元素，对应bit置1，否则置0。</p>
-<p><em>画外音：究竟需要多少存存储空间，取决于集合中元素的值域，在什么范围之内。</em></p>
-<p>上述集合S，可以用1010101010000000这样一个16bit的bitmap来表示，其中，第1, 3, 5, 7, 9个bit位置是1。</p>
-<p>假设TopK的n个元素都是int，且元素之间没有重复，只需要申请2^32个bit，即4G的内存，就能够用bitmap表示这n元素。</p>
-<p>扫描一次所有n个元素，以生成bitmap，其时间复杂度是O(n)。生成后，取TopK只需要找到最高位的k个bit即可。算法总时间复杂度也是O(n)。</p>
-<p>伪代码为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bitmap[4G] &#x3D; make_bitmap(arr[1, n]);</span><br><span class="line">return bitmap[top k bits];</span><br></pre></td></tr></table></figure>
-
-
-<p>bitmap算法有个缺点，如果集合元素有重复，相同的元素会被去重，假设集合S中有5个1，最终S制作成bitmap后，这5个1只对应1个bit位，相当于4个元素被丢掉了，这样会导致，找到的TopK不准。<strong>该怎么优化呢？</strong></p>
-<p><strong>比特位图计数</strong></p>
-<p>优化方法是，每个元素的1个bit变成1个计数。</p>
-<p><img src="https://mmbiz.qpic.cn/mmbiz_jpg/YrezxckhYOxyjTHsJnqyMvp4peu6NiaXESzU0WNiaUjvAwXZNjLuyicktn7fl7Y48D34ib5r4cv0WlMicjA5dScK4oA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
-<p>如上图所示，TopK的集合经过比特位图计数处理后，会记录每个bit对应在集合S中出现过多少次。</p>
-<p>接下来，找TopK的过程，就是bitmap从高位的计数开始，往低位的计数扫描，得到count之和等于k，对应的bit就是TopK所求。</p>
-<p><img src="https://mmbiz.qpic.cn/mmbiz_jpg/YrezxckhYOxyjTHsJnqyMvp4peu6NiaXEY1hhFg7yJ9DF30oeg2Y6lQM7ztxUyMOypBDgtjdO9GLAtyQUlcZl7w/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="图片"></p>
-<p>如上图所示，k=5：</p>
-<p>（1）第一个非0的count是1，对应的bit是9；</p>
-<p>（2）第二个非0的count也是1，对应的bit是8；</p>
-<p>（3）第三个非0的count是2，对应的bit是7；</p>
-<p>（4）第四个非0的count是2，对应的bit是6，但TopK只缺1个数字了，故只有1个6入选；</p>
-<p>故，最终的TopK={9, 8, 7, 7, 6}。</p>
-<p><strong>结论</strong>：通过比特位图精准计数的方式，求解TopK，算法整体只需要不到2次扫描，时间复杂度为O(n)，比减治法的随机选择会更快。</p>
-<p>为了巩固今天的内容，例行挖个坑。</p>
-<p>面试中，还有个问题问得比较多：<strong>求一个正整数的二进制表示包含多少个1？</strong></p>
-<p>例如：7的二进制表示是111，即7的二进制表示包含3个1。</p>
-<p><em>画外音：我面试过程中从不问这个问题。</em></p>
-<p>最常见的解法是：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">uint32_t count_one(uint32_t n)&#123;</span><br><span class="line">  uint32_t count&#x3D;0;</span><br><span class="line">  while(n)&#123;</span><br><span class="line">​    count ++;</span><br><span class="line">​    n &amp;&#x3D; (n-1);</span><br><span class="line">  &#125;</span><br><span class="line">  return count;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/02/27/topK%E9%97%AE%E9%A2%98/">展开全文 >></a>
         </p>
       
 
