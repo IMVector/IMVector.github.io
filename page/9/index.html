@@ -150,6 +150,822 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-背包九讲之多重背包问题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/23/%E8%83%8C%E5%8C%85%E4%B9%9D%E8%AE%B2%E4%B9%8B%E5%A4%9A%E9%87%8D%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98/">背包九讲之多重背包问题</a>
+    </h1>
+  
+
+        
+        <a href="/2021/03/23/%E8%83%8C%E5%8C%85%E4%B9%9D%E8%AE%B2%E4%B9%8B%E5%A4%9A%E9%87%8D%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98/" class="archive-article-date">
+  	<time datetime="2021-03-23T13:35:22.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-23</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<p>[toc]</p>
+<h2 id="说明"><a href="#说明" class="headerlink" title="说明:"></a>说明:</h2><p>本文所讲内容摘录自<a target="_blank" rel="noopener" href="https://github.com/tianyicui/pack">崔添翼:背包九讲</a>,并对其中的数学内容和一些较为复杂的内容进行了删减,增加了基础的例题,只是面向初学者或者不需要深入理解背包及其衍生问题的读者,如果有能力并且有意愿加深理解,本文可能会对您形成误导,请移步<a target="_blank" rel="noopener" href="https://github.com/tianyicui/pack">崔添翼:背包九讲.</a></p>
+<h2 id="多重背包问题"><a href="#多重背包问题" class="headerlink" title="多重背包问题"></a>多重背包问题</h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h3><p>有 $N$ 种物品和一个容量为 $V$ 的背包。第 $i$ 种物品最多有 $M_i$ 件可用，每件耗费的空间是 $C_i$，价值是 $W_i$。求解将哪些物品装入背包可使这些物品的耗费的空间总和不超 过背包容量，且价值总和最大.</p>
+<h3 id="基本思路"><a href="#基本思路" class="headerlink" title="基本思路"></a>基本思路</h3><p>因为对于第 $i$ 种物品 <strong>有 $M_i + 1$ 种策略</strong> ： <strong>取 $0$ 件，取 $1$ 件……取 $M_i$ 件</strong>。 <strong>令 $F[i, v]$表示前 $i$ 种物品恰放入一个容量为 $v$ 的背包的最大价值</strong>，则有状态转移方程：<br>$$<br>F[i，v] = max\left{F[i − 1, v − k ∗ C_i] + k ∗W_i \space\space|\space\space 0 ≤ k ≤ M_i\right}<br>$$<br>时间复杂度是 $O\left(N V \sum M_i\right)$。</p>
+<p><strong>上述问题的伪代码</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> N, V;</span><br><span class="line"><span class="comment">// cv[i][0]是放第i件物品消耗的费用,cv[i][1]是放第i件物品的收益价值,cv[i][2]是第i件物品的最大数量,其中i从1开始</span></span><br><span class="line"><span class="keyword">int</span>[][] cv = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][<span class="number">3</span>];</span><br><span class="line"><span class="keyword">int</span> dp[][] = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][V + <span class="number">1</span>];</span><br><span class="line">dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= V; j++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k * cv[i][<span class="number">0</span>] &lt;= j &amp;&amp; k &lt;= cv[i][<span class="number">2</span>]; k++) &#123;</span><br><span class="line">            dp[i][j] = Math.max(dp[i][j], dp[i - <span class="number">1</span>][j - k * cv[i][<span class="number">0</span>]] + k * cv[i][<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> dp[N][V];</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意❗: 外层<code>i</code>枚举物品的数量,内层<code>j</code>枚举背包的容量，最内层<code>k</code>枚举选择i的件数</strong></p>
+<p><strong>注意❗❗❗: 转移方程为<code>dp[i][j] = Math.max(dp[i][j], dp[i - 1][j - k * cv[i][0]] + k * cv[i][1])</code> max函数里面是<code>dp[i][j]</code>和<code>dp[i - 1][j - k * cv[i][0]] + k * cv[i][1]</code>这两项,  切记!切记!</strong></p>
+<h3 id="一个简单有效的优化"><a href="#一个简单有效的优化" class="headerlink" title="一个简单有效的优化"></a>一个简单有效的优化</h3><p>略🚮🤐(太菜了,慢慢来)</p>
+<h2 id="相关题目练习"><a href="#相关题目练习" class="headerlink" title="相关题目练习"></a>相关题目练习</h2><h3 id="题目URL"><a href="#题目URL" class="headerlink" title="题目URL"></a><a target="_blank" rel="noopener" href="https://www.acwing.com/problem/content/4/">题目URL</a></h3><p>有 <code>N</code> 种物品和一个容量是 <code>V</code> 的背包。</p>
+<p>第 <code>i</code> 种物品最多有 $s_i$ 件，每件体积是 $v_i$，价值是 $w_i$。</p>
+<p>求解将哪些物品装入背包，可使物品体积总和不超过背包容量，且价值总和最大。<br>输出最大价值。</p>
+<h4 id="输入格式"><a href="#输入格式" class="headerlink" title="输入格式"></a>输入格式</h4><p>第一行两个整数，<code>N</code>，<code>V</code>，用空格隔开，分别表示物品种数和背包容积。</p>
+<p>接下来有 <code>N</code> 行，每行三个整数 $v_i,w_i,s_i$，用空格隔开，分别表示第 <code>i</code> 种物品的体积、价值和数量。</p>
+<h4 id="输出格式"><a href="#输出格式" class="headerlink" title="输出格式"></a>输出格式</h4><p>输出一个整数，表示最大价值。</p>
+<h4 id="数据范围"><a href="#数据范围" class="headerlink" title="数据范围"></a>数据范围</h4><p>$0&lt;N,V≤1000&lt;N,V≤100$</p>
+<p>$0&lt;v_i,w_i,s_i≤1000&lt;v_i,w_i,s_i≤100$</p>
+<h4 id="输入样例"><a href="#输入样例" class="headerlink" title="输入样例"></a>输入样例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">4 5</span><br><span class="line">1 2 3</span><br><span class="line">2 4 1</span><br><span class="line">3 4 3</span><br><span class="line">4 5 2</span><br></pre></td></tr></table></figure>
+
+<h4 id="输出样例："><a href="#输出样例：" class="headerlink" title="输出样例："></a>输出样例：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">10</span><br></pre></td></tr></table></figure>
+
+<h3 id="题目解法"><a href="#题目解法" class="headerlink" title="题目解法"></a>题目解法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Scanner sc = <span class="keyword">new</span> Scanner(System.in);</span><br><span class="line">        <span class="comment">// 物品的数量</span></span><br><span class="line">        <span class="keyword">int</span> N = sc.nextInt();</span><br><span class="line">        <span class="comment">// 背包的容量</span></span><br><span class="line">        <span class="keyword">int</span> V = sc.nextInt();</span><br><span class="line">        <span class="comment">// 每个物品的体积和价值</span></span><br><span class="line">        <span class="keyword">int</span>[][] vw = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][<span class="number">3</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">            <span class="comment">// 体积</span></span><br><span class="line">            vw[i][<span class="number">0</span>] = sc.nextInt();</span><br><span class="line">            <span class="comment">// 价值</span></span><br><span class="line">            vw[i][<span class="number">1</span>] = sc.nextInt();</span><br><span class="line">            <span class="comment">// 数量</span></span><br><span class="line">            vw[i][<span class="number">2</span>] = sc.nextInt();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> dp[][] = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][V + <span class="number">1</span>];</span><br><span class="line">        <span class="comment">// 不要求完全装满背包,初始化全设置为0,因为java默认int数组为0所以象征性的初始化第一个</span></span><br><span class="line">        dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 枚举第i件物品</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">            <span class="comment">// 枚举背包的容量j</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= V; j++) &#123;</span><br><span class="line">                <span class="comment">// 枚举选择第i种物品的数量k</span></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k * vw[i][<span class="number">0</span>] &lt;= j &amp;&amp; k &lt;= vw[i][<span class="number">2</span>]; k++) &#123;</span><br><span class="line">                    <span class="comment">// dp[i][j]的值是:&#123;选择k件第i种物品时&#125;与&#123;选择其他数量的第i种物品&#125;的两者的最大值</span></span><br><span class="line">                    dp[i][j] = Math.max(dp[i][j], dp[i - <span class="number">1</span>][j - k * vw[i][<span class="number">0</span>]] + k * vw[i][<span class="number">1</span>]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 返回N件物品,背包容量为V的装入的最大价值</span></span><br><span class="line">        System.out.println(dp[N][V]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">背包九讲</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">多重背包</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/03/23/%E8%83%8C%E5%8C%85%E4%B9%9D%E8%AE%B2%E4%B9%8B%E5%A4%9A%E9%87%8D%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-背包九讲之完全背包问题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/23/%E8%83%8C%E5%8C%85%E4%B9%9D%E8%AE%B2%E4%B9%8B%E5%AE%8C%E5%85%A8%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98/">背包九讲之完全背包问题</a>
+    </h1>
+  
+
+        
+        <a href="/2021/03/23/%E8%83%8C%E5%8C%85%E4%B9%9D%E8%AE%B2%E4%B9%8B%E5%AE%8C%E5%85%A8%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98/" class="archive-article-date">
+  	<time datetime="2021-03-23T12:29:18.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-23</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+<p>[toc]</p>
+<h2 id="说明"><a href="#说明" class="headerlink" title="说明:"></a>说明:</h2><p>本文所讲内容摘录自<a target="_blank" rel="noopener" href="https://github.com/tianyicui/pack">崔添翼:背包九讲</a>,并对其中的数学内容和一些较为复杂的内容进行了删减,增加了基础的例题,只是面向初学者或者不需要深入理解背包及其衍生问题的读者,如果有能力并且有意愿加深理解,本文可能会对您形成误导,请移步<a target="_blank" rel="noopener" href="https://github.com/tianyicui/pack">崔添翼:背包九讲.</a></p>
+<h2 id="完全背包问题"><a href="#完全背包问题" class="headerlink" title="完全背包问题"></a>完全背包问题</h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h3><p>有 $N$ 种物品和一个容量为 $V$ 的背包，<strong>每种物品都有无限件可用</strong>。放入第 $i$ 种物品<br>的费用是 $C_i$，价值是 $W_i$。求解：将哪些物品装入背包，可使这些物品的耗费的费用总和不超过背包容量，且价值总和最大</p>
+<h3 id="基本思路"><a href="#基本思路" class="headerlink" title="基本思路"></a>基本思路</h3><p>与01背包问题的不同之处在于每种物品有无限件,从每种物品的角度考虑,与它相关的 <strong>策略不再是取或者不取两种状态,而是有取$0$件、取$1$件、取$2$件……直至取$⌊V/C_i⌋$ 件等许多种.</strong></p>
+<p>按照01背包的思路，<strong>令 $F[i, v]$ 表示前 $i$ 种物品恰放入一个容量为 $v$的背包的最大价值(收益)</strong>。仍然可以按照每种物品不同的策略写出状态转移方程：<br>$$<br>F[i, v]=\max \left{F\left[i-1, v-k C_{i}\right]+k W_{i} \mid 0 \leq k C_{i} \leq v\right}<br>$$</p>
+<p>这跟 01 背包问题一样有 $O(VN)$ 个状态需要求解，但求解每个状态的时间已经不是常数了,因为需要遍历<code>k</code>为$1、2、3… \frac{v}{c_{i}}$ 时的状态，求解状态 $F[i, v]$ 的时间是$O\left(\frac{v}{C_{i}}\right)$ . 总的复杂度可以认为是 $O\left(N V \sum \frac{V}{C_{i}}\right)$</p>
+<p><strong>上述问题的伪代码</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> N, V;</span><br><span class="line"><span class="comment">// cv[i][0]是放第i件物品消耗的费用,cv[i][1]是放第i件物品的收益价值,其中i从1开始</span></span><br><span class="line"><span class="keyword">int</span>[][] cv = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][<span class="number">2</span>];</span><br><span class="line"><span class="keyword">int</span> dp[][] = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][V + <span class="number">1</span>];</span><br><span class="line">dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= V; j++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k * cv[i][<span class="number">0</span>] &lt;= j; k++) &#123;</span><br><span class="line">            dp[i][j] = Math.max(dp[i][j], dp[i - <span class="number">1</span>][j - k * cv[i][<span class="number">0</span>]] + k * cv[i][<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> dp[N][V];</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意❗: 外层<code>i</code>枚举物品的数量,内层<code>j</code>枚举背包的容量，最内层<code>k</code>枚举选择i的件数</strong></p>
+<p><strong>注意❗❗❗: 转移方程为<code>dp[i][j] = Math.max(dp[i][j], dp[i - 1][j - k * cv[i][0]] + k * cv[i][1])</code> max函数里面是<code>dp[i][j]</code>和<code>dp[i - 1][j - k * cv[i][0]] + k * cv[i][1]</code>这两项,  切记!切记!</strong></p>
+<h3 id="一个简单有效的优化"><a href="#一个简单有效的优化" class="headerlink" title="一个简单有效的优化"></a>一个简单有效的优化</h3><p>略🚮🤐(太菜了,慢慢来)</p>
+<h2 id="O-VN-的算法"><a href="#O-VN-的算法" class="headerlink" title="$O(VN)$的算法"></a>$O(VN)$的算法</h2><p>伪代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">int</span> N, V;</span><br><span class="line"><span class="comment">// cv[i][0]是放第i件物品消耗的费用,cv[i][1]是放第i件物品的收益价值,其中i从1开始</span></span><br><span class="line"><span class="keyword">int</span>[][] cv = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][<span class="number">2</span>];</span><br><span class="line"><span class="keyword">int</span> dp[][] = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][V + <span class="number">1</span>];</span><br><span class="line">dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这两个循环的顺序可以交换,交换顺序后的</span></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;=v; i++)&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">1</span>; j&lt;=N;j++)&#123;</span><br><span class="line">        <span class="keyword">if</span>(cv[j][<span class="number">0</span>]&lt;=j)&#123;</span><br><span class="line">            dp[i] = Math.max(dp[i], dp[j-cv[j][<span class="number">0</span>]]+cv[j][<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 这两个循环的顺序可以交换,交换顺序前的</span></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>; i&lt;=N; i++)&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>; j&lt;=V; j++)&#123;</span><br><span class="line">        <span class="keyword">if</span>(cv[i][<span class="number">0</span>]&lt;=i)&#123;</span><br><span class="line">            dp[j] = Math.max(dp[j],dp[j-cv[i][<span class="number">0</span>]]+cv[i][<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 上面两种方法可以任选其一</span></span><br><span class="line"><span class="keyword">return</span> dp[V];</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="相关题目练习"><a href="#相关题目练习" class="headerlink" title="相关题目练习"></a>相关题目练习</h2><h3 id="题目URL"><a href="#题目URL" class="headerlink" title="题目URL"></a><a target="_blank" rel="noopener" href="https://www.acwing.com/problem/content/3/">题目URL</a></h3><p>有 <code>N</code> 种物品和一个容量是 <code>V</code> 的背包，每种物品都有无限件可用。</p>
+<p>第 <code>i</code> 种物品的体积是 $v_i$，价值是 $w_i$。</p>
+<p>求解将哪些物品装入背包，可使这些物品的总体积不超过背包容量，且总价值最大。<br>输出最大价值。</p>
+<h4 id="输入格式"><a href="#输入格式" class="headerlink" title="输入格式"></a>输入格式</h4><p>第一行两个整数，<code>N</code>，<code>V</code>用空格隔开，分别表示物品种数和背包容积。</p>
+<p>接下来有 <code>N</code> 行，每行两个整数 $v_i,w_i$用空格隔开，分别表示第 <code>i</code> 种物品的体积和价值。</p>
+<h4 id="输出格式"><a href="#输出格式" class="headerlink" title="输出格式"></a>输出格式</h4><p>输出一个整数，表示最大价值。</p>
+<h4 id="数据范围"><a href="#数据范围" class="headerlink" title="数据范围"></a>数据范围</h4><p>$0&lt;N,V≤10000&lt;N,V≤1000$</p>
+<p>$0&lt;vi,wi≤10000&lt;vi,wi≤1000$</p>
+<h4 id="输入样例"><a href="#输入样例" class="headerlink" title="输入样例"></a>输入样例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">4 5</span><br><span class="line">1 2</span><br><span class="line">2 4</span><br><span class="line">3 4</span><br><span class="line">4 5</span><br></pre></td></tr></table></figure>
+
+<h4 id="输出样例："><a href="#输出样例：" class="headerlink" title="输出样例："></a>输出样例：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">10</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="题目解法"><a href="#题目解法" class="headerlink" title="题目解法"></a>题目解法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Scanner sc = <span class="keyword">new</span> Scanner(System.in);</span><br><span class="line">        <span class="comment">// 物品的数量</span></span><br><span class="line">        <span class="keyword">int</span> N = sc.nextInt();</span><br><span class="line">        <span class="comment">// 背包的容量</span></span><br><span class="line">        <span class="keyword">int</span> V = sc.nextInt();</span><br><span class="line">        <span class="comment">// 每个物品的体积和价值</span></span><br><span class="line">        <span class="keyword">int</span>[][] vw = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][<span class="number">2</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">            <span class="comment">// 体积</span></span><br><span class="line">            vw[i][<span class="number">0</span>] = sc.nextInt();</span><br><span class="line">            <span class="comment">// 价值</span></span><br><span class="line">            vw[i][<span class="number">1</span>] = sc.nextInt();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> dp[][] = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][V + <span class="number">1</span>];</span><br><span class="line">        <span class="comment">// 不要求完全装满背包,初始化全设置为0,因为java默认int数组为0所以象征性的初始化第一个</span></span><br><span class="line">        dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 枚举第i件物品</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">            <span class="comment">// 枚举背包的容量j</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= V; j++) &#123;</span><br><span class="line">                <span class="comment">// 枚举选择第i种物品的数量k</span></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k * vw[i][<span class="number">0</span>] &lt;= j; k++) &#123;</span><br><span class="line">                    <span class="comment">// dp[i][j]的值是:&#123;选择k件第i种物品时&#125;与&#123;选择其他数量的第i种物品&#125;的两者的最大值</span></span><br><span class="line">                    dp[i][j] = Math.max(dp[i][j], dp[i - <span class="number">1</span>][j - k * vw[i][<span class="number">0</span>]] + k * vw[i][<span class="number">1</span>]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 返回N件物品,背包容量为V的装入的最大价值</span></span><br><span class="line">        System.out.println(dp[N][V]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>参考文献</p>
+</blockquote>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/tianyicui/pack">崔添翼:背包九讲</a></p>
+</blockquote>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">背包九讲</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">完全背包</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/03/23/%E8%83%8C%E5%8C%85%E4%B9%9D%E8%AE%B2%E4%B9%8B%E5%AE%8C%E5%85%A8%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-背包九讲之01背包问题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/23/%E8%83%8C%E5%8C%85%E4%B9%9D%E8%AE%B2%E4%B9%8B01%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98/">背包九讲之01背包问题</a>
+    </h1>
+  
+
+        
+        <a href="/2021/03/23/%E8%83%8C%E5%8C%85%E4%B9%9D%E8%AE%B2%E4%B9%8B01%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98/" class="archive-article-date">
+  	<time datetime="2021-03-23T11:29:42.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-23</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<p>[toc]</p>
+<h2 id="说明"><a href="#说明" class="headerlink" title="说明:"></a>说明:</h2><p>本文所讲内容摘录自<a target="_blank" rel="noopener" href="https://github.com/tianyicui/pack">崔添翼:背包九讲</a>,并对其中的数学内容和一些较为复杂的内容进行了删减,增加了基础的例题,只是面向初学者或者不需要深入理解背包及其衍生问题的读者,如果有能力并且有意愿加深理解,本文可能会对您形成误导,请移步<a target="_blank" rel="noopener" href="https://github.com/tianyicui/pack">崔添翼:背包九讲.</a></p>
+<h2 id="01背包问题"><a href="#01背包问题" class="headerlink" title="01背包问题"></a>01背包问题</h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h3><p>有 $N$ 件物品和一个容量为 $V$ 的背包。放入第 $i$ 件物品耗费的费用是 $C_i$得到的价值是 $W_i$。求解将哪些物品装入背包可使价值总和最大。</p>
+<h3 id="基本思路"><a href="#基本思路" class="headerlink" title="基本思路"></a>基本思路</h3><p>最基础的背包问题,特点是<strong>每种物品仅有一件,可以选择放或者不放.</strong></p>
+<p>$F[i, v]$ 表示前 $i$ 件物品恰放入一个容量为 $v$ 的背包可以获得的最大价值。则其状态转移方程便是：</p>
+<p>$$<br>F[i, v]=\max \left{F[i-1, v], F\left[i-1, v-C_{i}\right]+W_{i}\right}<br>$$</p>
+<p>存在两种情况:</p>
+<ul>
+<li>如果不放第 $i$ 件物品，那么问题就转化为 <strong>“前 $i − 1$ 件物品放入容量为 $v$ 的背 包中”，价值为 $F[i − 1, v]$；</strong></li>
+<li>如果放第 $i$ 件物品，那么问题就转化为 <strong>“前 $i − 1$ 件物品放 入剩下的容量为 $v −C_i$ 的背包中”，此时能获得的最大价值就是$F[i − 1, v −C_i]$ 再加上 通过放入第 $i$ 件物品获得的价值 $W_i$。</strong> </li>
+</ul>
+<p><strong>上述问题的伪代码:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> N, V;</span><br><span class="line"><span class="comment">// cv[i][0]是放第i件物品消耗的费用,cv[i][1]是放第i件物品的收益价值,其中i从1开始</span></span><br><span class="line"><span class="keyword">int</span>[][] cv = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][<span class="number">2</span>];</span><br><span class="line"><span class="keyword">int</span> dp[][] = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][V + <span class="number">1</span>];</span><br><span class="line">dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= V; j++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (cv[i][<span class="number">0</span>] &lt;= j) &#123;</span><br><span class="line">            dp[i][j] = Math.max(dp[i - <span class="number">1</span>][j], dp[i - <span class="number">1</span>][j - cv[i][<span class="number">0</span>]] + cv[i][<span class="number">1</span>]);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            dp[i][j] = dp[i - <span class="number">1</span>][j];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> dp[N][V];</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意❗: 外层枚举物品的数量,内层枚举背包的容量</strong></p>
+<h3 id="初始化的细节问题"><a href="#初始化的细节问题" class="headerlink" title="初始化的细节问题"></a>初始化的细节问题</h3><p>我们看到的求最优解的背包问题题目中，事实上有两种不太相同的问法。有的题目要求“<strong>恰好装满背包</strong>”时的最优解，有的题目则并<strong>没有要求必须把背包装满</strong>。一种区别 这两种问法的实现方法是在初始化的时候有所不同。</p>
+<ul>
+<li><strong>如果要求恰好装满背包</strong>，那么在<strong>初始化时除了$F[0]$ 为 $0$，其它$F[1..V]$ 均设为 $−∞$</strong>，这样就可以保证最终得到的 $F[V]$ 是一种恰好装满背包的最优解。</li>
+<li><strong>如果并没有要求必须把背包装满</strong>，而是只希望价格尽量大，<strong>初始化时应该将 $F[0..V]$全部设为 0。</strong></li>
+</ul>
+<p>这是为什么呢？可以这样理解：<strong>初始化的 $F$ 数组事实上就是在没有任何物品可以放入背包时的合法状态</strong>。</p>
+<ul>
+<li><p>如果要求背包<strong>恰好装满</strong>，那么此时只有容量为 $0$ 的背包可以在什么也不装且价值为 $0$ 的情况下被“恰好装满”，其它容量的背包均没有合法的解，属于未定义的状态，应该被赋值为 $-∞$ 了。</p>
+</li>
+<li><p>如果背包并<strong>非必须被装满</strong>，那么任何容量的背包都有一个合法解“什么都不装”，这个解的价值为 $0$，所以初始时状态的值也就全部为 $0$了。</p>
+</li>
+</ul>
+<h3 id="优化空间复杂度"><a href="#优化空间复杂度" class="headerlink" title="优化空间复杂度"></a>优化空间复杂度</h3><p>略🚮🤐(太菜了,慢慢来)</p>
+<h2 id="优化空间复杂度-1"><a href="#优化空间复杂度-1" class="headerlink" title="优化空间复杂度"></a>优化空间复杂度</h2><p>由于<code>dp[i][j]</code>是由<code>dp[i-1][j]</code>和<code>dp[i-1][j-cv[i][0]]</code>两个子问题递推而来，可以通过在每次主循环中通过递减背包容量的遍历方式计算<code>dp[j]</code>,这样就可以保证计算<code>dp[j]</code>的时候<code>dp[j-cv[i][0]]</code>保存的是<code>dp[i-1][j-cv[i][0]]</code>的值。</p>
+<p>伪代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> N, V;</span><br><span class="line"><span class="comment">// cv[i][0]是放第i件物品消耗的费用,cv[i][1]是放第i件物品的收益价值,其中i从1开始</span></span><br><span class="line"><span class="keyword">int</span>[][] cv = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][<span class="number">2</span>];</span><br><span class="line"><span class="keyword">int</span> dp[] = <span class="keyword">new</span> <span class="keyword">int</span>[V + <span class="number">1</span>];</span><br><span class="line">dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = V; j &gt;= <span class="number">0</span>; j--) &#123;</span><br><span class="line">        <span class="keyword">if</span> (cv[i][<span class="number">0</span>] &lt;= j) &#123;</span><br><span class="line">            dp[j] = Math.max(dp[j], dp[j - cv[i][<span class="number">0</span>]] + cv[i][<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> dp[V];</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="相关题目练习"><a href="#相关题目练习" class="headerlink" title="相关题目练习"></a>相关题目练习</h2><h3 id="题目URL"><a href="#题目URL" class="headerlink" title="题目URL"></a><a target="_blank" rel="noopener" href="https://www.acwing.com/problem/content/2/">题目URL</a></h3><p>有 <code>N</code> 件物品和一个容量是 <code>V</code> 的背包。每件物品只能使用一次。</p>
+<p>第 <code>i</code> 件物品的体积是 $v_i$，价值是 $w_i$。</p>
+<p>求解将哪些物品装入背包，可使这些物品的总体积不超过背包容量，且总价值最大。<br>输出最大价值。</p>
+<h4 id="输入格式"><a href="#输入格式" class="headerlink" title="输入格式"></a>输入格式</h4><p>第一行两个整数，<code>N</code>，<code>V</code>，用空格隔开，分别表示物品数量和背包容积。</p>
+<p>接下来有 <code>N</code> 行，每行两个整数 $v_i$,$w_i$，用空格隔开，分别表示第 <code>i</code> 件物品的体积和价值。</p>
+<h4 id="输出格式"><a href="#输出格式" class="headerlink" title="输出格式"></a>输出格式</h4><p>输出一个整数，表示最大价值。</p>
+<h4 id="数据范围"><a href="#数据范围" class="headerlink" title="数据范围"></a>数据范围</h4><p>$0&lt;N,V≤10000&lt;N,V≤1000$</p>
+<p>$0&lt;vi,wi≤10000&lt;vi,wi≤1000$</p>
+<h4 id="输入样例"><a href="#输入样例" class="headerlink" title="输入样例"></a>输入样例</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">4 5</span><br><span class="line">1 2</span><br><span class="line">2 4</span><br><span class="line">3 4</span><br><span class="line">4 5</span><br></pre></td></tr></table></figure>
+
+<h4 id="输出样例："><a href="#输出样例：" class="headerlink" title="输出样例："></a>输出样例：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">8</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="题目解法"><a href="#题目解法" class="headerlink" title="题目解法"></a>题目解法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Scanner sc = <span class="keyword">new</span> Scanner(System.in);</span><br><span class="line">        <span class="comment">// 物品的数量</span></span><br><span class="line">        <span class="keyword">int</span> N = sc.nextInt();</span><br><span class="line">        <span class="comment">// 背包的容量</span></span><br><span class="line">        <span class="keyword">int</span> V = sc.nextInt();</span><br><span class="line">        <span class="comment">// 每个物品的体积和价值</span></span><br><span class="line">        <span class="keyword">int</span>[][] vw = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][<span class="number">2</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">            <span class="comment">// 体积</span></span><br><span class="line">            vw[i][<span class="number">0</span>] = sc.nextInt();</span><br><span class="line">            <span class="comment">// 价值</span></span><br><span class="line">            vw[i][<span class="number">1</span>] = sc.nextInt();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> dp[][] = <span class="keyword">new</span> <span class="keyword">int</span>[N + <span class="number">1</span>][V + <span class="number">1</span>];</span><br><span class="line">        <span class="comment">// 不要求完全装满背包,初始化全设置为0,因为java默认int数组为0所以象征性的初始化第一个</span></span><br><span class="line">        dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 枚举第i件物品</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">            <span class="comment">// 枚举背包的容量</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= V; j++) &#123;</span><br><span class="line">                <span class="comment">// 如果当前物品的体积小于背包的剩余容量</span></span><br><span class="line">                <span class="keyword">if</span> (vw[i][<span class="number">0</span>] &lt;= j) &#123;</span><br><span class="line">                    <span class="comment">// 可以选择当前的物品加入背包或者不加入背包</span></span><br><span class="line">                    <span class="comment">// 不加入背包时:问题转化成i-1件物品装入容量为j的背包的子问题</span></span><br><span class="line">                    <span class="comment">// 加入背包时:问题转化成i-1件物品装入容量为j-vw[i][0]的背包的子问题</span></span><br><span class="line">                    dp[i][j] = Math.max(dp[i - <span class="number">1</span>][j], dp[i - <span class="number">1</span>][j - vw[i][<span class="number">0</span>]] + vw[i][<span class="number">1</span>]);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// 如果当前物品的体积大于背包的容量,那么不能装入,所以问题转化成</span></span><br><span class="line">                    <span class="comment">// i-1件物品装入容量为j的背包的子问题</span></span><br><span class="line">                    dp[i][j] = dp[i - <span class="number">1</span>][j];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 返回N件物品,背包容量为V的装入的最大价值</span></span><br><span class="line">        System.out.println(dp[N][V]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="空间复杂度优化"><a href="#空间复杂度优化" class="headerlink" title="空间复杂度优化"></a>空间复杂度优化</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String []args)</span></span>&#123;</span><br><span class="line">        Scanner sc=<span class="keyword">new</span> Scanner(System.in);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">int</span> N=sc.nextInt();</span><br><span class="line">        <span class="keyword">int</span> V=sc.nextInt();</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">int</span> [][]vw=<span class="keyword">new</span> <span class="keyword">int</span>[N+<span class="number">1</span>][<span class="number">2</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;=N;i++)&#123;</span><br><span class="line">            vw[i][<span class="number">0</span>]=sc.nextInt();</span><br><span class="line">            vw[i][<span class="number">1</span>]=sc.nextInt();</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">int</span> dp[]=<span class="keyword">new</span> <span class="keyword">int</span>[V+<span class="number">1</span>];</span><br><span class="line">        dp[<span class="number">0</span>]=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;=N;i++)&#123;</span><br><span class="line">            <span class="comment">// 注意01背包的空间复杂度优化时需要容量从后往前遍历</span></span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=V;j&gt;=<span class="number">0</span>;j--)&#123;</span><br><span class="line">                <span class="keyword">if</span>(vw[i][<span class="number">0</span>]&lt;=j)&#123;</span><br><span class="line">                    dp[j]=Math.max(dp[j],dp[j-vw[i][<span class="number">0</span>]]+vw[i][<span class="number">1</span>]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(dp[V]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>参考文献</p>
+</blockquote>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/tianyicui/pack">崔添翼:背包九讲</a></p>
+</blockquote>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">背包九讲</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">01背包</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/03/23/%E8%83%8C%E5%8C%85%E4%B9%9D%E8%AE%B2%E4%B9%8B01%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-扁平化的嵌套列表迭代器" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/23/%E6%89%81%E5%B9%B3%E5%8C%96%E7%9A%84%E5%B5%8C%E5%A5%97%E5%88%97%E8%A1%A8%E8%BF%AD%E4%BB%A3%E5%99%A8/">扁平化的嵌套列表迭代器</a>
+    </h1>
+  
+
+        
+        <a href="/2021/03/23/%E6%89%81%E5%B9%B3%E5%8C%96%E7%9A%84%E5%B5%8C%E5%A5%97%E5%88%97%E8%A1%A8%E8%BF%AD%E4%BB%A3%E5%99%A8/" class="archive-article-date">
+  	<time datetime="2021-03-23T08:06:50.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-23</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="341-扁平化嵌套列表迭代器"><a href="#341-扁平化嵌套列表迭代器" class="headerlink" title="341. 扁平化嵌套列表迭代器"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/flatten-nested-list-iterator/">341. 扁平化嵌套列表迭代器</a></h4><p>难度中等</p>
+<p>给你一个嵌套的整型列表。请你设计一个迭代器，使其能够遍历这个整型列表中的所有整数。</p>
+<p>列表中的每一项或者为一个整数，或者是另一个列表。其中列表的元素也可能是整数或是其他列表。</p>
+<p><strong>示例 1:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入: [[1,1],2,[1,1]]</span><br><span class="line">输出: [1,1,2,1,1]</span><br><span class="line">解释: 通过重复调用 next 直到 hasNext 返回 false，next 返回的元素的顺序应该是: [1,1,2,1,1]。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入: [1,[4,[6]]]</span><br><span class="line">输出: [1,4,6]</span><br><span class="line">解释: 通过重复调用 next 直到 hasNext 返回 false，next 返回的元素的顺序应该是: [1,4,6]。</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="DFS"><a href="#DFS" class="headerlink" title="DFS"></a>DFS</h2><p>这样写好像不符合Iterator 的设计规范。。。。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * // This is the interface that allows for creating nested lists.</span></span><br><span class="line"><span class="comment"> * // You should not implement it, or speculate about its implementation</span></span><br><span class="line"><span class="comment"> * public interface NestedInteger &#123;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *     // <span class="doctag">@return</span> true if this NestedInteger holds a single integer, rather than a nested list.</span></span><br><span class="line"><span class="comment"> *     public boolean isInteger();</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *     // <span class="doctag">@return</span> the single integer that this NestedInteger holds, if it holds a single integer</span></span><br><span class="line"><span class="comment"> *     // Return null if this NestedInteger holds a nested list</span></span><br><span class="line"><span class="comment"> *     public Integer getInteger();</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *     // <span class="doctag">@return</span> the nested list that this NestedInteger holds, if it holds a nested list</span></span><br><span class="line"><span class="comment"> *     // Return null if this NestedInteger holds a single integer</span></span><br><span class="line"><span class="comment"> *     public List&lt;NestedInteger&gt; getList();</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NestedIterator</span> <span class="keyword">implements</span> <span class="title">Iterator</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    List&lt;Integer&gt; list;</span><br><span class="line">    Iterator&lt;Integer&gt; it;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NestedIterator</span><span class="params">(List&lt;NestedInteger&gt; nestedList)</span> </span>&#123;</span><br><span class="line">        list=<span class="keyword">new</span> ArrayList&lt;&gt;();  </span><br><span class="line">        dfs(nestedList);</span><br><span class="line">        it=list.iterator();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">next</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> it.next();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">hasNext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> it.hasNext();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">dfs</span><span class="params">(List&lt;NestedInteger&gt; nestedList)</span></span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(NestedInteger nst:nestedList)&#123;</span><br><span class="line">            <span class="keyword">if</span>(nst.isInteger())&#123;</span><br><span class="line">                list.add(nst.getInteger());</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                dfs(nst.getList());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Your NestedIterator object will be instantiated and called as such:</span></span><br><span class="line"><span class="comment"> * NestedIterator i = new NestedIterator(nestedList);</span></span><br><span class="line"><span class="comment"> * while (i.hasNext()) v[f()] = i.next();</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="栈"><a href="#栈" class="headerlink" title="栈"></a>栈</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NestedIterator</span> <span class="keyword">implements</span> <span class="title">Iterator</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// 存储列表的当前遍历位置</span></span><br><span class="line">    <span class="keyword">private</span> Deque&lt;Iterator&lt;NestedInteger&gt;&gt; stack;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NestedIterator</span><span class="params">(List&lt;NestedInteger&gt; nestedList)</span> </span>&#123;</span><br><span class="line">        stack = <span class="keyword">new</span> LinkedList&lt;Iterator&lt;NestedInteger&gt;&gt;();</span><br><span class="line">        stack.push(nestedList.iterator());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">next</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 由于保证调用 next 之前会调用 hasNext，直接返回栈顶列表的当前元素</span></span><br><span class="line">        <span class="keyword">return</span> stack.peek().next().getInteger();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">hasNext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (!stack.isEmpty()) &#123;</span><br><span class="line">            Iterator&lt;NestedInteger&gt; it = stack.peek();</span><br><span class="line">            <span class="keyword">if</span> (!it.hasNext()) &#123; <span class="comment">// 遍历到当前列表末尾，出栈</span></span><br><span class="line">                stack.pop();</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 若取出的元素是整数，则通过创建一个额外的列表将其重新放入栈中</span></span><br><span class="line">            NestedInteger nest = it.next();</span><br><span class="line">            <span class="keyword">if</span> (nest.isInteger()) &#123;</span><br><span class="line">                List&lt;NestedInteger&gt; list = <span class="keyword">new</span> ArrayList&lt;NestedInteger&gt;();</span><br><span class="line">                list.add(nest);</span><br><span class="line">                stack.push(list.iterator());</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            stack.push(nest.getList().iterator());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/flatten-nested-list-iterator/solution/bian-ping-hua-qian-tao-lie-biao-die-dai-ipjzq/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">递归</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">栈</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">设计</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/03/23/%E6%89%81%E5%B9%B3%E5%8C%96%E7%9A%84%E5%B5%8C%E5%A5%97%E5%88%97%E8%A1%A8%E8%BF%AD%E4%BB%A3%E5%99%A8/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-位1的个数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/22/%E4%BD%8D1%E7%9A%84%E4%B8%AA%E6%95%B0/">位1的个数</a>
+    </h1>
+  
+
+        
+        <a href="/2021/03/22/%E4%BD%8D1%E7%9A%84%E4%B8%AA%E6%95%B0/" class="archive-article-date">
+  	<time datetime="2021-03-22T05:51:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="191-位1的个数"><a href="#191-位1的个数" class="headerlink" title="191. 位1的个数"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/number-of-1-bits/">191. 位1的个数</a></h4><p>难度简单298收藏分享切换为英文接收动态反馈</p>
+<p>编写一个函数，输入是一个无符号整数（以二进制串的形式），返回其二进制表达式中数字位数为 ‘1’ 的个数（也被称为<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/汉明重量">汉明重量</a>）。</p>
+<p><strong>提示：</strong></p>
+<ul>
+<li>请注意，在某些语言（如 Java）中，没有无符号整数类型。在这种情况下，输入和输出都将被指定为有符号整数类型，并且不应影响您的实现，因为无论整数是有符号的还是无符号的，其内部的二进制表示形式都是相同的。</li>
+<li>在 Java 中，编译器使用<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/二进制补码/5295284">二进制补码</a>记法来表示有符号整数。因此，在上面的 <strong>示例 3</strong> 中，输入表示有符号整数 <code>-3</code>。</li>
+</ul>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：00000000000000000000000000001011</span><br><span class="line">输出：3</span><br><span class="line">解释：输入的二进制串 00000000000000000000000000001011 中，共有三位为 &#39;1&#39;。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：00000000000000000000000010000000</span><br><span class="line">输出：1</span><br><span class="line">解释：输入的二进制串 00000000000000000000000010000000 中，共有一位为 &#39;1&#39;。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 3：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：11111111111111111111111111111101</span><br><span class="line">输出：31</span><br><span class="line">解释：输入的二进制串 11111111111111111111111111111101 中，共有 31 位为 &#39;1&#39;。</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li>输入必须是长度为 <code>32</code> 的 <strong>二进制串</strong> 。</li>
+</ul>
+<p><strong>进阶</strong>：</p>
+<ul>
+<li>如果多次调用这个函数，你将如何优化你的算法？</li>
+</ul>
+<h2 id="位运算"><a href="#位运算" class="headerlink" title="位运算"></a>位运算</h2><p>通过<code>n&amp;(n-1)</code>可以消去<code>n</code>的最高位的1</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">00000000000000000000000001100100</span><br><span class="line"></span><br><span class="line">00000000000000000000000001100011</span><br><span class="line"></span><br><span class="line">100&amp;99 &#x3D; 96</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="comment">// you need to treat n as an unsigned value</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hammingWeight</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> sum=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(n!=<span class="number">0</span>)&#123;</span><br><span class="line">            sum++;</span><br><span class="line">            n&amp;=(n-<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sum;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">位运算</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">二进制</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/03/22/%E4%BD%8D1%E7%9A%84%E4%B8%AA%E6%95%B0/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-python写入json文件" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/22/python%E5%86%99%E5%85%A5json%E6%96%87%E4%BB%B6/">python写入json文件</a>
+    </h1>
+  
+
+        
+        <a href="/2021/03/22/python%E5%86%99%E5%85%A5json%E6%96%87%E4%BB%B6/" class="archive-article-date">
+  	<time datetime="2021-03-22T02:32:37.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<p>作者：知乎用户<br>链接：<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/67111152/answer/249259611">https://www.zhihu.com/question/67111152/answer/249259611</a><br>来源：知乎<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import json</span><br><span class="line"># 列表写入文件</span><br><span class="line"># 测试list</span><br><span class="line">risk_list &#x3D;  [&#123;&#39;123&#39;:&#39;111&#39;,&#39;456&#39;:222&#125;,&#123;&#39;123&#39;:&#39;111&#39;,&#39;456&#39;:222&#125;]</span><br><span class="line"># 将数据写入文件</span><br><span class="line">file &#x3D; open(&#39;risk.json&#39;, &#39;w&#39;)</span><br><span class="line">for i in risk_list:</span><br><span class="line">    json_i &#x3D; json.dumps(i)</span><br><span class="line">    file.write(json_i+&#39;\n&#39;)</span><br><span class="line">file.close()</span><br><span class="line"></span><br><span class="line"># 从文件中读取数据</span><br><span class="line">risk_result &#x3D; []</span><br><span class="line">with open(&#39;risk.json&#39;,&#39;r&#39;) as f:</span><br><span class="line">    # 读取数据并分割。 最后一个为空，所以去除</span><br><span class="line">    risk_new_list &#x3D; f.read().split(&#39;\n&#39;)[:-1]</span><br><span class="line">    for x in risk_new_list:</span><br><span class="line">        json_x &#x3D; json.loads(x)</span><br><span class="line">        risk_result.append(json_x)</span><br><span class="line">f.close()</span><br><span class="line">print(&quot;原始数据是：&quot;, risk_list)</span><br><span class="line">print(&quot;结果数据是：&quot;, risk_result)</span><br></pre></td></tr></table></figure>
+
+<p>再看结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">原始数据是： [&#123;&#x27;123&#x27;: &#x27;111&#x27;, &#x27;456&#x27;: 222&#125;, &#123;&#x27;123&#x27;: &#x27;111&#x27;, &#x27;456&#x27;: 222&#125;]</span><br><span class="line">结果数据是： [&#123;&#x27;123&#x27;: &#x27;111&#x27;, &#x27;456&#x27;: 222&#125;, &#123;&#x27;123&#x27;: &#x27;111&#x27;, &#x27;456&#x27;: 222&#125;]</span><br><span class="line">[Finished in 0.1s]</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/03/22/python%E5%86%99%E5%85%A5json%E6%96%87%E4%BB%B6/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-最大整除子集" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/21/%E6%9C%80%E5%A4%A7%E6%95%B4%E9%99%A4%E5%AD%90%E9%9B%86/">最大整除子集</a>
+    </h1>
+  
+
+        
+        <a href="/2021/03/21/%E6%9C%80%E5%A4%A7%E6%95%B4%E9%99%A4%E5%AD%90%E9%9B%86/" class="archive-article-date">
+  	<time datetime="2021-03-21T15:19:43.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-21</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="368-最大整除子集"><a href="#368-最大整除子集" class="headerlink" title="368. 最大整除子集"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/largest-divisible-subset/">368. 最大整除子集</a></h4><p>难度中等207收藏分享切换为英文接收动态反馈</p>
+<p>给出一个由<strong>无重复的</strong>正整数组成的集合，找出其中最大的整除子集，子集中任意一对 (Si，Sj) 都要满足：Si % Sj = 0 或 Sj % Si = 0。</p>
+<p>如果有多个目标子集，返回其中任何一个均可。</p>
+<p><strong>示例 1:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: [1,2,3]</span><br><span class="line">输出: [1,2] (当然, [1,3] 也正确)</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: [1,2,4,8]</span><br><span class="line">输出: [1,2,4,8]</span><br></pre></td></tr></table></figure>
+
+<h2 id="动态规划"><a href="#动态规划" class="headerlink" title="动态规划"></a>动态规划</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">largestDivisibleSubset</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Test case with empty set.</span></span><br><span class="line">    <span class="keyword">int</span> n = nums.length;</span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">new</span> ArrayList();</span><br><span class="line">        </span><br><span class="line">    <span class="comment">// Container to keep the largest divisible subset</span></span><br><span class="line">    <span class="comment">//   that ends with each of the nums.</span></span><br><span class="line">    List&lt;ArrayList&gt; EDS = <span class="keyword">new</span> ArrayList();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> num : nums) EDS.add(<span class="keyword">new</span> ArrayList());</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Sort the original list in ascending order. */</span></span><br><span class="line">    Arrays.sort(nums);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Calculate all the values of EDS(X_i) */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">      List&lt;Integer&gt; maxSubset = <span class="keyword">new</span> ArrayList();</span><br><span class="line">            </span><br><span class="line">      <span class="comment">// Find the largest divisible subset of previous elements.</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; i; ++k) </span><br><span class="line">        <span class="keyword">if</span> (nums[i] % nums[k] == <span class="number">0</span> &amp;&amp; maxSubset.size() &lt; EDS.get(k).size())</span><br><span class="line">          maxSubset = EDS.get(k);</span><br><span class="line">          </span><br><span class="line">      <span class="comment">// Extend the found subset with the element itself.</span></span><br><span class="line">      EDS.get(i).addAll(maxSubset);</span><br><span class="line">      EDS.get(i).add(nums[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/* Find the largest of EDS values  */</span></span><br><span class="line">    List&lt;Integer&gt; ret = <span class="keyword">new</span> ArrayList();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) </span><br><span class="line">      <span class="keyword">if</span> (ret.size() &lt; EDS.get(i).size()) ret = EDS.get(i);</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">  &#125;  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/largest-divisible-subset/solution/zui-da-zheng-chu-zi-ji-by-leetcode/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+<h2 id="优化的动态规划"><a href="#优化的动态规划" class="headerlink" title="优化的动态规划"></a>优化的动态规划</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">largestDivisibleSubset</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Test case with empty set.</span></span><br><span class="line">    <span class="keyword">int</span> n = nums.length;</span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">new</span> ArrayList();</span><br><span class="line">        </span><br><span class="line">    <span class="comment">// Container to keep the size of the largest divisible subset</span></span><br><span class="line">    <span class="comment">//   that ends with each of the nums.</span></span><br><span class="line">    Integer[] dp = <span class="keyword">new</span> Integer[n];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Sort the original list in ascending order. */</span></span><br><span class="line">    Arrays.sort(nums);</span><br><span class="line"></span><br><span class="line">    Integer maxSubsetSize = -<span class="number">1</span>, maxSubsetIndex = -<span class="number">1</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* Calculate the rest of EDS(X_i) */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">      Integer subsetSize = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Find the size of the largest divisible subset.</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; i; ++k) </span><br><span class="line">        <span class="keyword">if</span> (nums[i] % nums[k] == <span class="number">0</span> &amp;&amp; subsetSize &lt; dp[k])</span><br><span class="line">          subsetSize = dp[k];</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Extend the found subset with the element itself.</span></span><br><span class="line">      dp[i] = subsetSize + <span class="number">1</span>;</span><br><span class="line">    </span><br><span class="line">      <span class="comment">// We reuse this loop to obtain the largest subset size </span></span><br><span class="line">      <span class="comment">//   in order to prepare for the reconstruction of subset.</span></span><br><span class="line">      <span class="keyword">if</span> (maxSubsetSize &lt; dp[i]) &#123;</span><br><span class="line">        maxSubsetSize = dp[i];</span><br><span class="line">        maxSubsetIndex = i;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* Reconstruct the largest divisible subset  */</span></span><br><span class="line">    LinkedList&lt;Integer&gt; subset = <span class="keyword">new</span> LinkedList();</span><br><span class="line">    Integer currSize = maxSubsetSize;</span><br><span class="line">    Integer currTail = nums[maxSubsetIndex];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = maxSubsetIndex; i &gt;= <span class="number">0</span>; --i) &#123;</span><br><span class="line">      <span class="keyword">if</span> (currSize == <span class="number">0</span>) <span class="keyword">break</span>;</span><br><span class="line">    </span><br><span class="line">      <span class="keyword">if</span> (currTail % nums[i] == <span class="number">0</span> &amp;&amp; currSize == dp[i]) &#123;</span><br><span class="line">        subset.addFirst(nums[i]);</span><br><span class="line">        currTail = nums[i];</span><br><span class="line">        currSize -= <span class="number">1</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> subset;</span><br><span class="line">  &#125;  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/largest-divisible-subset/solution/zui-da-zheng-chu-zi-ji-by-leetcode/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">动态规划</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">重要题型</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/03/21/%E6%9C%80%E5%A4%A7%E6%95%B4%E9%99%A4%E5%AD%90%E9%9B%86/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-和为奇数的子数组数目" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -488,774 +1304,9 @@ tex2jax: {
 
 
   
-    <article id="post-最简分数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/03/21/%E6%9C%80%E7%AE%80%E5%88%86%E6%95%B0/">最简分数</a>
-    </h1>
-  
-
-        
-        <a href="/2021/03/21/%E6%9C%80%E7%AE%80%E5%88%86%E6%95%B0/" class="archive-article-date">
-  	<time datetime="2021-03-21T13:26:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-21</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="1447-最简分数"><a href="#1447-最简分数" class="headerlink" title="1447. 最简分数"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/simplified-fractions/">1447. 最简分数</a></h4><p>难度中等11收藏分享切换为英文接收动态反馈</p>
-<p>给你一个整数 <code>n</code> ，请你返回所有 0 到 1 之间（不包括 0 和 1）满足分母小于等于 <code>n</code> 的 <strong>最简</strong> 分数 。分数可以以 <strong>任意</strong> 顺序返回。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 2</span><br><span class="line">输出：[&quot;1&#x2F;2&quot;]</span><br><span class="line">解释：&quot;1&#x2F;2&quot; 是唯一一个分母小于等于 2 的最简分数。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 3</span><br><span class="line">输出：[&quot;1&#x2F;2&quot;,&quot;1&#x2F;3&quot;,&quot;2&#x2F;3&quot;]</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 4</span><br><span class="line">输出：[&quot;1&#x2F;2&quot;,&quot;1&#x2F;3&quot;,&quot;1&#x2F;4&quot;,&quot;2&#x2F;3&quot;,&quot;3&#x2F;4&quot;]</span><br><span class="line">解释：&quot;2&#x2F;4&quot; 不是最简分数，因为它可以化简为 &quot;1&#x2F;2&quot; 。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 4：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 1</span><br><span class="line">输出：[]</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= n &lt;= 100</code></li>
-</ul>
-<h2 id="最大公约数判断是否可以化简"><a href="#最大公约数判断是否可以化简" class="headerlink" title="最大公约数判断是否可以化简"></a>最大公约数判断是否可以化简</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">simplifiedFractions</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; list=<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="comment">// 分子为1的情况</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">2</span>;i&lt;=n;i++)&#123;</span><br><span class="line">            list.add(<span class="string">&quot;1/&quot;</span>+i);</span><br><span class="line">        &#125;</span><br><span class="line">		<span class="comment">// 遍历分子不为1的情况</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">2</span>;i&lt;n;i++)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=i+<span class="number">1</span>;j&lt;=n;j++)&#123;</span><br><span class="line">                <span class="keyword">if</span>(j%i!=<span class="number">0</span>&amp;&amp;gcd(j,i)==<span class="number">1</span>)&#123;</span><br><span class="line">                    list.add(i+<span class="string">&quot;/&quot;</span>+j);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> list;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 求最大公约数</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">gcd</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> y &gt; <span class="number">0</span> ? gcd(y, x % y) : x;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数学</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">最大公约数</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/03/21/%E6%9C%80%E7%AE%80%E5%88%86%E6%95%B0/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-第N位数字" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/03/21/%E7%AC%ACN%E4%BD%8D%E6%95%B0%E5%AD%97/">第N位数字</a>
-    </h1>
-  
-
-        
-        <a href="/2021/03/21/%E7%AC%ACN%E4%BD%8D%E6%95%B0%E5%AD%97/" class="archive-article-date">
-  	<time datetime="2021-03-21T13:06:16.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-21</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="400-第-N-位数字"><a href="#400-第-N-位数字" class="headerlink" title="400. 第 N 位数字"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/nth-digit/">400. 第 N 位数字</a></h4><p>难度中等145收藏分享切换为英文接收动态反馈</p>
-<p>在无限的整数序列 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, …中找到第 <code>n</code> 位数字。</p>
-<p><strong>注意：</strong><code>n</code> 是正数且在 32 位整数范围内（<code>n &lt; 231</code>）。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：3</span><br><span class="line">输出：3</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：11</span><br><span class="line">输出：0</span><br><span class="line">解释：第 11 位数字在序列 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, ... 里是 0 ，它是 10 的一部分。</span><br></pre></td></tr></table></figure>
-
-<h2 id="找规律"><a href="#找规律" class="headerlink" title="找规律"></a>找规律</h2><ul>
-<li>1位数字能提供9个</li>
-<li>2位数字能提供90*2个</li>
-<li>3位数字能提供900*3个</li>
-<li>4位数字能提供9000*4个</li>
-<li>。。。。。。。<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">findNthDigit</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 1位数字能提供9</span></span><br><span class="line">        <span class="comment">// 2位数字能提供90*2</span></span><br><span class="line">        <span class="comment">// 3位数字能提供900*3</span></span><br><span class="line">        <span class="comment">// 4位数字能提供9000*4</span></span><br><span class="line">        <span class="keyword">if</span> (n &lt;= <span class="number">9</span>) <span class="keyword">return</span> n;</span><br><span class="line">        <span class="keyword">if</span>(n==<span class="number">11</span>)<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">long</span> bit = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> num = <span class="number">1</span>;</span><br><span class="line">        <span class="comment">// 计算base对应的数量</span></span><br><span class="line">        <span class="keyword">while</span> (n &gt; bit * <span class="number">9</span> * num) &#123;</span><br><span class="line">            n -= bit * <span class="number">9</span> * num;</span><br><span class="line">            bit *= <span class="number">10</span>;</span><br><span class="line">            num++;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> base = bit;</span><br><span class="line">        <span class="keyword">long</span> count = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 从base出发,找到剩余的数量</span></span><br><span class="line">        <span class="keyword">while</span> (n &gt; num) &#123;</span><br><span class="line">            n -= num;</span><br><span class="line">            count++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 求出那个数字</span></span><br><span class="line">        <span class="keyword">long</span> value = (<span class="keyword">long</span>) (base + count);</span><br><span class="line">        <span class="comment">// 找到第几位疯狂debug才得出来</span></span><br><span class="line">        <span class="keyword">int</span> res = Long.toString(value).charAt(n - <span class="number">1</span>) - <span class="string">&#x27;0&#x27;</span>;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数学</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">找规律</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/03/21/%E7%AC%ACN%E4%BD%8D%E6%95%B0%E5%AD%97/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-最大升序子数组和" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/03/21/%E6%9C%80%E5%A4%A7%E5%8D%87%E5%BA%8F%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/">最大升序子数组和</a>
-    </h1>
-  
-
-        
-        <a href="/2021/03/21/%E6%9C%80%E5%A4%A7%E5%8D%87%E5%BA%8F%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/" class="archive-article-date">
-  	<time datetime="2021-03-21T06:55:40.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-21</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="5709-最大升序子数组和"><a href="#5709-最大升序子数组和" class="headerlink" title="5709. 最大升序子数组和"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/maximum-ascending-subarray-sum/">5709. 最大升序子数组和</a></h4><p>难度简单1</p>
-<p>给你一个正整数组成的数组 <code>nums</code> ，返回 <code>nums</code> 中一个 <strong>升序</strong> 子数组的最大可能元素和。</p>
-<p>子数组是数组中的一个连续数字序列。</p>
-<p>已知子数组 <code>[numsl, numsl+1, ..., numsr-1, numsr]</code> ，若对所有 <code>i</code>（<code>l &lt;= i &lt; r</code>），<code>numsi &lt; numsi+1</code> 都成立，则称这一子数组为 <strong>升序</strong> 子数组。注意，大小为 <code>1</code> 的子数组也视作 <strong>升序</strong> 子数组。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [10,20,30,5,10,50]</span><br><span class="line">输出：65</span><br><span class="line">解释：[5,10,50] 是元素和最大的升序子数组，最大元素和为 65 。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [10,20,30,40,50]</span><br><span class="line">输出：150</span><br><span class="line">解释：[10,20,30,40,50] 是元素和最大的升序子数组，最大元素和为 150 。 </span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [12,17,15,13,10,11,12]</span><br><span class="line">输出：33</span><br><span class="line">解释：[10,11,12] 是元素和最大的升序子数组，最大元素和为 33 。 </span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 4：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [100,10,1]</span><br><span class="line">输出：100</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= nums.length &lt;= 100</code></li>
-<li><code>1 &lt;= nums[i] &lt;= 100</code></li>
-</ul>
-<h2 id="一次遍历"><a href="#一次遍历" class="headerlink" title="一次遍历"></a>一次遍历</h2><p>记录当前的是否比前一个大，如果是，那么累计和，如果不是累积和为当前的<code>nums[i]</code></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">maxAscendingSum</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> last = nums[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">int</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span>[] dp = <span class="keyword">new</span> <span class="keyword">int</span>[n + <span class="number">1</span>];</span><br><span class="line">        </span><br><span class="line">        </span><br><span class="line">        sum += last;</span><br><span class="line">        dp[<span class="number">0</span>] = sum;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (nums[i] &gt; last) &#123;</span><br><span class="line">                sum += nums[i];</span><br><span class="line">                dp[i] = sum;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                sum = nums[i];</span><br><span class="line">                dp[i] = sum;</span><br><span class="line">            &#125;</span><br><span class="line">            last = nums[i];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> ans = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            ans = Math.max(ans, dp[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">子数组</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/03/21/%E6%9C%80%E5%A4%A7%E5%8D%87%E5%BA%8F%E5%AD%90%E6%95%B0%E7%BB%84%E5%92%8C/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-积压订单中的订单总数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/03/21/%E7%A7%AF%E5%8E%8B%E8%AE%A2%E5%8D%95%E4%B8%AD%E7%9A%84%E8%AE%A2%E5%8D%95%E6%80%BB%E6%95%B0/">积压订单中的订单总数</a>
-    </h1>
-  
-
-        
-        <a href="/2021/03/21/%E7%A7%AF%E5%8E%8B%E8%AE%A2%E5%8D%95%E4%B8%AD%E7%9A%84%E8%AE%A2%E5%8D%95%E6%80%BB%E6%95%B0/" class="archive-article-date">
-  	<time datetime="2021-03-21T06:50:49.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-21</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h3 id="5710-积压订单中的订单总数"><a href="#5710-积压订单中的订单总数" class="headerlink" title="5710. 积压订单中的订单总数"></a>5710. 积压订单中的订单总数</h3><p>给你一个二维整数数组 <code>orders</code> ，其中每个 <code>orders[i] = [pricei, amounti, orderTypei]</code> 表示有 <code>amounti</code> 笔类型为 <code>orderTypei</code> 、价格为 <code>pricei</code> 的订单。</p>
-<p>订单类型 <code>orderTypei</code> 可以分为两种：</p>
-<ul>
-<li><code>0</code> 表示这是一批采购订单 <code>buy</code></li>
-<li><code>1</code> 表示这是一批销售订单 <code>sell</code></li>
-</ul>
-<p>注意，<code>orders[i]</code> 表示一批共计 <code>amounti</code> 笔的独立订单，这些订单的价格和类型相同。对于所有有效的 <code>i</code> ，由 <code>orders[i]</code> 表示的所有订单提交时间均早于 <code>orders[i+1]</code> 表示的所有订单。</p>
-<p>存在由未执行订单组成的 <strong>积压订单</strong> 。积压订单最初是空的。提交订单时，会发生以下情况：</p>
-<ul>
-<li>如果该订单是一笔采购订单 <code>buy</code> ，则可以查看积压订单中价格 <strong>最低</strong> 的销售订单 <code>sell</code> 。如果该销售订单 <code>sell</code> 的价格 <strong>低于或等于</strong> 当前采购订单 <code>buy</code> 的价格，则匹配并执行这两笔订单，并将销售订单 <code>sell</code> 从积压订单中删除。否则，采购订单 <code>buy</code> 将会添加到积压订单中。</li>
-<li>反之亦然，如果该订单是一笔销售订单 <code>sell</code> ，则可以查看积压订单中价格 <strong>最高</strong> 的采购订单 <code>buy</code> 。如果该采购订单 <code>buy</code> 的价格 <strong>高于或等于</strong> 当前销售订单 <code>sell</code> 的价格，则匹配并执行这两笔订单，并将采购订单 <code>buy</code> 从积压订单中删除。否则，销售订单 <code>sell</code> 将会添加到积压订单中。</li>
-</ul>
-<p>输入所有订单后，返回积压订单中的 <strong>订单总数</strong> 。由于数字可能很大，所以需要返回对 <code>109 + 7</code> 取余的结果。</p>
-<p><strong>示例 1：</strong></p>
-<p><img src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2021/03/21/ex1.png" alt="img"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">输入：orders &#x3D; [[10,5,0],[15,2,1],[25,1,1],[30,4,0]]</span><br><span class="line">输出：6</span><br><span class="line">解释：输入订单后会发生下述情况：</span><br><span class="line">- 提交 5 笔采购订单，价格为 10 。没有销售订单，所以这 5 笔订单添加到积压订单中。</span><br><span class="line">- 提交 2 笔销售订单，价格为 15 。没有采购订单的价格大于或等于 15 ，所以这 2 笔订单添加到积压订单中。</span><br><span class="line">- 提交 1 笔销售订单，价格为 25 。没有采购订单的价格大于或等于 25 ，所以这 1 笔订单添加到积压订单中。</span><br><span class="line">- 提交 4 笔采购订单，价格为 30 。前 2 笔采购订单与价格最低（价格为 15）的 2 笔销售订单匹配，从积压订单中删除这 2 笔销售订单。第 3 笔采购订单与价格最低的 1 笔销售订单匹配，销售订单价格为 25 ，从积压订单中删除这 1 笔销售订单。积压订单中不存在更多销售订单，所以第 4 笔采购订单需要添加到积压订单中。</span><br><span class="line">最终，积压订单中有 5 笔价格为 10 的采购订单，和 1 笔价格为 30 的采购订单。所以积压订单中的订单总数为 6 。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<p><img src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2021/03/21/ex2.png" alt="img"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">输入：orders &#x3D; [[7,1000000000,1],[15,3,0],[5,999999995,0],[5,1,1]]</span><br><span class="line">输出：999999984</span><br><span class="line">解释：输入订单后会发生下述情况：</span><br><span class="line">- 提交 109 笔销售订单，价格为 7 。没有采购订单，所以这 109 笔订单添加到积压订单中。</span><br><span class="line">- 提交 3 笔采购订单，价格为 15 。这些采购订单与价格最低（价格为 7 ）的 3 笔销售订单匹配，从积压订单中删除这 3 笔销售订单。</span><br><span class="line">- 提交 999999995 笔采购订单，价格为 5 。销售订单的最低价为 7 ，所以这 999999995 笔订单添加到积压订单中。</span><br><span class="line">- 提交 1 笔销售订单，价格为 5 。这笔销售订单与价格最高（价格为 5 ）的 1 笔采购订单匹配，从积压订单中删除这 1 笔采购订单。</span><br><span class="line">最终，积压订单中有 (1000000000-3) 笔价格为 7 的销售订单，和 (999999995-1) 笔价格为 5 的采购订单。所以积压订单中的订单总数为 1999999991 ，等于 999999984 % (109 + 7) 。</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= orders.length &lt;= 105</code></li>
-<li><code>orders[i].length == 3</code></li>
-<li><code>1 &lt;= pricei, amounti &lt;= 109</code></li>
-<li><code>orderTypei</code> 为 <code>0</code> 或 <code>1</code></li>
-</ul>
-<h2 id="读题是关键"><a href="#读题是关键" class="headerlink" title="读题是关键"></a>读题是关键</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getNumberOfBacklogOrders</span><span class="params">(<span class="keyword">int</span>[][] orders)</span> </span>&#123;</span><br><span class="line">        PriorityQueue&lt;<span class="keyword">int</span>[]&gt; buy = <span class="keyword">new</span> PriorityQueue&lt;&gt;((a, b) -&gt; b[<span class="number">0</span>] - a[<span class="number">0</span>]);</span><br><span class="line">        PriorityQueue&lt;<span class="keyword">int</span>[]&gt; sell = <span class="keyword">new</span> PriorityQueue&lt;&gt;((a, b) -&gt; a[<span class="number">0</span>] - b[<span class="number">0</span>]);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span>[] order : orders) &#123;</span><br><span class="line">            <span class="keyword">if</span> (order[<span class="number">2</span>] == <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">// buy,看积压的sell中有没有小于等于他的</span></span><br><span class="line">                <span class="keyword">while</span> (!sell.isEmpty() &amp;&amp; sell.peek()[<span class="number">0</span>] &lt;= order[<span class="number">0</span>] &amp;&amp; order[<span class="number">1</span>] &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="keyword">int</span>[] s = sell.poll();</span><br><span class="line">                    <span class="comment">// 如果buy订单的数量小于sell堆顶的元素，那么这个订单就被抵消了</span></span><br><span class="line">                    <span class="keyword">if</span> (order[<span class="number">1</span>] &lt;= s[<span class="number">1</span>]) &#123;</span><br><span class="line">                        s[<span class="number">1</span>] -= order[<span class="number">1</span>];</span><br><span class="line">                        order[<span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">                        <span class="keyword">if</span> (s[<span class="number">1</span>] &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                            sell.offer(s);</span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        order[<span class="number">1</span>] -= s[<span class="number">1</span>];</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (order[<span class="number">1</span>] &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    buy.offer(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;order[<span class="number">0</span>], order[<span class="number">1</span>]&#125;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// sell，看积压的buy中有没有大于等于他的</span></span><br><span class="line">                <span class="keyword">while</span> (!buy.isEmpty() &amp;&amp; buy.peek()[<span class="number">0</span>] &gt;= order[<span class="number">0</span>] &amp;&amp; order[<span class="number">1</span>] &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="keyword">int</span>[] b = buy.poll();</span><br><span class="line">                    <span class="comment">// 如果sell订单的数量小于buy堆顶的元素，那么这个订单就被抵消了</span></span><br><span class="line">                    <span class="keyword">if</span> (order[<span class="number">1</span>] &lt;= b[<span class="number">1</span>]) &#123;</span><br><span class="line">                        b[<span class="number">1</span>] -= order[<span class="number">1</span>];</span><br><span class="line">                        order[<span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">                        <span class="keyword">if</span> (b[<span class="number">1</span>] &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                            buy.offer(b);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        order[<span class="number">1</span>] -= b[<span class="number">1</span>];</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (order[<span class="number">1</span>] &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    sell.offer(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;order[<span class="number">0</span>], order[<span class="number">1</span>]&#125;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> ans = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> mod = (<span class="keyword">int</span>) <span class="number">1e9</span> + <span class="number">7</span>;</span><br><span class="line">        <span class="keyword">while</span> (!buy.isEmpty()) &#123;</span><br><span class="line">            ans += buy.poll()[<span class="number">1</span>] % mod;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (!sell.isEmpty()) &#123;</span><br><span class="line">            ans += sell.poll()[<span class="number">1</span>] % mod;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (<span class="keyword">int</span>)(ans % mod);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">堆</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/03/21/%E7%A7%AF%E5%8E%8B%E8%AE%A2%E5%8D%95%E4%B8%AD%E7%9A%84%E8%AE%A2%E5%8D%95%E6%80%BB%E6%95%B0/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-有界数组指定下标处的最大值" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/03/21/%E6%9C%89%E7%95%8C%E6%95%B0%E7%BB%84%E6%8C%87%E5%AE%9A%E4%B8%8B%E6%A0%87%E5%A4%84%E7%9A%84%E6%9C%80%E5%A4%A7%E5%80%BC/">有界数组指定下标处的最大值</a>
-    </h1>
-  
-
-        
-        <a href="/2021/03/21/%E6%9C%89%E7%95%8C%E6%95%B0%E7%BB%84%E6%8C%87%E5%AE%9A%E4%B8%8B%E6%A0%87%E5%A4%84%E7%9A%84%E6%9C%80%E5%A4%A7%E5%80%BC/" class="archive-article-date">
-  	<time datetime="2021-03-21T04:30:19.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-21</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="5711-有界数组中指定下标处的最大值"><a href="#5711-有界数组中指定下标处的最大值" class="headerlink" title="5711. 有界数组中指定下标处的最大值"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/maximum-value-at-a-given-index-in-a-bounded-array/">5711. 有界数组中指定下标处的最大值</a></h4><p>难度中等</p>
-<p>给你三个正整数 <code>n</code>、<code>index</code> 和 <code>maxSum</code> 。你需要构造一个同时满足下述所有条件的数组 <code>nums</code>（下标 <strong>从 0 开始</strong> 计数）：</p>
-<ul>
-<li><code>nums.length == n</code></li>
-<li><code>nums[i]</code> 是 <strong>正整数</strong> ，其中 <code>0 &lt;= i &lt; n</code></li>
-<li><code>abs(nums[i] - nums[i+1]) &lt;= 1</code> ，其中 <code>0 &lt;= i &lt; n-1</code></li>
-<li><code>nums</code> 中所有元素之和不超过 <code>maxSum</code></li>
-<li><code>nums[index]</code> 的值被 <strong>最大化</strong></li>
-</ul>
-<p>返回你所构造的数组中的 <code>nums[index]</code> 。</p>
-<p>注意：<code>abs(x)</code> 等于 <code>x</code> 的前提是 <code>x &gt;= 0</code> ；否则，<code>abs(x)</code> 等于 <code>-x</code> 。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 4, index &#x3D; 2,  maxSum &#x3D; 6</span><br><span class="line">输出：2</span><br><span class="line">解释：数组 [1,1,2,1] 和 [1,2,2,1] 满足所有条件。不存在其他在指定下标处具有更大值的有效数组。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 6, index &#x3D; 1,  maxSum &#x3D; 10</span><br><span class="line">输出：3</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= n &lt;= maxSum &lt;= 109</code></li>
-<li><code>0 &lt;= index &lt; n</code></li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">maxValue</span><span class="params">(<span class="keyword">int</span> n, <span class="keyword">int</span> index, <span class="keyword">int</span> maxSum)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> max = maxSum / n + n / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">1</span>, right = max;</span><br><span class="line">        <span class="keyword">while</span> (left &lt;= right) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> mid = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 左边的首项（后面会继续处理）</span></span><br><span class="line">            <span class="keyword">int</span> f = mid - index;</span><br><span class="line">            <span class="comment">// 右边的首项(后面会继续处理)</span></span><br><span class="line">            <span class="keyword">int</span> l = mid - (n - index - <span class="number">1</span>);</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">long</span> leftMin = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">long</span> rightMin = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (f &lt; <span class="number">1</span>) &#123;</span><br><span class="line">                <span class="comment">// 左边除等差数列外剩余的1的数量</span></span><br><span class="line">                <span class="keyword">int</span> fTsum = <span class="number">1</span> - f;</span><br><span class="line">                <span class="comment">// 首项是1的时候左边的最小和</span></span><br><span class="line">                <span class="comment">// 1是首项,mid-1是尾项，数字的数量是mid-1</span></span><br><span class="line">                <span class="comment">// 左边的等差数列的和是(1 + mid - 1) * (mid - 1) / 2,其中还有fTsum个1</span></span><br><span class="line">                leftMin = (<span class="keyword">long</span>) (<span class="number">1</span> + mid - <span class="number">1</span>) * (mid - <span class="number">1</span>) / <span class="number">2</span> + fTsum;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 首项不是1的时候左边的最小和</span></span><br><span class="line">                <span class="comment">// f是首项,mid-1是尾项,数字的数量是mid-f,</span></span><br><span class="line">                <span class="comment">// 左边的等差数列的和是(f + mid - 1) * (mid - f) / 2</span></span><br><span class="line">                leftMin = (<span class="keyword">long</span>) (f + mid - <span class="number">1</span>) * (mid - f) / <span class="number">2</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (l &lt; <span class="number">1</span>) &#123;</span><br><span class="line">                <span class="comment">// 右边除等差数列外剩余的1的数量</span></span><br><span class="line">                <span class="keyword">int</span> lTsum = <span class="number">1</span> - l;</span><br><span class="line">                <span class="comment">// 首项是1的时候左边的最小和</span></span><br><span class="line">                <span class="comment">// 1是首项,mid-1是尾项，数字的数量是mid-1</span></span><br><span class="line">                <span class="comment">// 右边的等差数列的和是(1 + mid - 1) * (mid - 1) / 2,其中还有lTsum个1</span></span><br><span class="line">                rightMin = (<span class="keyword">long</span>) (<span class="number">1</span> + mid - <span class="number">1</span>) * (mid - <span class="number">1</span>) / <span class="number">2</span> + lTsum;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 首项不是1的时候左边的最小和</span></span><br><span class="line">                <span class="comment">// f是首项,mid-1是尾项,数字的数量是mid-l,</span></span><br><span class="line">                <span class="comment">// 右边的等差数列的和是(l + mid - 1) * (mid - l) / 2</span></span><br><span class="line">                rightMin = (<span class="keyword">long</span>) (l + mid - <span class="number">1</span>) * (mid - l) / <span class="number">2</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 如果满足条件，那么可以继续增加index的值试探</span></span><br><span class="line">            <span class="keyword">if</span> (leftMin + rightMin + mid &lt;= maxSum) &#123;</span><br><span class="line">                res = Math.max(mid, res);</span><br><span class="line">                left = mid + <span class="number">1</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                right = mid - <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">二分搜索</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">等差数列</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/03/21/%E6%9C%89%E7%95%8C%E6%95%B0%E7%BB%84%E6%8C%87%E5%AE%9A%E4%B8%8B%E6%A0%87%E5%A4%84%E7%9A%84%E6%9C%80%E5%A4%A7%E5%80%BC/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-矩阵置零-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/03/21/%E7%9F%A9%E9%98%B5%E7%BD%AE%E9%9B%B6-1/">矩阵置零</a>
-    </h1>
-  
-
-        
-        <a href="/2021/03/21/%E7%9F%A9%E9%98%B5%E7%BD%AE%E9%9B%B6-1/" class="archive-article-date">
-  	<time datetime="2021-03-21T01:48:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-21</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="73-矩阵置零"><a href="#73-矩阵置零" class="headerlink" title="73. 矩阵置零"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/set-matrix-zeroes/">73. 矩阵置零</a></h4><p>难度中等399</p>
-<p>给定一个 <em>m</em> x <em>n</em> 的矩阵，如果一个元素为 0，则将其所在行和列的所有元素都设为 0。请使用<strong><a target="_blank" rel="noopener" href="http://baike.baidu.com/item/原地算法">原地</a></strong>算法<strong>。</strong></p>
-<p><strong>示例 1:</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">输入: </span><br><span class="line">[</span><br><span class="line">  [1,1,1],</span><br><span class="line">  [1,0,1],</span><br><span class="line">  [1,1,1]</span><br><span class="line">]</span><br><span class="line">输出: </span><br><span class="line">[</span><br><span class="line">  [1,0,1],</span><br><span class="line">  [0,0,0],</span><br><span class="line">  [1,0,1]</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2:</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">输入: </span><br><span class="line">[</span><br><span class="line">  [0,1,2,0],</span><br><span class="line">  [3,4,5,2],</span><br><span class="line">  [1,3,1,5]</span><br><span class="line">]</span><br><span class="line">输出: </span><br><span class="line">[</span><br><span class="line">  [0,0,0,0],</span><br><span class="line">  [0,4,5,0],</span><br><span class="line">  [0,3,1,0]</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-
-<p><strong>进阶:</strong></p>
-<ul>
-<li>一个直接的解决方案是使用  O(<em>mn</em>) 的额外空间，但这并不是一个好的解决方案。</li>
-<li>一个简单的改进方案是使用 O(<em>m</em> + <em>n</em>) 的额外空间，但这仍然不是最好的解决方案。</li>
-<li>你能想出一个常数空间的解决方案吗？</li>
-</ul>
-<h2 id="常数空间"><a href="#常数空间" class="headerlink" title="常数空间"></a>常数空间</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setZeroes</span><span class="params">(<span class="keyword">int</span>[][] matrix)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> m=matrix.length;</span><br><span class="line">        <span class="keyword">if</span>(m==<span class="number">0</span>)<span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">int</span> n=matrix[<span class="number">0</span>].length;</span><br><span class="line">		<span class="comment">// 分别记录第一行是否有0和第一列是否有0</span></span><br><span class="line">        <span class="keyword">int</span> row=<span class="number">1</span>,col=<span class="number">1</span>;</span><br><span class="line">		<span class="comment">// 第一列是否有零</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;m;i++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(matrix[i][<span class="number">0</span>]==<span class="number">0</span>)&#123;</span><br><span class="line">                row=<span class="number">0</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">		<span class="comment">// 第一行是否有0</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>;j&lt;n;j++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(matrix[<span class="number">0</span>][j]==<span class="number">0</span>)&#123;</span><br><span class="line">                col=<span class="number">0</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">		<span class="comment">// 除第一行和第一列之后的如果有零把第一行和第一列的元素置零</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;m;i++)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">1</span>;j&lt;n;j++)&#123;</span><br><span class="line">                <span class="keyword">if</span>(matrix[i][j]==<span class="number">0</span>)&#123;</span><br><span class="line">                    matrix[i][<span class="number">0</span>]=<span class="number">0</span>;</span><br><span class="line">                    matrix[<span class="number">0</span>][j]=<span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">		<span class="comment">// 对于每一行，如果行头为0，那么后面的都为0</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;m;i++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(matrix[i][<span class="number">0</span>]==<span class="number">0</span>)&#123;</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>;j&lt;n;j++)&#123;</span><br><span class="line">                    matrix[i][j]=<span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">		<span class="comment">// 对于每一列,如果列头为0,那么后面的都为0</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">1</span>;j&lt;n;j++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(matrix[<span class="number">0</span>][j]==<span class="number">0</span>)&#123;</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;m;i++)&#123;</span><br><span class="line">                    matrix[i][j]=<span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">		<span class="comment">// 处理第一列</span></span><br><span class="line">        <span class="keyword">if</span>(row==<span class="number">0</span>)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;m;i++)&#123;</span><br><span class="line">                matrix[i][<span class="number">0</span>]=<span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 处理第一行</span></span><br><span class="line">        <span class="keyword">if</span>(col==<span class="number">0</span>)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>;j&lt;n;j++)&#123;</span><br><span class="line">                matrix[<span class="number">0</span>][j]=<span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">矩阵</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/03/21/%E7%9F%A9%E9%98%B5%E7%BD%AE%E9%9B%B6-1/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-表达式求值" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/03/21/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B1%82%E5%80%BC/">表达式求值</a>
-    </h1>
-  
-
-        
-        <a href="/2021/03/21/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B1%82%E5%80%BC/" class="archive-article-date">
-  	<time datetime="2021-03-21T01:22:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-21</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<p>给定一个表达式，其中运算符仅包含 <code>+,-,*,/</code>（加 减 乘 整除），可能包含括号，请你求出表达式的最终值。</p>
-<p><strong>注意：</strong></p>
-<ul>
-<li>数据保证给定的表达式合法。</li>
-<li>题目保证符号 <code>-</code> 只作为减号出现，不会作为负号出现，例如，<code>-1+2</code>,<code>(2+2)*(-(1+1)+2)</code> 之类表达式均不会出现。</li>
-<li>题目保证表达式中所有数字均为正整数。</li>
-<li>题目保证表达式在中间计算过程以及结果中，均不超过 231−1231−1。</li>
-<li>题目中的整除是指向 00 取整，也就是说对于大于 00 的结果向下取整，例如 5/3=15/3=1，对于小于 00 的结果向上取整，例如 5/(1−4)=−15/(1−4)=−1。</li>
-<li>C++和Java中的整除默认是向零取整；Python中的整除<code>//</code>默认向下取整，因此Python的<code>eval()</code>函数中的整除也是向下取整，在本题中不能直接使用。</li>
-</ul>
-<h4 id="输入格式"><a href="#输入格式" class="headerlink" title="输入格式"></a>输入格式</h4><p>共一行，为给定表达式。</p>
-<h4 id="输出格式"><a href="#输出格式" class="headerlink" title="输出格式"></a>输出格式</h4><p>共一行，为表达式的结果。</p>
-<h4 id="数据范围"><a href="#数据范围" class="headerlink" title="数据范围"></a>数据范围</h4><p>表达式的长度不超过 105105。</p>
-<h4 id="输入样例："><a href="#输入样例：" class="headerlink" title="输入样例："></a>输入样例：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(2+2)*(1+1)</span><br></pre></td></tr></table></figure>
-
-<h4 id="输出样例："><a href="#输出样例：" class="headerlink" title="输出样例："></a>输出样例：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">8</span><br></pre></td></tr></table></figure>
-
-<h2 id="双栈"><a href="#双栈" class="headerlink" title="双栈"></a>双栈</h2><p>利用双栈，一个栈保存数字，一个栈保存运算符和括号</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Scanner sc = <span class="keyword">new</span> Scanner(System.in);</span><br><span class="line">        String s = sc.nextLine();</span><br><span class="line">        <span class="comment">// 数字栈</span></span><br><span class="line">        Deque&lt;Integer&gt; stack = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        <span class="comment">// 符号栈</span></span><br><span class="line">        Deque&lt;Character&gt; opStack = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        <span class="comment">// 运算的优先级</span></span><br><span class="line">        Map&lt;Character, Integer&gt; priority = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">		<span class="comment">// 括号不参与运算优先级设置为0,没有括号时,先乘除法再加减法</span></span><br><span class="line">        priority.put(<span class="string">&#x27;+&#x27;</span>, <span class="number">1</span>);</span><br><span class="line">        priority.put(<span class="string">&#x27;-&#x27;</span>, <span class="number">1</span>);</span><br><span class="line">        priority.put(<span class="string">&#x27;*&#x27;</span>, <span class="number">2</span>);</span><br><span class="line">        priority.put(<span class="string">&#x27;/&#x27;</span>, <span class="number">2</span>);</span><br><span class="line">        priority.put(<span class="string">&#x27;(&#x27;</span>, <span class="number">0</span>);</span><br><span class="line">        priority.put(<span class="string">&#x27;)&#x27;</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> n = s.length();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">char</span> c = s.charAt(i);</span><br><span class="line">            <span class="comment">// 如果某个字符是数字,那么把连续的数字转换成运算数</span></span><br><span class="line">            <span class="keyword">if</span> (Character.isDigit(c)) &#123;</span><br><span class="line">                <span class="keyword">int</span> val = <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">boolean</span> flag = <span class="keyword">false</span>;</span><br><span class="line">                <span class="keyword">while</span> (i &lt; n &amp;&amp; Character.isDigit(s.charAt(i))) &#123;</span><br><span class="line">                    val = val * <span class="number">10</span> + s.charAt(i) - <span class="string">&#x27;0&#x27;</span>;</span><br><span class="line">                    flag = <span class="keyword">true</span>;</span><br><span class="line">                    i++;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (flag) i--;</span><br><span class="line">                <span class="comment">// 将数字加入数字栈</span></span><br><span class="line">                stack.push(val);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (c == <span class="string">&#x27;(&#x27;</span>) &#123;<span class="comment">// 遇到左括号直接入栈</span></span><br><span class="line">                opStack.push(c);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (c == <span class="string">&#x27;)&#x27;</span>) &#123;<span class="comment">// 遇到右括号,计算括号里面的加减法,因为在下个部分没有遇到右括号之前,乘除法已经运算完了,所以这边只剩下加减法.</span></span><br><span class="line">                <span class="keyword">while</span> (opStack.peek() != <span class="string">&#x27;(&#x27;</span>) &#123;</span><br><span class="line">                    eval(stack, opStack);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 左括号出栈</span></span><br><span class="line">                opStack.pop();</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 计算乘除法</span></span><br><span class="line">                <span class="comment">// 如果符号栈不为空,并且栈顶的优先级大于目前操作符的优先级,那么对当前的符号和数字进行计算</span></span><br><span class="line">                <span class="keyword">while</span> (!opStack.isEmpty() &amp;&amp; priority.get(opStack.peek()) &gt;= priority.get(c)) &#123;</span><br><span class="line">                    <span class="comment">// 计算的应该是乘除法</span></span><br><span class="line">                    eval(stack, opStack);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 把当前的运算符入栈(应该是加减法的符号)</span></span><br><span class="line">                opStack.push(c);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果符号栈还没有空,说明还有需要计算的,此时应该只剩下加减法,直接计算即可</span></span><br><span class="line">        <span class="keyword">while</span> (!opStack.isEmpty()) &#123;</span><br><span class="line">            eval(stack, opStack);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(stack.pop());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 计算模块,计算模块只负责计算,不考虑优先级</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">eval</span><span class="params">(Deque&lt;Integer&gt; stack, Deque&lt;Character&gt; opStack)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> op2 = stack.pop();</span><br><span class="line">        <span class="keyword">int</span> op1 = stack.pop();</span><br><span class="line">        <span class="keyword">char</span> op = opStack.pop();</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">switch</span> (op) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;+&#x27;</span>:</span><br><span class="line">                res = op1 + op2;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;-&#x27;</span>:</span><br><span class="line">                res = op1 - op2;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;*&#x27;</span>:</span><br><span class="line">                res = op1 * op2;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;/&#x27;</span>:</span><br><span class="line">                res = op1 / op2;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        stack.push(res);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">栈</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/03/21/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B1%82%E5%80%BC/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/8/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/71/">71</a><a class="extend next" rel="next" href="/page/10/">Next &amp;raquo;</a>
+      <a class="extend prev" rel="prev" href="/page/8/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/72/">72</a><a class="extend next" rel="next" href="/page/10/">Next &amp;raquo;</a>
     </nav>
   
 
@@ -2024,6 +2075,10 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">构建二叉树</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">面试题</a>
               </li>
             
             <div class="clearfix"></div>
