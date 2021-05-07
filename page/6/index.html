@@ -150,6 +150,118 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-设计循环队列" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/04/16/%E8%AE%BE%E8%AE%A1%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97/">设计循环队列</a>
+    </h1>
+  
+
+        
+        <a href="/2021/04/16/%E8%AE%BE%E8%AE%A1%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97/" class="archive-article-date">
+  	<time datetime="2021-04-16T02:20:49.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-16</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="622-设计循环队列"><a href="#622-设计循环队列" class="headerlink" title="622. 设计循环队列"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/design-circular-queue/">622. 设计循环队列</a></h4><p>难度中等182</p>
+<p>设计你的循环队列实现。 循环队列是一种线性数据结构，其操作表现基于 FIFO（先进先出）原则并且队尾被连接在队首之后以形成一个循环。它也被称为“环形缓冲器”。</p>
+<p>循环队列的一个好处是我们可以利用这个队列之前用过的空间。在一个普通队列里，一旦一个队列满了，我们就不能插入下一个元素，即使在队列前面仍有空间。但是使用循环队列，我们能使用这些空间去存储新的值。</p>
+<p>你的实现应该支持如下操作：</p>
+<ul>
+<li><code>MyCircularQueue(k)</code>: 构造器，设置队列长度为 k 。</li>
+<li><code>Front</code>: 从队首获取元素。如果队列为空，返回 -1 。</li>
+<li><code>Rear</code>: 获取队尾元素。如果队列为空，返回 -1 。</li>
+<li><code>enQueue(value)</code>: 向循环队列插入一个元素。如果成功插入则返回真。</li>
+<li><code>deQueue()</code>: 从循环队列中删除一个元素。如果成功删除则返回真。</li>
+<li><code>isEmpty()</code>: 检查循环队列是否为空。</li>
+<li><code>isFull()</code>: 检查循环队列是否已满。</li>
+</ul>
+<p><strong>示例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">MyCircularQueue circularQueue &#x3D; new MyCircularQueue(3); &#x2F;&#x2F; 设置长度为 3</span><br><span class="line">circularQueue.enQueue(1);  &#x2F;&#x2F; 返回 true</span><br><span class="line">circularQueue.enQueue(2);  &#x2F;&#x2F; 返回 true</span><br><span class="line">circularQueue.enQueue(3);  &#x2F;&#x2F; 返回 true</span><br><span class="line">circularQueue.enQueue(4);  &#x2F;&#x2F; 返回 false，队列已满</span><br><span class="line">circularQueue.Rear();  &#x2F;&#x2F; 返回 3</span><br><span class="line">circularQueue.isFull();  &#x2F;&#x2F; 返回 true</span><br><span class="line">circularQueue.deQueue();  &#x2F;&#x2F; 返回 true</span><br><span class="line">circularQueue.enQueue(4);  &#x2F;&#x2F; 返回 true</span><br><span class="line">circularQueue.Rear();  &#x2F;&#x2F; 返回 4</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li>所有的值都在 0 至 1000 的范围内；</li>
+<li>操作数将在 1 至 1000 的范围内；</li>
+<li>请不要使用内置的队列库。</li>
+</ul>
+<h2 id="使用一个start和一个count来处理所有index"><a href="#使用一个start和一个count来处理所有index" class="headerlink" title="使用一个start和一个count来处理所有index"></a>使用一个start和一个count来处理所有index</h2><p>不要使用start和end，否则就会很复杂，导致后面的错误不断</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyCircularQueue</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span>[] queue;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> headIndex;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> count;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> capacity;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/** Initialize your data structure here. Set the size of the queue to be k. */</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">MyCircularQueue</span><span class="params">(<span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.capacity = k;</span><br><span class="line">    <span class="keyword">this</span>.queue = <span class="keyword">new</span> <span class="keyword">int</span>[k];</span><br><span class="line">    <span class="keyword">this</span>.headIndex = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">this</span>.count = <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/** Insert an element into the circular queue. Return true if the operation is successful. */</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">enQueue</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.count == <span class="keyword">this</span>.capacity)</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">this</span>.queue[(<span class="keyword">this</span>.headIndex + <span class="keyword">this</span>.count) % <span class="keyword">this</span>.capacity] = value;</span><br><span class="line">    <span class="keyword">this</span>.count += <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/** Delete an element from the circular queue. Return true if the operation is successful. */</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">deQueue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.count == <span class="number">0</span>)</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">this</span>.headIndex = (<span class="keyword">this</span>.headIndex + <span class="number">1</span>) % <span class="keyword">this</span>.capacity;</span><br><span class="line">    <span class="keyword">this</span>.count -= <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/** Get the front item from the queue. */</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">Front</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.count == <span class="number">0</span>)</span><br><span class="line">      <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.queue[<span class="keyword">this</span>.headIndex];</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/** Get the last item from the queue. */</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">Rear</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.count == <span class="number">0</span>)</span><br><span class="line">      <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> tailIndex = (<span class="keyword">this</span>.headIndex + <span class="keyword">this</span>.count - <span class="number">1</span>) % <span class="keyword">this</span>.capacity;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.queue[tailIndex];</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/** Checks whether the circular queue is empty or not. */</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isEmpty</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="keyword">this</span>.count == <span class="number">0</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/** Checks whether the circular queue is full or not. */</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isFull</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="keyword">this</span>.count == <span class="keyword">this</span>.capacity);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/design-circular-queue/solution/she-ji-xun-huan-dui-lie-by-leetcode/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">循环队列</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/04/16/%E8%AE%BE%E8%AE%A1%E5%BE%AA%E7%8E%AF%E9%98%9F%E5%88%97/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-数据流中的中位数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1054,127 +1166,6 @@ tex2jax: {
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/04/11/%E6%B1%82%E5%87%BAMK%E5%B9%B3%E5%9D%87%E5%80%BC/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-最少侧跳的次数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/04/11/%E6%9C%80%E5%B0%91%E4%BE%A7%E8%B7%B3%E7%9A%84%E6%AC%A1%E6%95%B0/">最少侧跳的次数</a>
-    </h1>
-  
-
-        
-        <a href="/2021/04/11/%E6%9C%80%E5%B0%91%E4%BE%A7%E8%B7%B3%E7%9A%84%E6%AC%A1%E6%95%B0/" class="archive-article-date">
-  	<time datetime="2021-04-11T05:09:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-11</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h3 id="5728-最少侧跳次数"><a href="#5728-最少侧跳次数" class="headerlink" title="5728. 最少侧跳次数"></a>5728. 最少侧跳次数</h3><p>给你一个长度为 <code>n</code> 的 <strong>3 跑道道路</strong> ，它总共包含 <code>n + 1</code> 个 <strong>点</strong> ，编号为 <code>0</code> 到 <code>n</code> 。一只青蛙从 <code>0</code> 号点第二条跑道 <strong>出发</strong> ，它想要跳到点 <code>n</code> 处。然而道路上可能有一些障碍。</p>
-<p>给你一个长度为 <code>n + 1</code> 的数组 <code>obstacles</code> ，其中 <code>obstacles[i]</code> （<strong>取值范围从 0 到 3</strong>）表示在点 <code>i</code> 处的 <code>obstacles[i]</code> 跑道上有一个障碍。如果 <code>obstacles[i] == 0</code> ，那么点 <code>i</code> 处没有障碍。任何一个点的三条跑道中 <strong>最多有一个</strong> 障碍。</p>
-<ul>
-<li>比方说，如果 <code>obstacles[2] == 1</code> ，那么说明在点 2 处跑道 1 有障碍。</li>
-</ul>
-<p>这只青蛙从点 <code>i</code> 跳到点 <code>i + 1</code> 且跑道不变的前提是点 <code>i + 1</code> 的同一跑道上没有障碍。为了躲避障碍，这只青蛙也可以在 <strong>同一个</strong> 点处 <strong>侧跳</strong> 到 <strong>另外一条</strong> 跑道（这两条跑道可以不相邻），但前提是跳过去的跑道该点处没有障碍。</p>
-<ul>
-<li>比方说，这只青蛙可以从点 3 处的跑道 3 跳到点 3 处的跑道 1 。</li>
-</ul>
-<p>这只青蛙从点 0 处跑道 <code>2</code> 出发，并想到达点 <code>n</code> 处的 <strong>任一跑道</strong> ，请你返回 <strong>最少侧跳次数</strong> 。</p>
-<p><strong>注意</strong>：点 <code>0</code> 处和点 <code>n</code> 处的任一跑道都不会有障碍。</p>
-<p><strong>示例 1：</strong></p>
-<p><img src="https://assets.leetcode.com/uploads/2021/03/25/ic234-q3-ex1.png" alt="img"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：obstacles &#x3D; [0,1,2,3,0]</span><br><span class="line">输出：2 </span><br><span class="line">解释：最优方案如上图箭头所示。总共有 2 次侧跳（红色箭头）。</span><br><span class="line">注意，这只青蛙只有当侧跳时才可以跳过障碍（如上图点 2 处所示）。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<p><img src="https://assets.leetcode.com/uploads/2021/03/25/ic234-q3-ex2.png" alt="img"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：obstacles &#x3D; [0,1,1,3,3,0]</span><br><span class="line">输出：0</span><br><span class="line">解释：跑道 2 没有任何障碍，所以不需要任何侧跳。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<p><img src="https://assets.leetcode.com/uploads/2021/03/25/ic234-q3-ex3.png" alt="img"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：obstacles &#x3D; [0,2,1,0,3,0]</span><br><span class="line">输出：2</span><br><span class="line">解释：最优方案如上图所示。总共有 2 次侧跳。</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>obstacles.length == n + 1</code></li>
-<li><code>1 &lt;= n &lt;= 5 * 105</code></li>
-<li><code>0 &lt;= obstacles[i] &lt;= 3</code></li>
-<li><code>obstacles[0] == obstacles[n] == 0</code></li>
-</ul>
-<h2 id="记忆化搜索"><a href="#记忆化搜索" class="headerlink" title="记忆化搜索"></a>记忆化搜索</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">minSideJumps</span><span class="params">(<span class="keyword">int</span>[] obstacles)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 每一个位置有三个状态</span></span><br><span class="line">        <span class="keyword">int</span> n = obstacles.length;</span><br><span class="line">        dp = <span class="keyword">new</span> <span class="keyword">int</span>[n][<span class="number">4</span>];</span><br><span class="line">        <span class="keyword">return</span> Math.min(f(obstacles, n - <span class="number">2</span>, <span class="number">2</span>), Math.min(f(obstacles, n - <span class="number">2</span>, <span class="number">1</span>), f(obstacles, n - <span class="number">2</span>, <span class="number">3</span>)));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> dp[][];</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span>[] obs, <span class="keyword">int</span> index, <span class="keyword">int</span> road)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (index == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (road == <span class="number">2</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (dp[index][road] != <span class="number">0</span>) <span class="keyword">return</span> dp[index][road];</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 当前位置没有障碍物</span></span><br><span class="line">        <span class="keyword">if</span> (obs[index] == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> n1, n2;</span><br><span class="line">            <span class="keyword">if</span> (road == <span class="number">1</span>) &#123;</span><br><span class="line">                n1 = <span class="number">2</span>;</span><br><span class="line">                n2 = <span class="number">3</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (road == <span class="number">2</span>) &#123;</span><br><span class="line">                n1 = <span class="number">1</span>;</span><br><span class="line">                n2 = <span class="number">3</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                n1 = <span class="number">1</span>;</span><br><span class="line">                n2 = <span class="number">2</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            res = Math.min(f(obs, index - <span class="number">1</span>, road), Math.min(f(obs, index - <span class="number">1</span>, n1), f(obs, index - <span class="number">1</span>, n2)) + <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (obs[index] == <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="comment">// 障碍物在1这条路上</span></span><br><span class="line">            <span class="keyword">if</span> (road == <span class="number">1</span>) &#123;</span><br><span class="line">                res = Integer.MAX_VALUE / <span class="number">2</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (road == <span class="number">2</span>) &#123;</span><br><span class="line">                res = Math.min(f(obs, index - <span class="number">1</span>, road), f(obs, index - <span class="number">1</span>, <span class="number">3</span>) + <span class="number">1</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                res = Math.min(f(obs, index - <span class="number">1</span>, road), f(obs, index - <span class="number">1</span>, <span class="number">2</span>) + <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (obs[index] == <span class="number">2</span>) &#123;</span><br><span class="line">            <span class="comment">// 障碍物在2这条路上</span></span><br><span class="line">            <span class="keyword">if</span> (road == <span class="number">1</span>) &#123;</span><br><span class="line">                res = Math.min(f(obs, index - <span class="number">1</span>, road), f(obs, index - <span class="number">1</span>, <span class="number">3</span>) + <span class="number">1</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (road == <span class="number">2</span>) &#123;</span><br><span class="line">                res = Integer.MAX_VALUE / <span class="number">2</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                res = Math.min(f(obs, index - <span class="number">1</span>, road), f(obs, index - <span class="number">1</span>, <span class="number">1</span>) + <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 障碍物在3这条路上</span></span><br><span class="line">            <span class="keyword">if</span> (road == <span class="number">1</span>) &#123;</span><br><span class="line">                res = Math.min(f(obs, index - <span class="number">1</span>, road), f(obs, index - <span class="number">1</span>, <span class="number">2</span>) + <span class="number">1</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (road == <span class="number">2</span>) &#123;</span><br><span class="line">                res = Math.min(f(obs, index - <span class="number">1</span>, road), f(obs, index - <span class="number">1</span>, <span class="number">1</span>) + <span class="number">1</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                res = Integer.MAX_VALUE / <span class="number">2</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        dp[index][road] = res;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="自底向上的动态规划"><a href="#自底向上的动态规划" class="headerlink" title="自底向上的动态规划"></a>自底向上的动态规划</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">minSideJumps</span><span class="params">(<span class="keyword">int</span>[] obstacles)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = obstacles.length;</span><br><span class="line">        <span class="keyword">int</span>[][] dp=<span class="keyword">new</span> <span class="keyword">int</span>[n][<span class="number">3</span>];</span><br><span class="line">        dp[<span class="number">0</span>][<span class="number">0</span>]=<span class="number">1</span>;</span><br><span class="line">        dp[<span class="number">0</span>][<span class="number">2</span>]=<span class="number">1</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;n;++i)&#123;</span><br><span class="line">            <span class="keyword">if</span>(obstacles[i]==<span class="number">1</span>)&#123;    </span><br><span class="line">                dp[i][<span class="number">0</span>]=Integer.MAX_VALUE-<span class="number">1</span>;</span><br><span class="line">                dp[i][<span class="number">1</span>]=Math.min(dp[i-<span class="number">1</span>][<span class="number">1</span>],dp[i-<span class="number">1</span>][<span class="number">2</span>]+<span class="number">1</span>);</span><br><span class="line">                dp[i][<span class="number">2</span>]=Math.min(dp[i-<span class="number">1</span>][<span class="number">2</span>],dp[i-<span class="number">1</span>][<span class="number">1</span>]+<span class="number">1</span>);                </span><br><span class="line">            &#125;<span class="keyword">else</span> <span class="keyword">if</span>(obstacles[i]==<span class="number">2</span>)&#123;</span><br><span class="line">                dp[i][<span class="number">1</span>]=Integer.MAX_VALUE-<span class="number">1</span>;</span><br><span class="line">                dp[i][<span class="number">0</span>]=Math.min(dp[i-<span class="number">1</span>][<span class="number">0</span>],dp[i-<span class="number">1</span>][<span class="number">2</span>]+<span class="number">1</span>);</span><br><span class="line">                dp[i][<span class="number">2</span>]=Math.min(dp[i-<span class="number">1</span>][<span class="number">2</span>],dp[i-<span class="number">1</span>][<span class="number">0</span>]+<span class="number">1</span>);                </span><br><span class="line">            &#125;<span class="keyword">else</span> <span class="keyword">if</span>(obstacles[i]==<span class="number">3</span>)&#123;</span><br><span class="line">                dp[i][<span class="number">2</span>]=Integer.MAX_VALUE-<span class="number">1</span>;</span><br><span class="line">                dp[i][<span class="number">0</span>]=Math.min(dp[i-<span class="number">1</span>][<span class="number">0</span>],dp[i-<span class="number">1</span>][<span class="number">1</span>]+<span class="number">1</span>);</span><br><span class="line">                dp[i][<span class="number">1</span>]=Math.min(dp[i-<span class="number">1</span>][<span class="number">1</span>],dp[i-<span class="number">1</span>][<span class="number">0</span>]+<span class="number">1</span>);                </span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                dp[i][<span class="number">0</span>]=Math.min(dp[i-<span class="number">1</span>][<span class="number">0</span>],Math.min(dp[i-<span class="number">1</span>][<span class="number">1</span>],dp[i-<span class="number">1</span>][<span class="number">2</span>])+<span class="number">1</span>);</span><br><span class="line">                dp[i][<span class="number">1</span>]=Math.min(dp[i-<span class="number">1</span>][<span class="number">1</span>],Math.min(dp[i-<span class="number">1</span>][<span class="number">0</span>],dp[i-<span class="number">1</span>][<span class="number">2</span>])+<span class="number">1</span>);</span><br><span class="line">                dp[i][<span class="number">2</span>]=Math.min(dp[i-<span class="number">1</span>][<span class="number">2</span>],Math.min(dp[i-<span class="number">1</span>][<span class="number">0</span>],dp[i-<span class="number">1</span>][<span class="number">1</span>])+<span class="number">1</span>);</span><br><span class="line">            &#125;            </span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> Math.min(dp[n-<span class="number">1</span>][<span class="number">0</span>],Math.min(dp[n-<span class="number">1</span>][<span class="number">1</span>],dp[n-<span class="number">1</span>][<span class="number">2</span>]));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：gao-he-jin</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/minimum-sideway-jumps/solution/javadong-tai-gui-hua-by-gao-he-jin-guw6/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">动态规划</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/04/11/%E6%9C%80%E5%B0%91%E4%BE%A7%E8%B7%B3%E7%9A%84%E6%AC%A1%E6%95%B0/">展开全文 >></a>
         </p>
       
 
