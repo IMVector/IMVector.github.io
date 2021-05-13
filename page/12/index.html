@@ -150,6 +150,419 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-ThreadLocal源码阅读" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/29/ThreadLocal%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/">ThreadLocal源码阅读</a>
+    </h1>
+  
+
+        
+        <a href="/2021/03/29/ThreadLocal%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" class="archive-article-date">
+  	<time datetime="2021-03-29T02:22:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+<h2 id="ThreadLocal的简单使用"><a href="#ThreadLocal的简单使用" class="headerlink" title="ThreadLocal的简单使用"></a>ThreadLocal的简单使用</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadMain</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ThreadLocal&lt;Integer&gt; seqNum = <span class="keyword">new</span> ThreadLocal&lt;Integer&gt;(&#123;</span><br><span class="line">      <span class="function"><span class="keyword">public</span> Integer <span class="title">initialValue</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ThreadLocal&lt;Integer&gt; <span class="title">getThreadLocal</span><span class="params">()</span></span>&#123;</span><br><span class="line">      <span class="keyword">return</span> seqNum;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getNextNum</span><span class="params">()</span></span>&#123;</span><br><span class="line">      seqNum.set(seqNum.get()+<span class="number">1</span>);</span><br><span class="line">      <span class="keyword">return</span> seqNum.get();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String []args)</span></span>&#123;</span><br><span class="line">      ThreadMain sn = <span class="keyword">new</span> ThreadMain();</span><br><span class="line"></span><br><span class="line">      TestClient t1=<span class="keyword">new</span> TestClient();</span><br><span class="line">      TestClient t2=<span class="keyword">new</span> TestClient();</span><br><span class="line">      TestClient t3=<span class="keyword">new</span> TestClient();</span><br><span class="line">      t1.start();</span><br><span class="line">      t2.start();</span><br><span class="line">      t3.start();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> calss TestClient extends Thread&#123;</span><br><span class="line">      <span class="keyword">private</span> ThreadMain sn;</span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="title">TestClient</span><span class="params">(ThreadMain sn)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.sn = sn;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">3</span>;i++)&#123;</span><br><span class="line">          System.out.println(<span class="string">&quot;thread[&quot;</span>+Thread.currentTHread().getName()+<span class="string">&quot;]--&gt;sn[&quot;</span>+sn.getNextNum()+<span class="string">&quot;]&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        sn.getThreadLocal().remove();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通常我们通过匿名内部类的方式定义ThreadLocal的子类，提供初始的变量值。<br>TestClient线程产生一组序列号，生成三个TestClient他们共享同一个TestNum实例，运行结果如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">thread[Thread-0]--&gt;sn[1]</span><br><span class="line">thread[Thread-1]--&gt;sn[1]</span><br><span class="line">thread[Thread-2]--&gt;sn[1]</span><br><span class="line">thread[Thread-1]--&gt;sn[2]</span><br><span class="line">thread[Thread-0]--&gt;sn[2]</span><br><span class="line">thread[Thread-1]--&gt;sn[3]</span><br><span class="line">thread[Thread-2]--&gt;sn[2]</span><br><span class="line">thread[Thread-0]--&gt;sn[3]</span><br><span class="line">thread[Thread-2]--&gt;sn[3]</span><br></pre></td></tr></table></figure>
+
+<p>线程个隔离的秘密就在于ThreadLocalMap这个类，ThreadLocalMap是ThreadLocal类的一个静态内部类，它实现了键值对的设置和获取(对比Map对象来理解)，每个线程中都有一个独立的ThreadLocalMap的副本，它所存储的值只能被当前的线程读取和修改。ThreadLocal通过操作每一个线程所独有的ThreadLocaMap的副本，从而实现了变量访问在不同线程中的隔离。</p>
+<p>ThreadLocalMap中的键值对中的键是this对象指向的ThreadLocal对象，而值就是自己设置的对象。</p>
+<h2 id="源码解析重新排版"><a href="#源码解析重新排版" class="headerlink" title="源码解析重新排版"></a>源码解析<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/88133406">重新排版</a></h2><blockquote>
+<h3 id="以下部分原文"><a href="#以下部分原文" class="headerlink" title="以下部分原文"></a><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/88133406">以下部分原文</a></h3></blockquote>
+<p>ThreadLocal 是一个线程的本地变量，也就意味着这个变量是线程独有的，是不能与其他线程共享的，这样就可以避免资源竞争带来的多线程的问题，这种解决多线程的安全问题和lock(这里的lock 指通过synchronized 或者Lock 等实现的锁) 是有本质的区别的:</p>
+<ol>
+<li>lock 的资源是多个线程共享的，所以访问的时候需要加锁。</li>
+<li>ThreadLocal 是每个线程都有一个副本，是不需要加锁的。</li>
+<li>lock 是通过时间换空间的做法。</li>
+<li>ThreadLocal 是典型的通过空间换时间的做法。</li>
+</ol>
+<p>当然他们的使用场景也是不同的，关键看你的资源是需要多线程之间共享的还是单线程内部共享的<br>使用<br>ThreadLocal 的使用是非常简单的，看下面的代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ThreadLocal&lt;String&gt; local = <span class="keyword">new</span> ThreadLocal&lt;&gt;();</span><br><span class="line">        <span class="comment">//设置值</span></span><br><span class="line">        local.set(<span class="string">&quot;hello word&quot;</span>);</span><br><span class="line">        <span class="comment">//获取刚刚设置的值</span></span><br><span class="line">        System.out.println(local.get());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>看到这里是不是觉得特别简单？别高兴太早，点进去代码看看，你绝对会怀疑人生<br>源码分析<br>在分析源码之前先画一下ThreadLocal ，ThreadLocalMap 和Thread 的关系，如果你对他们的关系还不了解的话，请看我的另一篇文章BAT面试必考：ThreadLocal ，ThreadLocalMap 和Thread 的关系</p>
+<p><img src="https://pic3.zhimg.com/80/v2-7f1821c6153da0da106116535e7a5d72_720w.jpg" alt="img"></p>
+<p>set 方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(T value)</span> </span>&#123;</span><br><span class="line">    Thread t = Thread .currentThread();</span><br><span class="line">    <span class="comment">// 获取线程绑定的ThreadLocalMap</span></span><br><span class="line">    ThreadLocalMap map = getMap(t);</span><br><span class="line">    <span class="keyword">if</span> (map != <span class="keyword">null</span>)</span><br><span class="line">    map.set(<span class="keyword">this</span>, value);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    <span class="comment">//第一次设置值的时候进来是这里</span></span><br><span class="line">    createMap(t, value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>createMap 方法只是在第一次设置值的时候创建一个ThreadLocalMap 赋值给Thread 对象的threadLocals 属性进行绑定，以后就可以直接通过这个属性获取到值了。从这里可以看出，为什么说ThreadLocal 是线程本地变量来的了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">createMap</span><span class="params">(Thread t, T firstValue)</span> </span>&#123;</span><br><span class="line">    t.threadLocals = <span class="keyword">new</span> ThreadLocalMap(<span class="keyword">this</span>, firstValue);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>值真正是放在ThreadLocalMap 中存取的，ThreadLocalMap 内部类有一个Entry 类，key是ThreadLocal 对象，value 就是你要存放的值，上面的代码value 存放的就是hello word。ThreadLocalMap 和HashMap的功能类似，但是实现上却有很大的不同：</p>
+<ol>
+<li>HashMap 的数据结构是数组+链表</li>
+<li>ThreadLocalMap的数据结构仅仅是数组</li>
+<li>HashMap 是通过链地址法解决hash 冲突的问题</li>
+<li>ThreadLocalMap 是通过开放地址法来解决hash 冲突的问题</li>
+<li>HashMap 里面的Entry 内部类的引用都是强引用</li>
+<li>ThreadLocalMap里面的Entry 内部类中的key 是弱引用，value 是强引用</li>
+</ol>
+<p>为什么ThreadLocalMap 采用开放地址法来解决哈希冲突?<br>jdk 中大多数的类都是采用了链地址法来解决hash 冲突，为什么ThreadLocalMap 采用开放地址法来解决哈希冲突呢？首先我们来看看这两种不同的方式</p>
+<p><strong>链地址法</strong></p>
+<p>这种方法的基本思想是将所有哈希地址为i的元素构成一个称为同义词链的单链表，并将单链表的头指针存在哈希表的第i个单元中，因而查找、插入和删除主要在同义词链中进行。列如对于关键字集合{12,67,56,16,25,37, 22,29,15,47,48,34}，我们用前面同样的12为除数，进行除留余数法：</p>
+<p><img src="https://pic1.zhimg.com/80/v2-4f915c12383f8296b92ba966b50f84c8_720w.jpg" alt="img"></p>
+<p><strong>开放地址法</strong></p>
+<p>这种方法的基本思想是一旦发生了冲突，就去寻找下一个空的散列地址(这非常重要，源码都是根据这个特性，必须理解这里才能往下走)，只要散列表足够大，空的散列地址总能找到，并将记录存入。<br>比如说，我们的关键字集合为{12,33,4,5,15,25},表长为10。 我们用散列函数f(key) = key mod l0。 当计算前S个数{12,33,4,5}时，都是没有冲突的散列地址，直接存入（蓝色代表为空的，可以存放数据）：</p>
+<p><img src="https://pic2.zhimg.com/80/v2-afc1bb6c5ecdd030dc03fd3e3e9fde7d_720w.jpg" alt="img"></p>
+<p>计算key = 15时，发现f(15) = 5，此时就与5所在的位置冲突。于是我们应用上面的公式f(15) = (f(15)+1) mod 10 =6。于是将15存入下标为6的位置。这其实就是房子被人买了于是买下一间的作法：</p>
+<p><img src="https://pic4.zhimg.com/80/v2-f9d9e987e65a995be9633790f4c7546b_720w.jpg" alt="img"></p>
+<p><strong>链地址法和开放地址法的优缺点</strong></p>
+<p>开放地址法：</p>
+<ol>
+<li>容易产生堆积问题，不适于大规模的数据存储。</li>
+<li>散列函数的设计对冲突会有很大的影响，插入时可能会出现多次冲突的现象。</li>
+<li>删除的元素是多个冲突元素中的一个，需要对后面的元素作处理，实现较复杂。</li>
+</ol>
+<p>链地址法：</p>
+<ol>
+<li>处理冲突简单，且无堆积现象，平均查找长度短。</li>
+<li>链表中的结点是动态申请的，适合构造表不能确定长度的情况。</li>
+<li>删除结点的操作易于实现。只要简单地删去链表上相应的结点即可。</li>
+<li>指针需要额外的空间，故当结点规模较小时，开放定址法较为节省空间。</li>
+</ol>
+<p><strong>ThreadLocalMap 采用开放地址法原因</strong></p>
+<ol>
+<li>ThreadLocal 中看到一个属性 HASH_INCREMENT = 0x61c88647 ，0x61c88647 是一个神奇的数字，让哈希码能均匀的分布在2的N次方的数组里, 即 Entry[] table，关于这个神奇的数字google 有很多解析，这里就不重复说了</li>
+<li>ThreadLocal 往往存放的数据量不会特别大（而且key 是弱引用又会被垃圾回收，及时让数据量更小），这个时候开放地址法简单的结构会显得更省空间，同时数组的查询效率也是非常高，加上第一点的保障，冲突概率也低</li>
+</ol>
+<p><strong>弱引用</strong></p>
+<p>接下来我们看看ThreadLocalMap 中的存放数据的内部类Entry 的实现源码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Entry</span> <span class="keyword">extends</span> <span class="title">WeakReference</span>&lt;<span class="title">ThreadLocal</span>&lt;?&gt;&gt; </span>&#123;</span><br><span class="line">  <span class="comment">/** The value associated with this ThreadLocal. */</span></span><br><span class="line">  Object value;</span><br><span class="line">  Entry(ThreadLocal&lt;?&gt; k, Object v) &#123;</span><br><span class="line">    <span class="keyword">super</span>(k);</span><br><span class="line">    value = v;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以知道Entry 的key 是一个弱引用，也就意味这可能会被垃圾回收器回收掉<br><code>threadLocal.get()==null</code></p>
+<p>也就意味着被回收掉了<br>ThreadLocalMap set 方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(ThreadLocal&lt;?&gt; key, Object value)</span> </span>&#123;</span><br><span class="line">    Entry[] tab = table;</span><br><span class="line">    <span class="keyword">int</span> len = tab.length;</span><br><span class="line">    <span class="comment">// 计算数组的下标</span></span><br><span class="line">    <span class="keyword">int</span> i = key.threadLocalHashCode &amp; (len-<span class="number">1</span>);</span><br><span class="line">    <span class="comment">// 注意这里结束循环的条件是e != null，这个很重要，还记得上面讲的开放地址法吗？</span></span><br><span class="line">    <span class="comment">// 忘记的回到上面看下，一定看懂才往下走，不然白白浪费时间</span></span><br><span class="line">    <span class="comment">// 这里遍历的逻辑是，先通过hash 找到数组下标，然后寻找相等的ThreadLocal对象</span></span><br><span class="line">    <span class="comment">// 找不到就往下一个index找，有两种可能会退出这个循环</span></span><br><span class="line">    <span class="comment">// 1.找到了相同ThreadLocal对象</span></span><br><span class="line">    <span class="comment">// 2.一直往数组下一个下标查询，直到下一个下标对应的是null 跳出</span></span><br><span class="line">    <span class="keyword">for</span> (Entry e = tab[i];</span><br><span class="line">    e != <span class="keyword">null</span>;</span><br><span class="line">    e = tab[i = nextIndex(i, len)]) &#123;</span><br><span class="line">      ThreadLocal&lt;?&gt; k = e.get();</span><br><span class="line">      <span class="comment">//如果找到直接设置value 值返回，这个很简单没什么好讲的</span></span><br><span class="line">      <span class="keyword">if</span> (k == key) &#123;</span><br><span class="line">        e.value = value;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// k==null&amp;&amp;e!=null 说明key被垃圾回收了，这里涉及到弱引用，接下来讲</span></span><br><span class="line">      <span class="keyword">if</span> (k == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">//被回收的话就需要替换掉过期过期的值，把新的值放在这里返回</span></span><br><span class="line">        replaceStaleEntry(key, value, i);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//来到这里，说明没找到</span></span><br><span class="line">    tab[i] = <span class="keyword">new</span> Entry(key, value);</span><br><span class="line">    <span class="keyword">int</span> sz = ++size;</span><br><span class="line">    <span class="keyword">if</span> (!cleanSomeSlots(i, sz) &amp;&amp; sz &gt;= threshold)</span><br><span class="line">      <span class="comment">//进行扩容，这里先不讲</span></span><br><span class="line">      rehash();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>还是拿上面解释开放地址法解释的例子来说明下。 比如说，我们的关键字集合为{12,33,4,5,15,25},表长为10。 我们用散列函数f(key) = key mod l0。 当计算前S个数{12,33,4,5,15,25}时，并且此时key=33,k=5 已经过期了（蓝色代表为空的，可以存放数据，红色代表key 过期，过期的key为null）：</p>
+<p><img src="https://pic3.zhimg.com/80/v2-67a10fc3f461adda47dfddd6e521de1a_720w.jpg" alt="img"></p>
+<p>这时候来了一个新的数据，key=15,value=new,通过计算f(15)=5,此时5已经过期，进入到下面这个if 语句 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (k == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="comment">//key 过期了，要进行替换</span></span><br><span class="line">    replaceStaleEntry(key, value, i);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>replaceStaleEntry 这个方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">replaceStaleEntry</span><span class="params">(ThreadLocal&lt;?&gt; key, Object value,</span></span></span><br><span class="line"><span class="function"><span class="params">                               <span class="keyword">int</span> staleSlot)</span> </span>&#123;</span><br><span class="line">    Entry[] tab = table;</span><br><span class="line">    <span class="keyword">int</span> len = tab.length;</span><br><span class="line">    Entry e;</span><br><span class="line">    <span class="comment">// 这里采用的是从当前的staleSlot 位置向前面遍历，i--</span></span><br><span class="line">    <span class="comment">// 这样的话是为了把前面所有的的已经被垃圾回收的也一起释放空间出来</span></span><br><span class="line">    <span class="comment">// （注意这里只是key 被回收，value还没被回收，entry更加没回收，所以需要让他们回收），</span></span><br><span class="line">    <span class="comment">// 同时也避免这样存在很多过期的对象的占用,导致这个时候刚好来了一个新的元素达到阀值而触发一的rehash</span></span><br><span class="line">    <span class="keyword">int</span> slotToExpunge = staleSlot;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = prevIndex(staleSlot, len);</span><br><span class="line">         (e = tab[i]) != <span class="keyword">null</span>;</span><br><span class="line">         i = prevIndex(i, len))</span><br><span class="line">        <span class="comment">// slotToExpunge 记录staleSlot左手边第一个空的entry 到staleSlot 之间key过期最小的index</span></span><br><span class="line">        <span class="keyword">if</span> (e.get() == <span class="keyword">null</span>)</span><br><span class="line">            slotToExpunge = i;</span><br><span class="line">    <span class="comment">// 这个时候是从数组下标小的往下标大的方向遍历，i++，刚好跟上面相反。</span></span><br><span class="line">    <span class="comment">// 这两个遍历就是为了在左边遇到的第一个空的entry到右边遇到的第一空的 entry之间查询所有过对象。</span></span><br><span class="line">    <span class="comment">// 注意：在右边如果找到需要设置值的key（这个例子是key=15）相同的时候就开始清理，然后返回再继续遍历下去了</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = nextIndex(staleSlot, len);</span><br><span class="line">         (e = tab[i]) != <span class="keyword">null</span>;</span><br><span class="line">         i = nextIndex(i, len)) &#123;</span><br><span class="line">        ThreadLocal&lt;?&gt; k = e.get();</span><br><span class="line">        <span class="comment">// 说明之前已经存在相同的key,所以需要替换旧的值并且和前面那个过期的对象的进行交换位置，</span></span><br><span class="line">        <span class="comment">// 交换的目的下面会解释</span></span><br><span class="line">        <span class="keyword">if</span> (k == key) &#123;</span><br><span class="line">            e.value = value;</span><br><span class="line">            tab[i] = tab[staleSlot];</span><br><span class="line">            tab[staleSlot] = e;</span><br><span class="line">            <span class="comment">// 这里的意思就是前面的第一个for 循环(i--)往前查找的时候没有找到过期的，staleSlot</span></span><br><span class="line">            <span class="comment">// 这个过期，由于前面过期的对象已经通过交换位置的方式放到index=i上了，</span></span><br><span class="line">            <span class="comment">// 所以需要清理的位置是i,而不是传过来的staleSlot</span></span><br><span class="line">            <span class="keyword">if</span> (slotToExpunge == staleSlot)</span><br><span class="line">                slotToExpunge = i;</span><br><span class="line">            <span class="comment">// 进行清理过期数据</span></span><br><span class="line">            cleanSomeSlots(expungeStaleEntry(slotToExpunge), len);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果我们在第一个for 循环(i--) 向前遍历的时候没有找到任何过期的对象</span></span><br><span class="line">        <span class="comment">// 那么我们需要把slotToExpunge 设置为向后遍历(i++) 的第一个过期对象的位置</span></span><br><span class="line">        <span class="comment">// 因为如果整个数组都没有找到要设置的key 的时候，该key 会设置在该staleSlot的位置上</span></span><br><span class="line">        <span class="comment">//如果数组中存在要设置的key,那么上面也会通过交换位置的时候把有效值移到staleSlot位置上</span></span><br><span class="line">        <span class="comment">//综上所述，staleSlot位置上不管怎么样，存放的都是有效的值，所以不需要清理的</span></span><br><span class="line">        <span class="keyword">if</span> (k == <span class="keyword">null</span> &amp;&amp; slotToExpunge == staleSlot)</span><br><span class="line">            slotToExpunge = i;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果key 在数组中没有存在，那么直接新建一个新的放进去就可以</span></span><br><span class="line">    tab[staleSlot].value = <span class="keyword">null</span>;</span><br><span class="line">    tab[staleSlot] = <span class="keyword">new</span> Entry(key, value);</span><br><span class="line">    <span class="comment">// 如果有其他已经过期的对象，那么需要清理他</span></span><br><span class="line">    <span class="keyword">if</span> (slotToExpunge != staleSlot)</span><br><span class="line">        cleanSomeSlots(expungeStaleEntry(slotToExpunge), len);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第一个for 循环是向前遍历数据的，直到遍历到空的entry 就停止（这个是根据开放地址的线性探测法）,这里的例子就是遍历到index=1就停止了。向前遍历的过程同时会找出过期的key,这个时候找到的是下标index=3 的为过期，进入到</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (e.get() == <span class="keyword">null</span>)</span><br><span class="line">    slotToExpunge = i;</span><br></pre></td></tr></table></figure>
+<p>注意此时slotToExpunge=3，staleSlot=5<br>第二个for 循环是从index=staleSlot开始，向后编列的，找出是否有和当前匹配的key,有的话进行清理过期的对象和重新设置当前的值。这个例子遍历到index=6 的时候，匹配到key=15的值，进入如下代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (k == key) &#123;</span><br><span class="line">    e.value = value;</span><br><span class="line">    tab[i] = tab[staleSlot];</span><br><span class="line">    tab[staleSlot] = e;</span><br><span class="line">    <span class="comment">// Start expunge at preceding stale entry if it exists</span></span><br><span class="line">    <span class="keyword">if</span> (slotToExpunge == staleSlot)</span><br><span class="line">      slotToExpunge = i;</span><br><span class="line">    cleanSomeSlots(expungeStaleEntry(slotToExpunge), len);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>先进行数据交换，注意此时slotToExpunge=3，staleSlot=5，i=6。这里就是把5 和6 的位置的元素进行交换，并且设置新的value=new,交换后的图是这样的</p>
+<p><img src="https://pic1.zhimg.com/80/v2-26bf545844297c818b3b945a88e57f9c_720w.jpg" alt="img"></p>
+<p>为什么要交换<br>这里解释下为什么交换，我们先来看看如果不交换的话，经过设置值和清理过期对象，会是以下这张图</p>
+<p><img src="https://pic3.zhimg.com/80/v2-7853832134516589b01762e3cafce162_720w.jpg" alt="img"></p>
+<p>这个时候如果我们再一次设置一个key=15,value=new2 的值，通过f(15)=5,这个时候由于上次index=5是过期对象，被清空了，所以可以存在数据，那么就直接存放在这里了</p>
+<p><img src="https://pic2.zhimg.com/80/v2-21fbdd2e63ca10b0ae7c836e96c49eed_720w.jpg" alt="img"></p>
+<p>你看，这样整个数组就存在两个key=15 的数据了，这样是不允许的，所以一定要交换数据expungeStaleEntry</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">expungeStaleEntry</span><span class="params">(<span class="keyword">int</span> staleSlot)</span> </span>&#123;</span><br><span class="line">    Entry[] tab = table;</span><br><span class="line">    <span class="keyword">int</span> len = tab.length;</span><br><span class="line">    tab[staleSlot].value = <span class="keyword">null</span>;</span><br><span class="line">    tab[staleSlot] = <span class="keyword">null</span>;</span><br><span class="line">    size--;</span><br><span class="line">    Entry e;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">for</span> (i = nextIndex(staleSlot, len);</span><br><span class="line">         (e = tab[i]) != <span class="keyword">null</span>;</span><br><span class="line">         i = nextIndex(i, len)) &#123;</span><br><span class="line">        ThreadLocal&lt;?&gt; k = e.get();</span><br><span class="line">        <span class="keyword">if</span> (k == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">//这里设置为null ,方便让GC 回收</span></span><br><span class="line">            e.value = <span class="keyword">null</span>;</span><br><span class="line">            tab[i] = <span class="keyword">null</span>;</span><br><span class="line">            size--;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">//这里主要的作用是由于采用了开放地址法，所以删除的元素是多个冲突元素中的一个，需要对后面的元素作</span></span><br><span class="line">          <span class="comment">//处理，可以简单理解就是让后面的元素往前面移动</span></span><br><span class="line">          <span class="comment">//为什么要这样做呢？主要是开放地址寻找元素的时候，遇到null 就停止寻找了，你前面k==null</span></span><br><span class="line">          <span class="comment">//的时候已经设置entry为null了，不移动的话，那么后面的元素就永远访问不了了，下面会画图进行解释说明</span></span><br><span class="line">            <span class="keyword">int</span> h = k.threadLocalHashCode &amp; (len - <span class="number">1</span>);</span><br><span class="line">          <span class="comment">//他们不相等，说明是经过hash 是有冲突的</span></span><br><span class="line">            <span class="keyword">if</span> (h != i) &#123;</span><br><span class="line">                tab[i] = <span class="keyword">null</span>;</span><br><span class="line">                <span class="keyword">while</span> (tab[h] != <span class="keyword">null</span>)</span><br><span class="line">                    h = nextIndex(h, len);</span><br><span class="line">                tab[h] = e;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来我们详细模拟下整个过程 根据我们的例子，key=5,15,25 都是冲突的，并且k=5的值已经过期，经过replaceStaleEntry 方法，在进入expungeStaleEntry 方法之前，数据结构是这样的</p>
+<p><img src="https://pic2.zhimg.com/80/v2-22e7b064192ab0f495d7a030704e4c29_720w.jpg" alt="img"></p>
+<p>此时传进来的参数staleSlot=6，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (k == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="comment">//这里设置为null ,方便让GC 回收</span></span><br><span class="line">    e.value = <span class="keyword">null</span>;</span><br><span class="line">    tab[i] = <span class="keyword">null</span>;</span><br><span class="line">    size--;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个时候会把index=6设置为null,数据结构变成下面的情况</p>
+<p><img src="https://pic3.zhimg.com/80/v2-2e36722bb8a42c2f5243b29ae22d1e6e_720w.jpg" alt="img"></p>
+<p>接下来我们会遍历到i=7，经过int h = k.threadLocalHashCode &amp; (len - 1) (实际上对应我们的举例的函数int h= f(25)); 得到的h=5,而25实际存放在index=7 的位置上，这个时候我们需要从h=5的位置上重新开始编列，直到遇到空的entry 为止 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> h = k.threadLocalHashCode &amp; (len - <span class="number">1</span>);</span><br><span class="line"><span class="keyword">if</span> (h != i) &#123;</span><br><span class="line">    tab[i] = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">while</span> (tab[h] != <span class="keyword">null</span>)</span><br><span class="line">    h = nextIndex(h, len);</span><br><span class="line">    tab[h] = e;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个时候h=6，并把k=25 的值移到index=6 的位置上，同时设置index=7 为空，如下图</p>
+<p><img src="https://pic1.zhimg.com/80/v2-ebe313ed831750dfc5c37b2472117a04_720w.jpg" alt="img"></p>
+<p>其实目的跟replaceStaleEntry 交换位置的原理是一样的，为了防止由于回收掉中间那个冲突的值，导致后面冲突的值没办法找到（因为e==null 就跳出循环了）</p>
+<p><strong>ThreadLocal 内存溢出问题：</strong></p>
+<p>通过上面的分析，我们知道expungeStaleEntry() 方法是帮助垃圾回收的，根据源码，我们可以发现 get 和set 方法都可能触发清理方法expungeStaleEntry()，所以正常情况下是不会有内存溢出的 但是如果我们没有调用get 和set 的时候就会可能面临着内存溢出，养成好习惯不再使用的时候调用remove(),加快垃圾回收，避免内存溢出<br>退一步说，就算我们没有调用get 和set 和remove 方法,线程结束的时候，也就没有强引用再指向ThreadLocal 中的ThreadLocalMap了，这样ThreadLocalMap 和里面的元素也会被回收掉，但是有一种危险是，如果线程是线程池的， 在线程执行完代码的时候并没有结束，只是归还给线程池，这个时候ThreadLocalMap 和里面的元素是不会回收掉的</p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/88133406">原文作者：面试君</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">源码阅读</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/03/29/ThreadLocal%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-颠倒二进制位" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/29/%E9%A2%A0%E5%80%92%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%BD%8D/">颠倒二进制位</a>
+    </h1>
+  
+
+        
+        <a href="/2021/03/29/%E9%A2%A0%E5%80%92%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%BD%8D/" class="archive-article-date">
+  	<time datetime="2021-03-29T01:01:50.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="190-颠倒二进制位"><a href="#190-颠倒二进制位" class="headerlink" title="190. 颠倒二进制位"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/reverse-bits/">190. 颠倒二进制位</a></h4><p>难度简单301收藏分享切换为英文接收动态反馈</p>
+<p>颠倒给定的 32 位无符号整数的二进制位。</p>
+<p><strong>提示：</strong></p>
+<ul>
+<li>请注意，在某些语言（如 Java）中，没有无符号整数类型。在这种情况下，输入和输出都将被指定为有符号整数类型，并且不应影响您的实现，因为无论整数是有符号的还是无符号的，其内部的二进制表示形式都是相同的。</li>
+<li>在 Java 中，编译器使用<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/二进制补码/5295284">二进制补码</a>记法来表示有符号整数。因此，在上面的 <strong>示例 2</strong> 中，输入表示有符号整数 <code>-3</code>，输出表示有符号整数 <code>-1073741825</code>。</li>
+</ul>
+<p><strong>进阶</strong>:<br>如果多次调用这个函数，你将如何优化你的算法？</p>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入: 00000010100101000001111010011100</span><br><span class="line">输出: 00111001011110000010100101000000</span><br><span class="line">解释: 输入的二进制串 00000010100101000001111010011100 表示无符号整数 43261596，</span><br><span class="line">     因此返回 964176192，其二进制表示形式为 00111001011110000010100101000000。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：11111111111111111111111111111101</span><br><span class="line">输出：10111111111111111111111111111111</span><br><span class="line">解释：输入的二进制串 11111111111111111111111111111101 表示无符号整数 4294967293，</span><br><span class="line">     因此返回 3221225471 其二进制表示形式为 10111111111111111111111111111111 。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 00000010100101000001111010011100</span><br><span class="line">输出：964176192 (00111001011110000010100101000000)</span><br><span class="line">解释：输入的二进制串 00000010100101000001111010011100 表示无符号整数 43261596，</span><br><span class="line">     因此返回 964176192，其二进制表示形式为 00111001011110000010100101000000。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 11111111111111111111111111111101</span><br><span class="line">输出：3221225471 (10111111111111111111111111111111)</span><br><span class="line">解释：输入的二进制串 11111111111111111111111111111101 表示无符号整数 4294967293，</span><br><span class="line">     因此返回 3221225471 其二进制表示形式为 10111111111111111111111111111111 。</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li>输入是一个长度为 <code>32</code> 的二进制字符串</li>
+</ul>
+<h2 id="位运算"><a href="#位运算" class="headerlink" title="位运算"></a>位运算</h2><p>先将数字转换成二进制位，转换的过程中直接翻转所有的位，然后按照翻转的顺序继续将二进制位转换成十进制数字</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="comment">// you need treat n as an unsigned value</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">reverseBits</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] val = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">32</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> bit = <span class="number">1</span>;</span><br><span class="line">        <span class="comment">// 将十进制数字转换成二进制数字的逆序</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">32</span>; i++) &#123;</span><br><span class="line">            val[i] = (bit &amp; n) != <span class="number">0</span> ? <span class="number">1</span> : <span class="number">0</span>;</span><br><span class="line">            bit = bit &lt;&lt; <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span>;</span><br><span class="line">        bit = <span class="number">1</span>;</span><br><span class="line">        <span class="comment">// 将二进制数字重新转换成十进制</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">31</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            res += bit * val[i];</span><br><span class="line">            bit = bit &lt;&lt; <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="逐位颠倒"><a href="#逐位颠倒" class="headerlink" title="逐位颠倒"></a>逐位颠倒</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">reverseBits</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> rev = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">32</span> &amp;&amp; n != <span class="number">0</span>; ++i) &#123;</span><br><span class="line">            rev |= (n &amp; <span class="number">1</span>) &lt;&lt; (<span class="number">31</span> - i);</span><br><span class="line">            n &gt;&gt;&gt;= <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> rev;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/reverse-bits/solution/dian-dao-er-jin-zhi-wei-by-leetcode-solu-yhxz/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+<h2 id="分治算法"><a href="#分治算法" class="headerlink" title="分治算法"></a>分治算法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> M1 = <span class="number">0x55555555</span>; <span class="comment">// 01010101010101010101010101010101</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> M2 = <span class="number">0x33333333</span>; <span class="comment">// 00110011001100110011001100110011</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> M4 = <span class="number">0x0f0f0f0f</span>; <span class="comment">// 00001111000011110000111100001111</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> M8 = <span class="number">0x00ff00ff</span>; <span class="comment">// 00000000111111110000000011111111</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">reverseBits</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        n = n &gt;&gt;&gt; <span class="number">1</span> &amp; M1 | (n &amp; M1) &lt;&lt; <span class="number">1</span>;</span><br><span class="line">        n = n &gt;&gt;&gt; <span class="number">2</span> &amp; M2 | (n &amp; M2) &lt;&lt; <span class="number">2</span>;</span><br><span class="line">        n = n &gt;&gt;&gt; <span class="number">4</span> &amp; M4 | (n &amp; M4) &lt;&lt; <span class="number">4</span>;</span><br><span class="line">        n = n &gt;&gt;&gt; <span class="number">8</span> &amp; M8 | (n &amp; M8) &lt;&lt; <span class="number">8</span>;</span><br><span class="line">        <span class="keyword">return</span> n &gt;&gt;&gt; <span class="number">16</span> | n &lt;&lt; <span class="number">16</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/reverse-bits/solution/dian-dao-er-jin-zhi-wei-by-leetcode-solu-yhxz/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">位运算</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/03/29/%E9%A2%A0%E5%80%92%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%BD%8D/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-好因子的最大数目" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/28/%E5%A5%BD%E5%9B%A0%E5%AD%90%E7%9A%84%E6%9C%80%E5%A4%A7%E6%95%B0%E7%9B%AE/">好因子的最大数目</a>
+    </h1>
+  
+
+        
+        <a href="/2021/03/28/%E5%A5%BD%E5%9B%A0%E5%AD%90%E7%9A%84%E6%9C%80%E5%A4%A7%E6%95%B0%E7%9B%AE/" class="archive-article-date">
+  	<time datetime="2021-03-28T11:59:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-28</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="5716-好因子的最大数目"><a href="#5716-好因子的最大数目" class="headerlink" title="5716. 好因子的最大数目"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/maximize-number-of-nice-divisors/">5716. 好因子的最大数目</a></h4><p>难度困难10</p>
+<p>给你一个正整数 <code>primeFactors</code> 。你需要构造一个正整数 <code>n</code> ，它满足以下条件：</p>
+<ul>
+<li><code>n</code> 质因数（质因数需要考虑重复的情况）的数目 <strong>不超过</strong> <code>primeFactors</code> 个。</li>
+<li><code>n</code> 好因子的数目最大化。如果 <code>n</code> 的一个因子可以被 <code>n</code> 的每一个质因数整除，我们称这个因子是 <strong>好因子</strong> 。比方说，如果 <code>n = 12</code> ，那么它的质因数为 <code>[2,2,3]</code> ，那么 <code>6</code> 和 <code>12</code> 是好因子，但 <code>3</code> 和 <code>4</code> 不是。</li>
+</ul>
+<p>请你返回 <code>n</code> 的好因子的数目。由于答案可能会很大，请返回答案对 <code>10^9 + 7</code> <strong>取余</strong> 的结果。</p>
+<p>请注意，一个质数的定义是大于 <code>1</code> ，且不能被分解为两个小于该数的自然数相乘。一个数 <code>n</code> 的质因子是将 <code>n</code> 分解为若干个质因子，且它们的乘积为 <code>n</code> 。</p>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">输入：primeFactors &#x3D; 5</span><br><span class="line">输出：6</span><br><span class="line">解释：200 是一个可行的 n 。</span><br><span class="line">它有 5 个质因子：[2,2,2,5,5] ，且有 6 个好因子：[10,20,40,50,100,200] 。</span><br><span class="line">不存在别的 n 有至多 5 个质因子，且同时有更多的好因子。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：primeFactors &#x3D; 8</span><br><span class="line">输出：18</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>1 &lt;= primeFactors &lt;= 10^9</code></li>
+</ul>
+<h2 id="切绳子的贪心做法-快速幂"><a href="#切绳子的贪心做法-快速幂" class="headerlink" title="切绳子的贪心做法+快速幂"></a>切绳子的贪心做法+快速幂</h2><p>最主要的是很难想到是怎么想到切绳子的</p>
+<p>可以通过数学证明，所有的数字切分成3的时候乘积最大</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">maxNiceDivisors</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> N = <span class="number">10_0000_0007</span>;</span><br><span class="line">        <span class="keyword">if</span> (n &lt;= <span class="number">3</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> n;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> a = n / <span class="number">3</span>, b = n % <span class="number">3</span>;</span><br><span class="line">        <span class="keyword">if</span> (b == <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> (<span class="keyword">int</span>) (quickPow(<span class="number">3</span>, a - <span class="number">1</span>, N) * <span class="number">4</span> % N);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (b == <span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> (<span class="keyword">int</span>) (quickPow(<span class="number">3</span>, a, N) * <span class="number">2</span> % N);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> (<span class="keyword">int</span>) quickPow(<span class="number">3</span>, a, N);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 计算p的q次幂,使用快速幂方法</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">quickPow</span><span class="params">(<span class="keyword">int</span> p, <span class="keyword">int</span> q, <span class="keyword">int</span> MOD)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> ans = <span class="number">1L</span>;</span><br><span class="line">        <span class="keyword">long</span> base = p;</span><br><span class="line">        <span class="keyword">while</span> (q != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> ((q &amp; <span class="number">1</span>) == <span class="number">1</span>) &#123;</span><br><span class="line">                ans = ans * base % MOD;</span><br><span class="line">            &#125;</span><br><span class="line">            base = base * base % MOD;</span><br><span class="line">            q &gt;&gt;&gt;= <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> 作者：liberg</span><br><span class="line"> 链接：https:<span class="comment">//leetcode-cn.com/problems/maximize-number-of-nice-divisors/solution/huan-ying-shou-cang-xiang-xi-shu-xue-tui-jrte/</span></span><br><span class="line"> 来源：力扣（LeetCode）</span><br><span class="line"> 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/03/28/%E5%A5%BD%E5%9B%A0%E5%AD%90%E7%9A%84%E6%9C%80%E5%A4%A7%E6%95%B0%E7%9B%AE/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-替换字符串中的括号内容" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -970,322 +1383,9 @@ tex2jax: {
 
 
   
-    <article id="post-水仙花数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/03/26/%E6%B0%B4%E4%BB%99%E8%8A%B1%E6%95%B0/">水仙花数</a>
-    </h1>
-  
-
-        
-        <a href="/2021/03/26/%E6%B0%B4%E4%BB%99%E8%8A%B1%E6%95%B0/" class="archive-article-date">
-  	<time datetime="2021-03-26T06:05:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-26</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h3 id="https-github-com-OBKoro1-Brush-algorithm-issues-9-水仙花数的定义：-水仙花数的定义："><a href="#https-github-com-OBKoro1-Brush-algorithm-issues-9-水仙花数的定义：-水仙花数的定义：" class="headerlink" title="(https://github.com/OBKoro1/Brush_algorithm/issues/9#水仙花数的定义：) 水仙花数的定义："></a>(<a target="_blank" rel="noopener" href="https://github.com/OBKoro1/Brush_algorithm/issues/9#水仙花数的定义：">https://github.com/OBKoro1/Brush_algorithm/issues/9#水仙花数的定义：</a>) 水仙花数的定义：</h3><p><strong>一个 N 位非负整数，其各位数字的 N 次方和等于该数本身</strong>。</p>
-<p>栗子：</p>
-<p>$153 = 1^3 + 5^3 + 3^3$</p>
-<p>$370 = 3^3 + 7^3 + 0^3$</p>
-<p>$371 = 3^3 + 7^3 + 1^3$</p>
-<p>$1634 = 14^4 + 64^4 + 34^4 + 44^4。$</p>
-<p>更详细的推荐：<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/水仙花数">维基百科</a></p>
-<h3 id="https-github-com-OBKoro1-Brush-algorithm-issues-9-描述：-描述："><a href="#https-github-com-OBKoro1-Brush-algorithm-issues-9-描述：-描述：" class="headerlink" title="(https://github.com/OBKoro1/Brush_algorithm/issues/9#描述：) 描述："></a>(<a target="_blank" rel="noopener" href="https://github.com/OBKoro1/Brush_algorithm/issues/9#描述：">https://github.com/OBKoro1/Brush_algorithm/issues/9#描述：</a>) 描述：</h3><p>给出一个范围$[m,n]$找出该范围内所有的水仙花数字</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Scanner sc = <span class="keyword">new</span> Scanner(System.in);</span><br><span class="line">        <span class="keyword">while</span> (sc.hasNext()) &#123;</span><br><span class="line">            <span class="keyword">int</span> s = sc.nextInt();</span><br><span class="line">            <span class="keyword">int</span> e = sc.nextInt();</span><br><span class="line">            <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = s; i &lt; e; i++) &#123;</span><br><span class="line">                <span class="keyword">long</span> sum = <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">int</span> num = i;</span><br><span class="line">                <span class="keyword">while</span> (num != <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="keyword">int</span> val = num % <span class="number">10</span>;</span><br><span class="line">                    sum += (val * val * val);</span><br><span class="line">                    num /= <span class="number">10</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (sum == i) &#123;</span><br><span class="line">                    count++;</span><br><span class="line">                    System.out.println(i);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (count == <span class="number">0</span>) System.out.println(<span class="string">&quot;no&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数学</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/03/26/%E6%B0%B4%E4%BB%99%E8%8A%B1%E6%95%B0/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-删除排序链表中的重复元素-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/03/26/%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0-1/">删除排序链表中的重复元素</a>
-    </h1>
-  
-
-        
-        <a href="/2021/03/26/%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0-1/" class="archive-article-date">
-  	<time datetime="2021-03-26T05:20:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-26</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="83-删除排序链表中的重复元素"><a href="#83-删除排序链表中的重复元素" class="headerlink" title="83. 删除排序链表中的重复元素"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list/">83. 删除排序链表中的重复元素</a></h4><p>难度简单523收藏分享切换为英文接收动态反馈</p>
-<p>存在一个按升序排列的链表，给你这个链表的头节点 <code>head</code> ，请你删除所有重复的元素，使每个元素 <strong>只出现一次</strong> 。</p>
-<p>返回同样按升序排列的结果链表。</p>
-<p><strong>示例 1：</strong></p>
-<p><img src="https://assets.leetcode.com/uploads/2021/01/04/list1.jpg" alt="img"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：head &#x3D; [1,1,2]</span><br><span class="line">输出：[1,2]</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<p><img src="https://assets.leetcode.com/uploads/2021/01/04/list2.jpg" alt="img"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：head &#x3D; [1,1,2,3,3]</span><br><span class="line">输出：[1,2,3]</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li>链表中节点数目在范围 <code>[0, 300]</code> 内</li>
-<li><code>-100 &lt;= Node.val &lt;= 100</code></li>
-<li>题目数据保证链表已经按升序排列</li>
-</ul>
-<h2 id="简洁写法"><a href="#简洁写法" class="headerlink" title="简洁写法"></a>简洁写法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">deleteDuplicates</span> <span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        ListNode cur = head;</span><br><span class="line">        <span class="keyword">while</span>(cur!=<span class="keyword">null</span>)&#123;</span><br><span class="line">            ListNode nex = cur.next;</span><br><span class="line">            <span class="keyword">while</span>(nex!=<span class="keyword">null</span>&amp;&amp;cur.val==nex.val)&#123;</span><br><span class="line">                nex = nex.next;</span><br><span class="line">            &#125;</span><br><span class="line">            cur.next = nex;</span><br><span class="line">            cur = cur.next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> head;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-<h2 id="使用dummyNode"><a href="#使用dummyNode" class="headerlink" title="使用dummyNode"></a>使用dummyNode</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Definition for singly-linked list.</span></span><br><span class="line"><span class="comment"> * public class ListNode &#123;</span></span><br><span class="line"><span class="comment"> *     int val;</span></span><br><span class="line"><span class="comment"> *     ListNode next;</span></span><br><span class="line"><span class="comment"> *     ListNode() &#123;&#125;</span></span><br><span class="line"><span class="comment"> *     ListNode(int val) &#123; this.val = val; &#125;</span></span><br><span class="line"><span class="comment"> *     ListNode(int val, ListNode next) &#123; this.val = val; this.next = next; &#125;</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">deleteDuplicates</span><span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        ListNode dummyNode = <span class="keyword">new</span> ListNode(-<span class="number">200</span>);</span><br><span class="line">        dummyNode.next=head;</span><br><span class="line">        ListNode pre=dummyNode;</span><br><span class="line">        ListNode cur=head;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(cur!= <span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="keyword">if</span>(pre.val == cur.val)&#123;</span><br><span class="line">                pre.next=cur.next;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                pre=pre.next;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(cur!=<span class="keyword">null</span>)cur=cur.next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> head;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="官方的简洁代码"><a href="#官方的简洁代码" class="headerlink" title="官方的简洁代码"></a>官方的简洁代码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">deleteDuplicates</span><span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (head == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> head;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ListNode cur = head;</span><br><span class="line">        <span class="keyword">while</span> (cur.next != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (cur.val == cur.next.val) &#123;</span><br><span class="line">                cur.next = cur.next.next;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                cur = cur.next;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> head;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/remove-duplicates-from-sorted-list/solution/shan-chu-pai-xu-lian-biao-zhong-de-zhong-49v5/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-
-
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">链表</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/03/26/%E5%88%A0%E9%99%A4%E6%8E%92%E5%BA%8F%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E9%87%8D%E5%A4%8D%E5%85%83%E7%B4%A0-1/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-数列sqrt问题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/03/26/%E6%95%B0%E5%88%97sqrt%E9%97%AE%E9%A2%98/">数列sqrt问题</a>
-    </h1>
-  
-
-        
-        <a href="/2021/03/26/%E6%95%B0%E5%88%97sqrt%E9%97%AE%E9%A2%98/" class="archive-article-date">
-  	<time datetime="2021-03-26T05:20:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-26</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-
-<h2 id="美团例题"><a href="#美团例题" class="headerlink" title="美团例题"></a>美团例题</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/dichuan/p/7769098.html">java保留固定位数的小数</a></p>
-<p><strong>时间限制：</strong> 4000MS<br><strong>内存限制：</strong> 557056KB</p>
-<p><strong>题目描述：</strong></p>
-<p>数列的定义如下： 数列的第一项为n，以后各项为前一项的平方根，求数列的前m项的和。</p>
-<p>输入描述</p>
-<p>输入数据有多组，每组占一行，由两个整数n（n&lt;10000）和m(m&lt;1000)组成，n和m的含义如前所述。</p>
-<p>输出描述</p>
-<p>对于每组输入数据，输出该数列的和，每个测试实例占一行，要求精度保留2位小数。</p>
-<p>样例输入</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">81 4</span><br><span class="line">2 2</span><br></pre></td></tr></table></figure>
-
-<p>样例输出</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">94.73</span><br><span class="line">3.41</span><br></pre></td></tr></table></figure>
-
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Scanner sc = <span class="keyword">new</span> Scanner(System.in);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (sc.hasNext()) &#123;</span><br><span class="line">            <span class="keyword">int</span> n = sc.nextInt();</span><br><span class="line">            <span class="keyword">int</span> m = sc.nextInt();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">double</span> sum = n;</span><br><span class="line">            <span class="keyword">double</span> val = n;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; m; i++) &#123;</span><br><span class="line">                val = Math.sqrt(val);</span><br><span class="line">                sum += val;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(String.format(<span class="string">&quot;%.2f&quot;</span>, sum));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数学</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">小数</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/03/26/%E6%95%B0%E5%88%97sqrt%E9%97%AE%E9%A2%98/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/11/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="page-number" href="/page/11/">11</a><span class="page-number current">12</span><a class="page-number" href="/page/13/">13</a><a class="page-number" href="/page/14/">14</a><span class="space">&hellip;</span><a class="page-number" href="/page/76/">76</a><a class="extend next" rel="next" href="/page/13/">Next &amp;raquo;</a>
+      <a class="extend prev" rel="prev" href="/page/11/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="page-number" href="/page/11/">11</a><span class="page-number current">12</span><a class="page-number" href="/page/13/">13</a><a class="page-number" href="/page/14/">14</a><span class="space">&hellip;</span><a class="page-number" href="/page/77/">77</a><a class="extend next" rel="next" href="/page/13/">Next &amp;raquo;</a>
     </nav>
   
 
