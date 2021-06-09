@@ -150,6 +150,175 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-python多进程类内部回调函数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/07/27/python%E5%A4%9A%E8%BF%9B%E7%A8%8B%E7%B1%BB%E5%86%85%E9%83%A8%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/">python多进程类内部回调函数</a>
+    </h1>
+  
+
+        
+        <a href="/2020/07/27/python%E5%A4%9A%E8%BF%9B%E7%A8%8B%E7%B1%BB%E5%86%85%E9%83%A8%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/" class="archive-article-date">
+  	<time datetime="2020-07-26T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-27</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>python多进程中，如果回调函数需要写类的属性，那么该类的属性应该设置为多进程共享变量，否则在回调函数中将无法写入该类变量，其余函数访问到的数据仍然是该回调函数写入之前的数据。</p>
+<p>不同的进程默认有自己独立的内存空间，互相之间不能直接访问。所以，通常的全局变量或者传递参数，在创建新进程时，都是拷贝一份到新进程里使用。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> multiprocessing</span><br><span class="line"><span class="comment">#截取的部分代码   截取的部分代码    截取的部分代码</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Moudle</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    control_flag=multiprocessing.Value(<span class="string">&quot;i&quot;</span>,-<span class="number">1</span>)<span class="comment">#多进程共享变量</span></span><br><span class="line">    <span class="comment">#control_flag=-1#这种写法是有问题的，在多进程情况下无法修改该变量的值</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">on_message</span>(<span class="params">self,client, userdata, msg</span>):</span><span class="comment">#回调函数返回消息时调用该方法</span></span><br><span class="line">        self.control_flag.value = msg.data[<span class="string">&#x27;index&#x27;</span>]</span><br><span class="line">        <span class="comment">#self.control_flag=msg.data[&#x27;index&#x27;]#这种写法是有问题的，在多进程情况下无法修改该变量的值</span></span><br><span class="line">        print(<span class="string">&quot;control_flag&quot;</span>,self.control_flag)</span><br><span class="line"></span><br><span class="line"><span class="comment">#截取的部分代码   截取的部分代码    截取的部分代码</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Env</span>(<span class="params">gym.Env</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, name</span>):</span></span><br><span class="line">        self.mqtt_util=Moudle()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">step</span>():</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        程序逻辑</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> multiprocessing</span><br><span class="line"><span class="keyword">from</span> environment <span class="keyword">import</span> Env</span><br><span class="line">os.environ[<span class="string">&quot;OMP_NUM_THREADS&quot;</span>] = <span class="string">&quot;1&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Worker</span>(<span class="params">mp.Process</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span>  <span class="comment">#</span></span><br><span class="line">        <span class="built_in">super</span>(Worker, self).__init__()</span><br><span class="line">        self.env = Env(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">100</span>):</span><br><span class="line">            done = self.env.step()</span><br><span class="line">            <span class="keyword">while</span> <span class="keyword">not</span> done:</span><br><span class="line">                 done =self.env,step()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    workers = [Worker()<span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>)]</span><br><span class="line">    [w.start() <span class="keyword">for</span> w <span class="keyword">in</span> workers]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>参考文献<br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/68828849">multiprocessing中的共享变量</a></p>
+</blockquote>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/07/27/python%E5%A4%9A%E8%BF%9B%E7%A8%8B%E7%B1%BB%E5%86%85%E9%83%A8%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-Android问题记录" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/06/Android%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/">Android问题记录</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/06/Android%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/" class="archive-article-date">
+  	<time datetime="2020-06-06T10:35:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-06</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Messenger 是基于消息(Message)的进程间通信方式。使用Messenger为服务创建接口，服务可以这种方式定义对应于不同类型Message对象的Handler，此Handler是Messenger的基础，Messenger随后可与客户端分享一个IBinder，从而让客户端能利用Message对象向服务发送命令。客户端还可以自定义Messenger来实现双向通信。</p>
+<p>客户端</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">      Intent intent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, XxxService.class);</span><br><span class="line">      bindService(intent, mMessengerConnection, BIND_AUTO_CREATE);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MSG_ID_CLIENT = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MSG_ID_SERVER = <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String MSG_CONTENT = <span class="string">&quot;getAddress&quot;</span>;</span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * 客户端的 Messenger</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  Messenger mClientMessenger = <span class="keyword">new</span> Messenger(<span class="keyword">new</span> Handler() &#123;</span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(<span class="keyword">final</span> Message msg)</span> </span>&#123;</span><br><span class="line">          <span class="keyword">if</span> (msg != <span class="keyword">null</span> &amp;&amp; msg.arg1 == MSG_ID_SERVER) &#123;</span><br><span class="line">              <span class="keyword">if</span> (msg.getData() == <span class="keyword">null</span>) &#123;</span><br><span class="line">                  <span class="keyword">return</span>;</span><br><span class="line">              &#125;</span><br><span class="line">              Map&lt;String, Integer&gt; locationMap= (Map&lt;String, Integer&gt;) msg.getData().get(MSG_CONTENT);</span><br><span class="line">              Log.e(<span class="string">&quot;IPC&quot;</span>, <span class="string">&quot;Message from server: &quot;</span> + locationMap.size());</span><br><span class="line">              prepareShow(locationMap);</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="comment">//服务端的 Messenger</span></span><br><span class="line">  <span class="keyword">private</span> Messenger mServerMessenger;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> ServiceConnection mMessengerConnection = <span class="keyword">new</span> ServiceConnection() &#123;</span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(<span class="keyword">final</span> ComponentName name, <span class="keyword">final</span> IBinder service)</span> </span>&#123;</span><br><span class="line">          mServerMessenger = <span class="keyword">new</span> Messenger(service);</span><br><span class="line"></span><br><span class="line">          Message message = Message.obtain();</span><br><span class="line">          message.arg1 = MSG_ID_CLIENT;</span><br><span class="line">          Bundle bundle = <span class="keyword">new</span> Bundle();</span><br><span class="line">          bundle.putString(MSG_CONTENT, <span class="string">&quot;测试信息&quot;</span>);</span><br><span class="line">          message.setData(bundle);</span><br><span class="line">          message.replyTo = mClientMessenger;     <span class="comment">//指定回信人是客户端定义的</span></span><br><span class="line"></span><br><span class="line">          <span class="keyword">try</span> &#123;</span><br><span class="line">              mServerMessenger.send(message);</span><br><span class="line">          &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">              e.printStackTrace();</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(<span class="keyword">final</span> ComponentName name)</span> </span>&#123;</span><br><span class="line">          mServerMessenger = <span class="keyword">null</span>;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>服务端</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MSG_ID_CLIENT = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MSG_ID_SERVER = <span class="number">2</span>;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String MSG_CONTENT = <span class="string">&quot;getAddress&quot;</span>;</span><br><span class="line"><span class="keyword">private</span> Messenger clientMessager = <span class="keyword">null</span>;</span><br><span class="line"><span class="comment">// private Message clientMessage = null;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Messenger mMessenger = <span class="keyword">new</span> Messenger(<span class="keyword">new</span> Handler() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (msg != <span class="keyword">null</span> &amp;&amp; msg.arg1 == MSG_ID_CLIENT) &#123;</span><br><span class="line">            clientMessager = msg.replyTo;</span><br><span class="line">            <span class="comment">// clientMessage=msg</span></span><br><span class="line">            getDataFromClient();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">getDataFromClient</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   <span class="keyword">if</span> (mMessage.getData() == <span class="keyword">null</span>) &#123;</span><br><span class="line">       <span class="keyword">return</span>;</span><br><span class="line">   &#125;</span><br><span class="line">   String content = (String) mMessage.getData().get(MSG_CONTENT);  <span class="comment">//接收客户端的消息</span></span><br><span class="line">   Log.e(<span class="string">&quot;IPC&quot;</span>, <span class="string">&quot;Message from client: &quot;</span> + content);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendDataToClient</span><span class="params">(Map&lt;String, Integer&gt; locationMap)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//回复消息给客户端</span></span><br><span class="line">    Message replyMsg = Message.obtain();</span><br><span class="line">    replyMsg.arg1 = MSG_ID_SERVER;</span><br><span class="line">    Bundle bundle = <span class="keyword">new</span> Bundle();</span><br><span class="line">    bundle.putSerializable(MSG_CONTENT, (Serializable) locationMap);</span><br><span class="line">    replyMsg.setData(bundle);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// clientMessage.replyTo.send(replyMsg);</span></span><br><span class="line">        clientMessager.send(replyMsg);     <span class="comment">//回信</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Nullable</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> mMessenger.getBinder();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>服务端被注释掉的这些代码如果在使用时会发生clientMessage.replyTo中的replyTo对象为Null的情况，但是如果在Handler中直接获取replyTo对象就没问题。</p>
+<p>猜测Message的成员对象replyTo在离开Handler时如果没有被引用生命周期结束，有空再研究。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//private Message clientMessage</span></span><br><span class="line"><span class="comment">// clientMessage=msg</span></span><br><span class="line"><span class="comment">// clientMessage.replyTo.send(replyMsg);</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>参考文献<br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/cf495b908930">Android进程间通信之Messenger</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/u011240877/article/details/72836178">Android 进阶10：进程通信之 Messenger 使用与解析</a></p>
+</blockquote>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/06/Android%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Android获取蓝牙MAC地址" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
