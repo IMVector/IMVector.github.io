@@ -150,6 +150,95 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-按要求补齐数组(重点)" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/12/29/%E6%8C%89%E8%A6%81%E6%B1%82%E8%A1%A5%E9%BD%90%E6%95%B0%E7%BB%84(%E9%87%8D%E7%82%B9)/">按要求补齐数组</a>
+    </h1>
+  
+
+        
+        <a href="/2020/12/29/%E6%8C%89%E8%A6%81%E6%B1%82%E8%A1%A5%E9%BD%90%E6%95%B0%E7%BB%84(%E9%87%8D%E7%82%B9)/" class="archive-article-date">
+  	<time datetime="2020-12-29T02:31:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="330-按要求补齐数组"><a href="#330-按要求补齐数组" class="headerlink" title="330. 按要求补齐数组"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/patching-array/">330. 按要求补齐数组</a></h4><p>难度：困难</p>
+<p>给定一个已排序的正整数数组 <em>nums<em>和一个正整数 *n</em>，从 <code>[1, n]</code> 区间内选取任意个数字补充到 *nums</em> 中，使得 <code>[1, n]</code> 区间内的任何数字都可以用 <em>nums</em> 中某几个数字的和来表示。请输出满足上述要求的最少需要补充的数字个数。</p>
+<p><strong>示例 1:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">输入: nums &#x3D; [1,3], n &#x3D; 6</span><br><span class="line">输出: 1 </span><br><span class="line">解释:</span><br><span class="line">根据 nums 里现有的组合 [1], [3], [1,3]，可以得出 1, 3, 4。</span><br><span class="line">现在如果我们将 2 添加到 nums 中， 组合变为: [1], [2], [3], [1,3], [2,3], [1,2,3]。</span><br><span class="line">其和可以表示数字 1, 2, 3, 4, 5, 6，能够覆盖 [1, 6] 区间里所有的数。</span><br><span class="line">所以我们最少需要添加一个数字。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入: nums &#x3D; [1,5,10], n &#x3D; 20</span><br><span class="line">输出: 2</span><br><span class="line">解释: 我们需要添加 [2, 4]。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 3:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: nums &#x3D; [1,2,2], n &#x3D; 5</span><br><span class="line">输出: 0</span><br></pre></td></tr></table></figure>
+<h1 id="贪心"><a href="#贪心" class="headerlink" title="贪心"></a>贪心</h1><p>对于正整数 <code>x</code>，如果区间 <code>[1,x-1]</code> 内的所有数字都已经被覆盖，且 <code>x</code> 在数组中，则区间 <code>[1,2x-1]</code> 内的所有数字也都被覆盖。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">minPatches</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> addNum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">long</span> x = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> length = nums.length, index = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (x &lt;= n) &#123;</span><br><span class="line">            <span class="keyword">if</span> (index &lt; length &amp;&amp; nums[index] &lt;= x) &#123;</span><br><span class="line">                x += nums[index];</span><br><span class="line">                index++;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                x *= <span class="number">2</span>;</span><br><span class="line">                addNum++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> addNum;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>参考文献</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/patching-array/solution/an-yao-qiu-bu-qi-shu-zu-by-leetcode-solu-klp1/">按要求补齐数组<br>力扣官方题解</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;patching-array&#x2F;solution&#x2F;an-yao-qiu-bu-qi-shu-zu-by-leetcode-solu-klp1&#x2F;</span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">贪心</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/12/29/%E6%8C%89%E8%A6%81%E6%B1%82%E8%A1%A5%E9%BD%90%E6%95%B0%E7%BB%84(%E9%87%8D%E7%82%B9)/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-节点间通路" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -897,90 +986,6 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2020/12/27/%E5%B9%B3%E5%9D%87%E7%AD%89%E5%BE%85%E6%97%B6%E9%97%B4/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-无法吃午餐的学生数量" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/12/27/%E6%97%A0%E6%B3%95%E5%90%83%E5%8D%88%E9%A4%90%E7%9A%84%E5%AD%A6%E7%94%9F%E6%95%B0%E9%87%8F/">无法吃午餐的学生数量</a>
-    </h1>
-  
-
-        
-        <a href="/2020/12/27/%E6%97%A0%E6%B3%95%E5%90%83%E5%8D%88%E9%A4%90%E7%9A%84%E5%AD%A6%E7%94%9F%E6%95%B0%E9%87%8F/" class="archive-article-date">
-  	<time datetime="2020-12-27T01:41:34.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-27</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">学校的自助午餐提供圆形和方形的三明治，分别用数字 0 和 1 表示。所有学生站在一个队列里，每个学生要么喜欢圆形的要么喜欢方形的。</span><br><span class="line">餐厅里三明治的数量与学生的数量相同。所有三明治都放在一个 栈 里，每一轮：</span><br><span class="line"></span><br><span class="line">如果队列最前面的学生 喜欢 栈顶的三明治，那么会 拿走它 并离开队列。</span><br><span class="line">否则，这名学生会 放弃这个三明治 并回到队列的尾部。</span><br><span class="line">这个过程会一直持续到队列里所有学生都不喜欢栈顶的三明治为止。</span><br><span class="line"></span><br><span class="line">给你两个整数数组 students 和 sandwiches ，其中 sandwiches[i] 是栈里面第 i​​​​​​ 个三明治的类型（i &#x3D; 0 是栈的顶部）， students[j] 是初始队列里第 j​​​​​​ 名学生对三明治的喜好（j &#x3D; 0 是队列的最开始位置）。请你返回无法吃午餐的学生数量。</span><br><span class="line"></span><br><span class="line">示例 1：</span><br><span class="line"></span><br><span class="line">输入：students &#x3D; [1,1,0,0], sandwiches &#x3D; [0,1,0,1]</span><br><span class="line">输出：0 </span><br><span class="line">解释：</span><br><span class="line">- 最前面的学生放弃最顶上的三明治，并回到队列的末尾，学生队列变为 students &#x3D; [1,0,0,1]。</span><br><span class="line">- 最前面的学生放弃最顶上的三明治，并回到队列的末尾，学生队列变为 students &#x3D; [0,0,1,1]。</span><br><span class="line">- 最前面的学生拿走最顶上的三明治，剩余学生队列为 students &#x3D; [0,1,1]，三明治栈为 sandwiches &#x3D; [1,0,1]。</span><br><span class="line">- 最前面的学生放弃最顶上的三明治，并回到队列的末尾，学生队列变为 students &#x3D; [1,1,0]。</span><br><span class="line">- 最前面的学生拿走最顶上的三明治，剩余学生队列为 students &#x3D; [1,0]，三明治栈为 sandwiches &#x3D; [0,1]。</span><br><span class="line">- 最前面的学生放弃最顶上的三明治，并回到队列的末尾，学生队列变为 students &#x3D; [0,1]。</span><br><span class="line">- 最前面的学生拿走最顶上的三明治，剩余学生队列为 students &#x3D; [1]，三明治栈为 sandwiches &#x3D; [1]。</span><br><span class="line">- 最前面的学生拿走最顶上的三明治，剩余学生队列为 students &#x3D; []，三明治栈为 sandwiches &#x3D; []。</span><br><span class="line">所以所有学生都有三明治吃。</span><br><span class="line">示例 2：</span><br><span class="line"></span><br><span class="line">输入：students &#x3D; [1,1,1,0,0,1], sandwiches &#x3D; [1,0,0,0,1,1]</span><br><span class="line">输出：3</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">提示：</span><br><span class="line"></span><br><span class="line">1 &lt;&#x3D; students.length, sandwiches.length &lt;&#x3D; 100</span><br><span class="line">students.length &#x3D;&#x3D; sandwiches.length</span><br><span class="line">sandwiches[i] 要么是 0 ，要么是 1 。</span><br><span class="line">students[i] 要么是 0 ，要么是 1 。</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;number-of-students-unable-to-eat-lunch</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-
-
-<p><strong>因为学生的数量比较少，所以直接暴力模拟，不新建队列</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">countStudents</span><span class="params">(<span class="keyword">int</span>[] students, <span class="keyword">int</span>[] sandwiches)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (students.length == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span> (sandwiches.length == <span class="number">0</span> &amp;&amp; students.length &gt; <span class="number">0</span>) <span class="keyword">return</span> students.length;</span><br><span class="line">        <span class="keyword">boolean</span>[] stu = <span class="keyword">new</span> <span class="keyword">boolean</span>[students.length];                               <span class="comment">//指示是否已经吃到午餐</span></span><br><span class="line">        <span class="keyword">int</span> stuPoint = <span class="number">0</span>;                                                           <span class="comment">//当前学生的指针</span></span><br><span class="line">        <span class="keyword">int</span> sanPoint = <span class="number">0</span>;                                                           <span class="comment">//当前午餐的指针</span></span><br><span class="line">        <span class="keyword">int</span> stuLen = students.length;                                               <span class="comment">//学生的数量</span></span><br><span class="line">        <span class="keyword">int</span> sanLen = sandwiches.length;                                             <span class="comment">//午餐的数量</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> stuCount = stuLen;                                                      <span class="comment">//当前没吃到午餐的学生的数量</span></span><br><span class="line">        <span class="keyword">boolean</span> stepFlag = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">int</span> step = <span class="number">0</span>;                                                               <span class="comment">//指示是否走了一圈但是没人能吃到午餐，如果大于stuLen就说明这一圈谁也没吃到</span></span><br><span class="line">        <span class="keyword">while</span> (stepFlag) &#123;</span><br><span class="line">            <span class="keyword">if</span> (step &gt; stuLen) &#123;                                                    <span class="comment">//走了一圈没人吃到，那么结束         </span></span><br><span class="line">                <span class="keyword">return</span> stuCount;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">int</span> stuIndex = stuPoint % stuLen;                                       <span class="comment">//当前学生的index</span></span><br><span class="line">            <span class="keyword">int</span> sanIndex = sanPoint % sanLen;                                       <span class="comment">//当前午餐的index</span></span><br><span class="line">            <span class="keyword">while</span> (stu[stuIndex]) &#123;                                                 <span class="comment">//如果已经吃到午餐了，就换下一个</span></span><br><span class="line">                stuPoint++;</span><br><span class="line">                stuIndex = stuPoint % stuLen;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (!stu[stuIndex] &amp;&amp; students[stuIndex] == sandwiches[sanIndex]) &#123;     <span class="comment">//如果这个午餐符合学生的胃口，就被吃掉</span></span><br><span class="line"></span><br><span class="line">                stu[stuIndex] = <span class="keyword">true</span>;</span><br><span class="line">                stuPoint++;                                                         <span class="comment">//学生和午餐指针同时步进1</span></span><br><span class="line">                sanPoint++;</span><br><span class="line">                step = <span class="number">0</span>;                                                           <span class="comment">//走的数量归0</span></span><br><span class="line">                stuCount--;                                                         <span class="comment">//没吃到午餐的人的数量减1</span></span><br><span class="line">                <span class="keyword">if</span> (stuCount == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;                                        <span class="comment">//所有学生都吃到午餐了，那么结束</span></span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                stuPoint++;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            step++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="维护喜欢每种三明治的人的数量，当喜欢某个种类的三明治的人的数量为0时，所有的人都不喜欢栈顶部的三明治，剩下的人都吃不长了"><a href="#维护喜欢每种三明治的人的数量，当喜欢某个种类的三明治的人的数量为0时，所有的人都不喜欢栈顶部的三明治，剩下的人都吃不长了" class="headerlink" title="维护喜欢每种三明治的人的数量，当喜欢某个种类的三明治的人的数量为0时，所有的人都不喜欢栈顶部的三明治，剩下的人都吃不长了"></a>维护喜欢每种三明治的人的数量，当喜欢某个种类的三明治的人的数量为0时，所有的人都不喜欢栈顶部的三明治，剩下的人都吃不长了</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">countStudents</span><span class="params">(<span class="keyword">int</span>[] students, <span class="keyword">int</span>[] sandwiches)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (students == <span class="keyword">null</span> || students.length == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span> (sandwiches == <span class="keyword">null</span> || sandwiches.length == <span class="number">0</span>) <span class="keyword">return</span> students.length;</span><br><span class="line">        <span class="comment">// stuLike[0] 喜欢圆形的学生数，stuLike[1]喜欢方形的学生数</span></span><br><span class="line">        <span class="keyword">int</span>[] stuLike = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">2</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> student : students) &#123;</span><br><span class="line">            stuLike[student]++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; sandwiches.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (stuLike[sandwiches[i]] == <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">// 学生是转圈来的，此时说明喜欢圆形或者方形的学生已经没有了，顶部的三明治没人取走了。</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 对应的学生满足一个，减少一个</span></span><br><span class="line">            stuLike[sandwiches[i]]--;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> stuLike[<span class="number">0</span>] + stuLike[<span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>参考文献</p>
-</blockquote>
-<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/number-of-students-unable-to-eat-lunch/solution/java-1msshuang-bai-zhi-jie-fan-yi-by-bo-vb263/">作者：bo-he-f 来源：力扣（LeetCode）著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/12/27/%E6%97%A0%E6%B3%95%E5%90%83%E5%8D%88%E9%A4%90%E7%9A%84%E5%AD%A6%E7%94%9F%E6%95%B0%E9%87%8F/">展开全文 >></a>
         </p>
       
 
@@ -1953,6 +1958,10 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">状态机</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">多叉树遍历</a>
               </li>
             
             <div class="clearfix"></div>
