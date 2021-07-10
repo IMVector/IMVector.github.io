@@ -150,6 +150,236 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-拓扑排序例子" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/06/17/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%BE%8B%E5%AD%90/">拓扑排序例子</a>
+    </h1>
+  
+
+        
+        <a href="/2021/06/17/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%BE%8B%E5%AD%90/" class="archive-article-date">
+  	<time datetime="2021-06-17T15:01:46.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-06-17</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<p>手机的相机模块中，图像从传感器到输出JPEG格式图片会经过很多node的处理，这些node构成了一个图像处理的pipeline；其中的有些节点依赖于其他节点的输出，A-&gt;B表示B的执行依赖于A，假设每个node的执行时间为A（t）即 node A需要执行t秒，没有以来的node可以并行执行，请编写一个方法任意输入一个有向无环图的pipeline，输出该pipeline执行完需要的最短时间。</p>
+<p><strong>输入数据</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">3,1,2,5,3,1</span><br><span class="line">2,3,4;5;5,6;0;6;0</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出数据</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">9</span><br></pre></td></tr></table></figure>
+
+<h2 id="拓扑排序"><a href="#拓扑排序" class="headerlink" title="拓扑排序"></a>拓扑排序</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Scanner sc = <span class="keyword">new</span> Scanner(System.in);</span><br><span class="line">        String line1 = sc.nextLine();</span><br><span class="line">        String line2 = sc.nextLine();</span><br><span class="line"></span><br><span class="line">        String[] timeStr = line1.split(<span class="string">&quot;,&quot;</span>);</span><br><span class="line">        String[] dep = line2.split(<span class="string">&quot;;&quot;</span>);</span><br><span class="line">        <span class="keyword">int</span> len = timeStr.length + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span>[] time = <span class="keyword">new</span> <span class="keyword">int</span>[len];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; len; i++) &#123;</span><br><span class="line">            time[i] = Integer.parseInt(timeStr[i - <span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        List&lt;Integer&gt;[] edge = <span class="keyword">new</span> List[len];</span><br><span class="line">        <span class="keyword">int</span>[] deg = <span class="keyword">new</span> <span class="keyword">int</span>[len];</span><br><span class="line"></span><br><span class="line">        edge[<span class="number">0</span>] = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; dep.length; i++) &#123;</span><br><span class="line">            edge[i+<span class="number">1</span>] = <span class="keyword">new</span> ArrayList&lt;Integer&gt;();</span><br><span class="line">            String[] e = dep[i].split(<span class="string">&quot;,&quot;</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; e.length; j++) &#123;</span><br><span class="line">                <span class="keyword">int</span> next = Integer.parseInt(e[j]);</span><br><span class="line">                edge[i+<span class="number">1</span>].add(next);</span><br><span class="line">                deg[next]++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Queue&lt;Integer&gt; queue = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; len; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (deg[i] == <span class="number">0</span>) queue.offer(i);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span>[] dp = <span class="keyword">new</span> <span class="keyword">int</span>[len];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (!queue.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">int</span> node = queue.poll();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; edge[node].size(); i++) &#123;</span><br><span class="line">                <span class="keyword">int</span> nex = edge[node].get(i);</span><br><span class="line">                deg[nex]--;</span><br><span class="line">                dp[nex] = Math.max(dp[nex], dp[node] + time[node]);</span><br><span class="line">                <span class="keyword">if</span> (deg[nex] == <span class="number">0</span>) queue.offer(nex);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> ans = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">            ans = Math.max(ans, dp[i] + time[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(ans);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">拓扑排序</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/06/17/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E4%BE%8B%E5%AD%90/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-有效数字" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/06/17/%E6%9C%89%E6%95%88%E6%95%B0%E5%AD%97/">有效数字</a>
+    </h1>
+  
+
+        
+        <a href="/2021/06/17/%E6%9C%89%E6%95%88%E6%95%B0%E5%AD%97/" class="archive-article-date">
+  	<time datetime="2021-06-17T11:52:22.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-06-17</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="65-有效数字"><a href="#65-有效数字" class="headerlink" title="65. 有效数字"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/valid-number/">65. 有效数字</a></h4><p>难度困难240</p>
+<p><strong>有效数字</strong>（按顺序）可以分成以下几个部分：</p>
+<ol>
+<li>一个 <strong>小数</strong> 或者 <strong>整数</strong></li>
+<li>（可选）一个 <code>&#39;e&#39;</code> 或 <code>&#39;E&#39;</code> ，后面跟着一个 <strong>整数</strong></li>
+</ol>
+<p><strong>小数</strong>（按顺序）可以分成以下几个部分：</p>
+<ol>
+<li>（可选）一个符号字符（<code>&#39;+&#39;</code> 或 <code>&#39;-&#39;</code>）</li>
+<li>下述格式之一：<ol>
+<li>至少一位数字，后面跟着一个点 <code>&#39;.&#39;</code></li>
+<li>至少一位数字，后面跟着一个点 <code>&#39;.&#39;</code> ，后面再跟着至少一位数字</li>
+<li>一个点 <code>&#39;.&#39;</code> ，后面跟着至少一位数字</li>
+</ol>
+</li>
+</ol>
+<p><strong>整数</strong>（按顺序）可以分成以下几个部分：</p>
+<ol>
+<li>（可选）一个符号字符（<code>&#39;+&#39;</code> 或 <code>&#39;-&#39;</code>）</li>
+<li>至少一位数字</li>
+</ol>
+<p>部分有效数字列举如下：</p>
+<ul>
+<li><code>[&quot;2&quot;, &quot;0089&quot;, &quot;-0.1&quot;, &quot;+3.14&quot;, &quot;4.&quot;, &quot;-.9&quot;, &quot;2e10&quot;, &quot;-90E3&quot;, &quot;3e+7&quot;, &quot;+6e-1&quot;, &quot;53.5e93&quot;, &quot;-123.456e789&quot;]</code></li>
+</ul>
+<p>部分无效数字列举如下：</p>
+<ul>
+<li><code>[&quot;abc&quot;, &quot;1a&quot;, &quot;1e&quot;, &quot;e3&quot;, &quot;99e2.5&quot;, &quot;--6&quot;, &quot;-+3&quot;, &quot;95a54e53&quot;]</code></li>
+</ul>
+<p>给你一个字符串 <code>s</code> ，如果 <code>s</code> 是一个 <strong>有效数字</strong> ，请返回 <code>true</code> 。</p>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;0&quot;</span><br><span class="line">输出：true</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;e&quot;</span><br><span class="line">输出：false</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 3：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;.&quot;</span><br><span class="line">输出：false</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 4：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;.1&quot;</span><br><span class="line">输出：true</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>1 &lt;= s.length &lt;= 20</code></li>
+<li><code>s</code> 仅含英文字母（大写和小写），数字（<code>0-9</code>），加号 <code>&#39;+&#39;</code> ，减号 <code>&#39;-&#39;</code> ，或者点 <code>&#39;.&#39;</code> 。</li>
+</ul>
+<h2 id="状态机"><a href="#状态机" class="headerlink" title="状态机"></a>状态机</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isNumber</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">        Map&lt;State, Map&lt;CharType, State&gt;&gt; transfer = <span class="keyword">new</span> HashMap&lt;State, Map&lt;CharType, State&gt;&gt;();</span><br><span class="line">        Map&lt;CharType, State&gt; initialMap = <span class="keyword">new</span> HashMap&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_INTEGER);</span><br><span class="line">            put(CharType.CHAR_POINT, State.STATE_POINT_WITHOUT_INT);</span><br><span class="line">            put(CharType.CHAR_SIGN, State.STATE_INT_SIGN);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_INITIAL, initialMap);</span><br><span class="line">        Map&lt;CharType, State&gt; intSignMap = <span class="keyword">new</span> HashMap&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_INTEGER);</span><br><span class="line">            put(CharType.CHAR_POINT, State.STATE_POINT_WITHOUT_INT);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_INT_SIGN, intSignMap);</span><br><span class="line">        Map&lt;CharType, State&gt; integerMap = <span class="keyword">new</span> HashMap&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_INTEGER);</span><br><span class="line">            put(CharType.CHAR_EXP, State.STATE_EXP);</span><br><span class="line">            put(CharType.CHAR_POINT, State.STATE_POINT);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_INTEGER, integerMap);</span><br><span class="line">        Map&lt;CharType, State&gt; pointMap = <span class="keyword">new</span> HashMap&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_FRACTION);</span><br><span class="line">            put(CharType.CHAR_EXP, State.STATE_EXP);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_POINT, pointMap);</span><br><span class="line">        Map&lt;CharType, State&gt; pointWithoutIntMap = <span class="keyword">new</span> HashMap&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_FRACTION);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_POINT_WITHOUT_INT, pointWithoutIntMap);</span><br><span class="line">        Map&lt;CharType, State&gt; fractionMap = <span class="keyword">new</span> HashMap&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_FRACTION);</span><br><span class="line">            put(CharType.CHAR_EXP, State.STATE_EXP);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_FRACTION, fractionMap);</span><br><span class="line">        Map&lt;CharType, State&gt; expMap = <span class="keyword">new</span> HashMap&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_EXP_NUMBER);</span><br><span class="line">            put(CharType.CHAR_SIGN, State.STATE_EXP_SIGN);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_EXP, expMap);</span><br><span class="line">        Map&lt;CharType, State&gt; expSignMap = <span class="keyword">new</span> HashMap&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_EXP_NUMBER);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_EXP_SIGN, expSignMap);</span><br><span class="line">        Map&lt;CharType, State&gt; expNumberMap = <span class="keyword">new</span> HashMap&lt;CharType, State&gt;() &#123;&#123;</span><br><span class="line">            put(CharType.CHAR_NUMBER, State.STATE_EXP_NUMBER);</span><br><span class="line">        &#125;&#125;;</span><br><span class="line">        transfer.put(State.STATE_EXP_NUMBER, expNumberMap);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> length = s.length();</span><br><span class="line">        State state = State.STATE_INITIAL;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; length; i++) &#123;</span><br><span class="line">            CharType type = toCharType(s.charAt(i));</span><br><span class="line">            <span class="keyword">if</span> (!transfer.get(state).containsKey(type)) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                state = transfer.get(state).get(type);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> state == State.STATE_INTEGER || state == State.STATE_POINT || state == State.STATE_FRACTION || state == State.STATE_EXP_NUMBER || state == State.STATE_END;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> CharType <span class="title">toCharType</span><span class="params">(<span class="keyword">char</span> ch)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (ch &gt;= <span class="string">&#x27;0&#x27;</span> &amp;&amp; ch &lt;= <span class="string">&#x27;9&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> CharType.CHAR_NUMBER;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ch == <span class="string">&#x27;e&#x27;</span> || ch == <span class="string">&#x27;E&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> CharType.CHAR_EXP;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ch == <span class="string">&#x27;.&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> CharType.CHAR_POINT;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ch == <span class="string">&#x27;+&#x27;</span> || ch == <span class="string">&#x27;-&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> CharType.CHAR_SIGN;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> CharType.CHAR_ILLEGAL;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">enum</span> <span class="title">State</span> </span>&#123;</span><br><span class="line">        STATE_INITIAL,</span><br><span class="line">        STATE_INT_SIGN,</span><br><span class="line">        STATE_INTEGER,</span><br><span class="line">        STATE_POINT,</span><br><span class="line">        STATE_POINT_WITHOUT_INT,</span><br><span class="line">        STATE_FRACTION,</span><br><span class="line">        STATE_EXP,</span><br><span class="line">        STATE_EXP_SIGN,</span><br><span class="line">        STATE_EXP_NUMBER,</span><br><span class="line">        STATE_END</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">enum</span> <span class="title">CharType</span> </span>&#123;</span><br><span class="line">        CHAR_NUMBER,</span><br><span class="line">        CHAR_EXP,</span><br><span class="line">        CHAR_POINT,</span><br><span class="line">        CHAR_SIGN,</span><br><span class="line">        CHAR_ILLEGAL</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">状态机</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/06/17/%E6%9C%89%E6%95%88%E6%95%B0%E5%AD%97/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-石子游戏" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1022,235 +1252,6 @@ tex2jax: {
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/06/11/%E9%9D%92%E8%9B%99%E8%BF%87%E6%B2%B3/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-零钱兑换2" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/06/10/%E9%9B%B6%E9%92%B1%E5%85%91%E6%8D%A22/">零钱兑换2</a>
-    </h1>
-  
-
-        
-        <a href="/2021/06/10/%E9%9B%B6%E9%92%B1%E5%85%91%E6%8D%A22/" class="archive-article-date">
-  	<time datetime="2021-06-10T14:54:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-06-10</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="518-零钱兑换-II"><a href="#518-零钱兑换-II" class="headerlink" title="518. 零钱兑换 II"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/coin-change-2/">518. 零钱兑换 II</a></h4><p>难度中等514</p>
-<p>给定不同面额的硬币和一个总金额。写出函数来计算可以凑成总金额的硬币组合数。假设每一种面额的硬币有无限个。 </p>
-<p><strong>示例 1:</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">输入: amount &#x3D; 5, coins &#x3D; [1, 2, 5]</span><br><span class="line">输出: 4</span><br><span class="line">解释: 有四种方式可以凑成总金额:</span><br><span class="line">5&#x3D;5</span><br><span class="line">5&#x3D;2+2+1</span><br><span class="line">5&#x3D;2+1+1+1</span><br><span class="line">5&#x3D;1+1+1+1+1</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2:</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入: amount &#x3D; 3, coins &#x3D; [2]</span><br><span class="line">输出: 0</span><br><span class="line">解释: 只用面额2的硬币不能凑成总金额3。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3:</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: amount &#x3D; 10, coins &#x3D; [10] </span><br><span class="line">输出: 1</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>注意**</strong>:**</p>
-<p>你可以假设：</p>
-<ul>
-<li>0 &lt;= amount (总金额) &lt;= 5000</li>
-<li>1 &lt;= coin (硬币面额) &lt;= 5000</li>
-<li>硬币种类不超过 500 种</li>
-<li>结果符合 32 位符号整数</li>
-</ul>
-<p>通过次数78,013</p>
-<p>提交次数123,874</p>
-<h2 id="完全背包"><a href="#完全背包" class="headerlink" title="完全背包"></a>完全背包</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">change</span><span class="params">(<span class="keyword">int</span> amount, <span class="keyword">int</span>[] coins)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> []dp = <span class="keyword">new</span> <span class="keyword">int</span> [amount+<span class="number">1</span>];</span><br><span class="line">        dp[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> coin:coins)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> i=coin;i&lt;=amount;i++)&#123;</span><br><span class="line">                dp[i] += dp[i-coin];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[amount];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">动态规划</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">完全背包</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/06/10/%E9%9B%B6%E9%92%B1%E5%85%91%E6%8D%A22/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-盈利计划" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/06/09/%E7%9B%88%E5%88%A9%E8%AE%A1%E5%88%92/">盈利计划</a>
-    </h1>
-  
-
-        
-        <a href="/2021/06/09/%E7%9B%88%E5%88%A9%E8%AE%A1%E5%88%92/" class="archive-article-date">
-  	<time datetime="2021-06-09T15:01:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-06-09</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="879-盈利计划"><a href="#879-盈利计划" class="headerlink" title="879. 盈利计划"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/profitable-schemes/">879. 盈利计划</a></h4><p>难度困难171</p>
-<p>集团里有 <code>n</code> 名员工，他们可以完成各种各样的工作创造利润。</p>
-<p>第 <code>i</code> 种工作会产生 <code>profit[i]</code> 的利润，它要求 <code>group[i]</code> 名成员共同参与。如果成员参与了其中一项工作，就不能参与另一项工作。</p>
-<p>工作的任何至少产生 <code>minProfit</code> 利润的子集称为 <strong>盈利计划</strong> 。并且工作的成员总数最多为 <code>n</code> 。</p>
-<p>有多少种计划可以选择？因为答案很大，所以 <strong>返回结果模</strong> <code>10^9 + 7</code> <strong>的值</strong>。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 5, minProfit &#x3D; 3, group &#x3D; [2,2], profit &#x3D; [2,3]</span><br><span class="line">输出：2</span><br><span class="line">解释：至少产生 3 的利润，该集团可以完成工作 0 和工作 1 ，或仅完成工作 1 。</span><br><span class="line">总的来说，有两种计划。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 10, minProfit &#x3D; 5, group &#x3D; [2,3,5], profit &#x3D; [6,7,8]</span><br><span class="line">输出：7</span><br><span class="line">解释：至少产生 5 的利润，只要完成其中一种工作就行，所以该集团可以完成任何工作。</span><br><span class="line">有 7 种可能的计划：(0)，(1)，(2)，(0,1)，(0,2)，(1,2)，以及 (0,1,2) 。</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= n &lt;= 100</code></li>
-<li><code>0 &lt;= minProfit &lt;= 100</code></li>
-<li><code>1 &lt;= group.length &lt;= 100</code></li>
-<li><code>1 &lt;= group[i] &lt;= 100</code></li>
-<li><code>profit.length == group.length</code></li>
-<li><code>0 &lt;= profit[i] &lt;= 100</code></li>
-</ul>
-<p>通过次数16,345</p>
-<p>提交次数30,002</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">profitableSchemes</span><span class="params">(<span class="keyword">int</span> n, <span class="keyword">int</span> minProfit, <span class="keyword">int</span>[] group, <span class="keyword">int</span>[] profit)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> len = group.length, MOD = (<span class="keyword">int</span>)<span class="number">1e9</span> + <span class="number">7</span>;</span><br><span class="line">        <span class="keyword">int</span>[][][] dp = <span class="keyword">new</span> <span class="keyword">int</span>[len + <span class="number">1</span>][n + <span class="number">1</span>][minProfit + <span class="number">1</span>];</span><br><span class="line">        dp[<span class="number">0</span>][<span class="number">0</span>][<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= len; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> members = group[i - <span class="number">1</span>], earn = profit[i - <span class="number">1</span>];</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= n; j++) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt;= minProfit; k++) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (j &lt; members) &#123;</span><br><span class="line">                        dp[i][j][k] = dp[i - <span class="number">1</span>][j][k];</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        dp[i][j][k] = (dp[i - <span class="number">1</span>][j][k] + dp[i - <span class="number">1</span>][j - members][Math.max(<span class="number">0</span>, k - earn)]) % MOD;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= n; j++) &#123;</span><br><span class="line">            sum = (sum + dp[len][j][minProfit]) % MOD;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sum;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">重点题型</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">笔试题</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/06/09/%E7%9B%88%E5%88%A9%E8%AE%A1%E5%88%92/">展开全文 >></a>
         </p>
       
 
