@@ -150,6 +150,301 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-部门工资最高的员工" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/04/03/%E9%83%A8%E9%97%A8%E5%B7%A5%E8%B5%84%E6%9C%80%E9%AB%98%E7%9A%84%E5%91%98%E5%B7%A5/">部门工资最高的员工</a>
+    </h1>
+  
+
+        
+        <a href="/2021/04/03/%E9%83%A8%E9%97%A8%E5%B7%A5%E8%B5%84%E6%9C%80%E9%AB%98%E7%9A%84%E5%91%98%E5%B7%A5/" class="archive-article-date">
+  	<time datetime="2021-04-03T01:18:11.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-03</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="184-部门工资最高的员工"><a href="#184-部门工资最高的员工" class="headerlink" title="184. 部门工资最高的员工"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/department-highest-salary/">184. 部门工资最高的员工</a></h4><p>难度中等358</p>
+<p>SQL架构</p>
+<p><code>Employee</code> 表包含所有员工信息，每个员工有其对应的 Id, salary 和 department Id。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+----+-------+--------+--------------+</span><br><span class="line">| Id | Name  | Salary | DepartmentId |</span><br><span class="line">+----+-------+--------+--------------+</span><br><span class="line">| 1  | Joe   | 70000  | 1            |</span><br><span class="line">| 2  | Jim   | 90000  | 1            |</span><br><span class="line">| 3  | Henry | 80000  | 2            |</span><br><span class="line">| 4  | Sam   | 60000  | 2            |</span><br><span class="line">| 5  | Max   | 90000  | 1            |</span><br><span class="line">+----+-------+--------+--------------+</span><br></pre></td></tr></table></figure>
+
+<p><code>Department</code> 表包含公司所有部门的信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+----+----------+</span><br><span class="line">| Id | Name     |</span><br><span class="line">+----+----------+</span><br><span class="line">| 1  | IT       |</span><br><span class="line">| 2  | Sales    |</span><br><span class="line">+----+----------+</span><br></pre></td></tr></table></figure>
+
+<p>编写一个 SQL 查询，找出每个部门工资最高的员工。对于上述表，您的 SQL 查询应返回以下行（行的顺序无关紧要）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">+------------+----------+--------+</span><br><span class="line">| Department | Employee | Salary |</span><br><span class="line">+------------+----------+--------+</span><br><span class="line">| IT         | Max      | 90000  |</span><br><span class="line">| IT         | Jim      | 90000  |</span><br><span class="line">| Sales      | Henry    | 80000  |</span><br><span class="line">+------------+----------+--------+</span><br></pre></td></tr></table></figure>
+
+<p><strong>解释：</strong></p>
+<p>Max 和 Jim 在 IT 部门的工资都是最高的，Henry 在销售部的工资最高。</p>
+<h2 id="in-关键字可以用于元组"><a href="#in-关键字可以用于元组" class="headerlink" title="in 关键字可以用于元组"></a>in 关键字可以用于元组</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">select </span><br><span class="line">d.Name as Department, e.name as Employee, e.Salary as Salary </span><br><span class="line">from </span><br><span class="line">Employee e,Department d</span><br><span class="line">where e.DepartmentId &#x3D; d.id</span><br><span class="line">and (Salary,DepartmentId) in</span><br><span class="line">(</span><br><span class="line">    select max(Salary) ,DepartmentId</span><br><span class="line">    from </span><br><span class="line">    Employee</span><br><span class="line">    group by DepartmentId</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">sql</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/04/03/%E9%83%A8%E9%97%A8%E5%B7%A5%E8%B5%84%E6%9C%80%E9%AB%98%E7%9A%84%E5%91%98%E5%B7%A5/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-超过经理收入的员工" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/04/02/%E8%B6%85%E8%BF%87%E7%BB%8F%E7%90%86%E6%94%B6%E5%85%A5%E7%9A%84%E5%91%98%E5%B7%A5/">超过经理收入的员工</a>
+    </h1>
+  
+
+        
+        <a href="/2021/04/02/%E8%B6%85%E8%BF%87%E7%BB%8F%E7%90%86%E6%94%B6%E5%85%A5%E7%9A%84%E5%91%98%E5%B7%A5/" class="archive-article-date">
+  	<time datetime="2021-04-02T05:12:18.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-02</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="181-超过经理收入的员工"><a href="#181-超过经理收入的员工" class="headerlink" title="181. 超过经理收入的员工"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/employees-earning-more-than-their-managers/">181. 超过经理收入的员工</a></h4><p>难度简单363</p>
+<p>SQL架构</p>
+<p><code>Employee</code> 表包含所有员工，他们的经理也属于员工。每个员工都有一个 Id，此外还有一列对应员工的经理的 Id。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+----+-------+--------+-----------+</span><br><span class="line">| Id | Name  | Salary | ManagerId |</span><br><span class="line">+----+-------+--------+-----------+</span><br><span class="line">| 1  | Joe   | 70000  | 3         |</span><br><span class="line">| 2  | Henry | 80000  | 4         |</span><br><span class="line">| 3  | Sam   | 60000  | NULL      |</span><br><span class="line">| 4  | Max   | 90000  | NULL      |</span><br><span class="line">+----+-------+--------+-----------+</span><br></pre></td></tr></table></figure>
+
+<p>给定 <code>Employee</code> 表，编写一个 SQL 查询，该查询可以获取收入超过他们经理的员工的姓名。在上面的表格中，Joe 是唯一一个收入超过他的经理的员工。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+----------+</span><br><span class="line">| Employee |</span><br><span class="line">+----------+</span><br><span class="line">| Joe      |</span><br><span class="line">+----------+</span><br></pre></td></tr></table></figure>
+
+<p>在真实的面试中遇到过这道题？</p>
+<h2 id="自连接"><a href="#自连接" class="headerlink" title="自连接"></a>自连接</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># Write your MySQL query statement below</span><br><span class="line"></span><br><span class="line">select e1.Name as Employee from</span><br><span class="line">Employee e1,Employee e2</span><br><span class="line">where e2.Id  &#x3D; e1.ManagerId </span><br><span class="line">and e1.Salary &gt; e2.Salary</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">sql</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/04/02/%E8%B6%85%E8%BF%87%E7%BB%8F%E7%90%86%E6%94%B6%E5%85%A5%E7%9A%84%E5%91%98%E5%B7%A5/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-连续出现的数字" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/04/02/%E8%BF%9E%E7%BB%AD%E5%87%BA%E7%8E%B0%E7%9A%84%E6%95%B0%E5%AD%97/">连续出现的数字</a>
+    </h1>
+  
+
+        
+        <a href="/2021/04/02/%E8%BF%9E%E7%BB%AD%E5%87%BA%E7%8E%B0%E7%9A%84%E6%95%B0%E5%AD%97/" class="archive-article-date">
+  	<time datetime="2021-04-02T05:04:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-02</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="180-连续出现的数字"><a href="#180-连续出现的数字" class="headerlink" title="180. 连续出现的数字"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/consecutive-numbers/">180. 连续出现的数字</a></h4><p>难度中等392</p>
+<p>SQL架构</p>
+<p>表：<code>Logs</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">+-------------+---------+</span><br><span class="line">| Column Name | Type    |</span><br><span class="line">+-------------+---------+</span><br><span class="line">| id          | int     |</span><br><span class="line">| num         | varchar |</span><br><span class="line">+-------------+---------+</span><br><span class="line">id 是这个表的主键。</span><br></pre></td></tr></table></figure>
+
+
+
+<p>编写一个 SQL 查询，查找所有至少连续出现三次的数字。</p>
+<p>返回的结果表中的数据可以按 <strong>任意顺序</strong> 排列。</p>
+<p>查询结果格式如下面的例子所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Logs 表：</span><br><span class="line">+----+-----+</span><br><span class="line">| Id | Num |</span><br><span class="line">+----+-----+</span><br><span class="line">| 1  | 1   |</span><br><span class="line">| 2  | 1   |</span><br><span class="line">| 3  | 1   |</span><br><span class="line">| 4  | 2   |</span><br><span class="line">| 5  | 1   |</span><br><span class="line">| 6  | 2   |</span><br><span class="line">| 7  | 2   |</span><br><span class="line">+----+-----+</span><br><span class="line"></span><br><span class="line">Result 表：</span><br><span class="line">+-----------------+</span><br><span class="line">| ConsecutiveNums |</span><br><span class="line">+-----------------+</span><br><span class="line">| 1               |</span><br><span class="line">+-----------------+</span><br><span class="line">1 是唯一连续出现至少三次的数字。</span><br></pre></td></tr></table></figure>
+
+<h2 id="题目默认数字连续那么id也是连续的"><a href="#题目默认数字连续那么id也是连续的" class="headerlink" title="题目默认数字连续那么id也是连续的"></a>题目默认数字连续那么id也是连续的</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># Write your MySQL query statement below</span><br><span class="line">select </span><br><span class="line">distinct(l1.Num) as ConsecutiveNums </span><br><span class="line">from </span><br><span class="line">Logs l1,</span><br><span class="line">Logs l2,</span><br><span class="line">Logs l3</span><br><span class="line">where </span><br><span class="line">l2.Num &#x3D; l1.Num</span><br><span class="line">and l3.Num &#x3D; l2.Num</span><br><span class="line">and l2.id &#x3D; l1.id+1</span><br><span class="line">and l3.id &#x3D; l2.id+1;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">sql</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/04/02/%E8%BF%9E%E7%BB%AD%E5%87%BA%E7%8E%B0%E7%9A%84%E6%95%B0%E5%AD%97/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-分数排名" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -959,358 +1254,6 @@ tex2jax: {
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/03/28/%E5%A5%BD%E5%9B%A0%E5%AD%90%E7%9A%84%E6%9C%80%E5%A4%A7%E6%95%B0%E7%9B%AE/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-替换字符串中的括号内容" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/03/28/%E6%9B%BF%E6%8D%A2%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%AD%E7%9A%84%E6%8B%AC%E5%8F%B7%E5%86%85%E5%AE%B9/">替换字符串中的括号内容</a>
-    </h1>
-  
-
-        
-        <a href="/2021/03/28/%E6%9B%BF%E6%8D%A2%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%AD%E7%9A%84%E6%8B%AC%E5%8F%B7%E5%86%85%E5%AE%B9/" class="archive-article-date">
-  	<time datetime="2021-03-28T11:46:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-28</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="5714-替换字符串中的括号内容"><a href="#5714-替换字符串中的括号内容" class="headerlink" title="5714. 替换字符串中的括号内容"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/evaluate-the-bracket-pairs-of-a-string/">5714. 替换字符串中的括号内容</a></h4><p>难度中等3</p>
-<p>给你一个字符串 <code>s</code> ，它包含一些括号对，每个括号中包含一个 <strong>非空</strong> 的键。</p>
-<ul>
-<li>比方说，字符串 <code>&quot;(name)is(age)yearsold&quot;</code> 中，有 <strong>两个</strong> 括号对，分别包含键 <code>&quot;name&quot;</code> 和 <code>&quot;age&quot;</code> 。</li>
-</ul>
-<p>你知道许多键对应的值，这些关系由二维字符串数组 <code>knowledge</code> 表示，其中 <code>knowledge[i] = [keyi, valuei]</code> ，表示键 <code>keyi</code> 对应的值为 <code>valuei</code> 。</p>
-<p>你需要替换 <strong>所有</strong> 的括号对。当你替换一个括号对，且它包含的键为 <code>keyi</code> 时，你需要：</p>
-<ul>
-<li>将 <code>keyi</code> 和括号用对应的值 <code>valuei</code> 替换。</li>
-<li>如果从 <code>knowledge</code> 中无法得知某个键对应的值，你需要将 <code>keyi</code> 和括号用问号 <code>&quot;?&quot;</code> 替换（不需要引号）。</li>
-</ul>
-<p><code>knowledge</code> 中每个键最多只会出现一次。<code>s</code> 中不会有嵌套的括号。</p>
-<p>请你返回替换 <strong>所有</strong> 括号对后的结果字符串。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;(name)is(age)yearsold&quot;, knowledge &#x3D; [[&quot;name&quot;,&quot;bob&quot;],[&quot;age&quot;,&quot;two&quot;]]</span><br><span class="line">输出：&quot;bobistwoyearsold&quot;</span><br><span class="line">解释：</span><br><span class="line">键 &quot;name&quot; 对应的值为 &quot;bob&quot; ，所以将 &quot;(name)&quot; 替换为 &quot;bob&quot; 。</span><br><span class="line">键 &quot;age&quot; 对应的值为 &quot;two&quot; ，所以将 &quot;(age)&quot; 替换为 &quot;two&quot; 。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;hi(name)&quot;, knowledge &#x3D; [[&quot;a&quot;,&quot;b&quot;]]</span><br><span class="line">输出：&quot;hi?&quot;</span><br><span class="line">解释：由于不知道键 &quot;name&quot; 对应的值，所以用 &quot;?&quot; 替换 &quot;(name)&quot; 。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;(a)(a)(a)aaa&quot;, knowledge &#x3D; [[&quot;a&quot;,&quot;yes&quot;]]</span><br><span class="line">输出：&quot;yesyesyesaaa&quot;</span><br><span class="line">解释：相同的键在 s 中可能会出现多次。</span><br><span class="line">键 &quot;a&quot; 对应的值为 &quot;yes&quot; ，所以将所有的 &quot;(a)&quot; 替换为 &quot;yes&quot; 。</span><br><span class="line">注意，不在括号里的 &quot;a&quot; 不需要被替换。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 4：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;(a)(b)&quot;, knowledge &#x3D; [[&quot;a&quot;,&quot;b&quot;],[&quot;b&quot;,&quot;a&quot;]]</span><br><span class="line">输出：&quot;ba&quot;</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= s.length &lt;= 105</code></li>
-<li><code>0 &lt;= knowledge.length &lt;= 105</code></li>
-<li><code>knowledge[i].length == 2</code></li>
-<li><code>1 &lt;= keyi.length, valuei.length &lt;= 10</code></li>
-<li><code>s</code> 只包含小写英文字母和圆括号 <code>&#39;(&#39;</code> 和 <code>&#39;)&#39;</code> 。</li>
-<li><code>s</code> 中每一个左圆括号 <code>&#39;(&#39;</code> 都有对应的右圆括号 <code>&#39;)&#39;</code> 。</li>
-<li><code>s</code> 中每对括号内的键都不会为空。</li>
-<li><code>s</code> 中不会有嵌套括号对。</li>
-<li><code>keyi</code> 和 <code>valuei</code> 只包含小写英文字母。</li>
-<li><code>knowledge</code> 中的 <code>keyi</code> 不会重复。</li>
-</ul>
-<h2 id="模拟替换"><a href="#模拟替换" class="headerlink" title="模拟替换"></a>模拟替换</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">evaluate</span><span class="params">(String s, List&lt;List&lt;String&gt;&gt; knowledge)</span> </span>&#123;</span><br><span class="line">        Map&lt;String, String&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (List&lt;String&gt; list : knowledge) &#123;</span><br><span class="line">            map.put(list.get(<span class="number">0</span>), list.get(<span class="number">1</span>));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> n = s.length();</span><br><span class="line"></span><br><span class="line">        StringBuilder bd = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">			<span class="comment">// 如果遇到左括号就处理括号中的内容，直至遇到右括号</span></span><br><span class="line">            <span class="keyword">if</span> (s.charAt(i) == <span class="string">&#x27;(&#x27;</span>) &#123;</span><br><span class="line">                <span class="keyword">int</span> index = i + <span class="number">1</span>;</span><br><span class="line">                <span class="comment">// 没有遇到右括号时,一直跳过当前的内容</span></span><br><span class="line">                <span class="keyword">while</span> (s.charAt(index) != <span class="string">&#x27;)&#x27;</span>) &#123;</span><br><span class="line">                    index++;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 获取括号中的key</span></span><br><span class="line">                String key = s.substring(i + <span class="number">1</span>, index);</span><br><span class="line">                </span><br><span class="line">				<span class="comment">// 查找当前的map中是否由当前的key,如果有当前的key那么替换,如果没有当前的key那么直接用问号替换</span></span><br><span class="line">                <span class="keyword">if</span> (map.containsKey(key)) &#123;</span><br><span class="line">                    bd.append(map.get(key));</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    bd.append(<span class="string">&quot;?&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 外层循环更新index</span></span><br><span class="line">                i = index;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 如果不是括号中的内容,直接添加</span></span><br><span class="line">                bd.append(s.charAt(i));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 返回修改完的结果</span></span><br><span class="line">        <span class="keyword">return</span> bd.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">字符串</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/03/28/%E6%9B%BF%E6%8D%A2%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%AD%E7%9A%84%E6%8B%AC%E5%8F%B7%E5%86%85%E5%AE%B9/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-还原排列的最少操作数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/03/28/%E8%BF%98%E5%8E%9F%E6%8E%92%E5%88%97%E7%9A%84%E6%9C%80%E5%B0%91%E6%93%8D%E4%BD%9C%E6%95%B0/">还原排列的最少操作数</a>
-    </h1>
-  
-
-        
-        <a href="/2021/03/28/%E8%BF%98%E5%8E%9F%E6%8E%92%E5%88%97%E7%9A%84%E6%9C%80%E5%B0%91%E6%93%8D%E4%BD%9C%E6%95%B0/" class="archive-article-date">
-  	<time datetime="2021-03-28T11:24:29.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-28</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="1806-还原排列的最少操作步数"><a href="#1806-还原排列的最少操作步数" class="headerlink" title="1806. 还原排列的最少操作步数"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/minimum-number-of-operations-to-reinitialize-a-permutation/">1806. 还原排列的最少操作步数</a></h4><p>难度中等3</p>
-<p>给你一个偶数 <code>n</code> ，已知存在一个长度为 <code>n</code> 的排列 <code>perm</code> ，其中 <code>perm[i] == i</code>（下标 <strong>从 0 开始</strong> 计数）。</p>
-<p>一步操作中，你将创建一个新数组 <code>arr</code> ，对于每个 <code>i</code> ：</p>
-<ul>
-<li>如果 <code>i % 2 == 0</code> ，那么 <code>arr[i] = perm[i / 2]</code></li>
-<li>如果 <code>i % 2 == 1</code> ，那么 <code>arr[i] = perm[n / 2 + (i - 1) / 2]</code></li>
-</ul>
-<p>然后将 <code>arr</code> 赋值给 <code>perm</code> 。</p>
-<p>要想使 <code>perm</code> 回到排列初始值，至少需要执行多少步操作？返回最小的 <strong>非零</strong> 操作步数。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 2</span><br><span class="line">输出：1</span><br><span class="line">解释：最初，perm &#x3D; [0,1]</span><br><span class="line">第 1 步操作后，perm &#x3D; [0,1]</span><br><span class="line">所以，仅需执行 1 步操作</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 4</span><br><span class="line">输出：2</span><br><span class="line">解释：最初，perm &#x3D; [0,1,2,3]</span><br><span class="line">第 1 步操作后，perm &#x3D; [0,2,1,3]</span><br><span class="line">第 2 步操作后，perm &#x3D; [0,1,2,3]</span><br><span class="line">所以，仅需执行 2 步操作</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 6</span><br><span class="line">输出：4</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>2 &lt;= n &lt;= 1000</code></li>
-<li><code>n</code> 是一个偶数</li>
-</ul>
-<h2 id="暴力模拟"><a href="#暴力模拟" class="headerlink" title="暴力模拟"></a>暴力模拟</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">reinitializePermutation</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> perm[] = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">		<span class="comment">// 生成排列数组</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            perm[i] = i;</span><br><span class="line">        &#125;</span><br><span class="line">		</span><br><span class="line">        <span class="comment">// 操作的数组</span></span><br><span class="line">        <span class="keyword">int</span>[] arr = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">        <span class="comment">// 原始数组,用来比较</span></span><br><span class="line">        <span class="keyword">int</span>[] ori = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            arr[i] = perm[i];</span><br><span class="line">            ori[i] = perm[i];</span><br><span class="line">        &#125;</span><br><span class="line">		<span class="comment">// 计数器</span></span><br><span class="line">        <span class="keyword">int</span> c = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">do</span> &#123;</span><br><span class="line">            <span class="comment">// 将 `arr` 赋值给 `perm` 。</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">                perm[i] = arr[i];</span><br><span class="line">            &#125;</span><br><span class="line">			<span class="comment">// 题目要求的处理过程</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (i % <span class="number">2</span> == <span class="number">0</span>) &#123;</span><br><span class="line">                    arr[i] = perm[i / <span class="number">2</span>];</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    arr[i] = perm[n / <span class="number">2</span> + (i - <span class="number">1</span>) / <span class="number">2</span>];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            c++;</span><br><span class="line">        &#125; <span class="keyword">while</span> (!same(ori, arr));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> c;</span><br><span class="line">    &#125;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 判断是否与原始数组相同</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">same</span><span class="params">(<span class="keyword">int</span> arr1[], <span class="keyword">int</span> arr2[])</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; arr1.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (arr1[i] != arr2[i]) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="将一个数字从原始位置回到原始位置其余的所有数字都能回到自己的位置"><a href="#将一个数字从原始位置回到原始位置其余的所有数字都能回到自己的位置" class="headerlink" title="将一个数字从原始位置回到原始位置其余的所有数字都能回到自己的位置"></a>将一个数字从原始位置回到原始位置其余的所有数字都能回到自己的位置</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">reinitializePermutation</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> ans = <span class="number">1</span>, pos =<span class="number">1</span>;</span><br><span class="line">        <span class="comment">// 对数字1进行模拟</span></span><br><span class="line">        pos = n/<span class="number">2</span> + (pos-<span class="number">1</span>)/<span class="number">2</span>;</span><br><span class="line">        <span class="comment">// 当1回到1的位置,模拟结束</span></span><br><span class="line">        <span class="keyword">while</span>(pos != <span class="number">1</span>)&#123;</span><br><span class="line">            <span class="comment">// 题目给出的条件</span></span><br><span class="line">            pos  = (pos%<span class="number">2</span> == <span class="number">0</span>)? pos/<span class="number">2</span> : (n/<span class="number">2</span> +(pos-<span class="number">1</span>)/<span class="number">2</span>);</span><br><span class="line">            <span class="comment">// 计数次数增加</span></span><br><span class="line">            ans++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">模拟</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/03/28/%E8%BF%98%E5%8E%9F%E6%8E%92%E5%88%97%E7%9A%84%E6%9C%80%E5%B0%91%E6%93%8D%E4%BD%9C%E6%95%B0/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-字符串中不同整数的数目" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/03/28/%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%AD%E4%B8%8D%E5%90%8C%E6%95%B4%E6%95%B0%E7%9A%84%E6%95%B0%E7%9B%AE/">字符串中不同整数的数目</a>
-    </h1>
-  
-
-        
-        <a href="/2021/03/28/%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%AD%E4%B8%8D%E5%90%8C%E6%95%B4%E6%95%B0%E7%9A%84%E6%95%B0%E7%9B%AE/" class="archive-article-date">
-  	<time datetime="2021-03-28T11:18:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-28</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="5713-字符串中不同整数的数目"><a href="#5713-字符串中不同整数的数目" class="headerlink" title="5713. 字符串中不同整数的数目"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/number-of-different-integers-in-a-string/">5713. 字符串中不同整数的数目</a></h4><p>难度简单4</p>
-<p>给你一个字符串 <code>word</code> ，该字符串由数字和小写英文字母组成。</p>
-<p>请你用空格替换每个不是数字的字符。例如，<code>&quot;a123bc34d8ef34&quot;</code> 将会变成 <code>&quot; 123 34 8 34&quot;</code> 。注意，剩下的这些整数为（相邻彼此至少有一个空格隔开）：<code>&quot;123&quot;</code>、<code>&quot;34&quot;</code>、<code>&quot;8&quot;</code> 和 <code>&quot;34&quot;</code> 。</p>
-<p>返回对 <code>word</code> 完成替换后形成的 <strong>不同</strong> 整数的数目。</p>
-<p>只有当两个整数的 <strong>不含前导零</strong> 的十进制表示不同， 才认为这两个整数也不同。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：word &#x3D; &quot;a123bc34d8ef34&quot;</span><br><span class="line">输出：3</span><br><span class="line">解释：不同的整数有 &quot;123&quot;、&quot;34&quot; 和 &quot;8&quot; 。注意，&quot;34&quot; 只计数一次。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：word &#x3D; &quot;leet1234code234&quot;</span><br><span class="line">输出：2</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：word &#x3D; &quot;a1b01c001&quot;</span><br><span class="line">输出：1</span><br><span class="line">解释：&quot;1&quot;、&quot;01&quot; 和 &quot;001&quot; 视为同一个整数的十进制表示，因为在比较十进制值时会忽略前导零的存在。</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= word.length &lt;= 1000</code></li>
-<li><code>word</code> 由数字和小写英文字母组成</li>
-</ul>
-<h2 id="模拟"><a href="#模拟" class="headerlink" title="模拟"></a>模拟</h2><p>注意数字的最大位数有1000位,所以不能转换成数字来做,而是需要去掉前导0,然后将字符串形式的数字加入set中去.</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">numDifferentIntegers</span><span class="params">(String word)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> n = word.length();</span><br><span class="line"></span><br><span class="line">        StringBuilder bd = <span class="keyword">new</span> StringBuilder();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">char</span> c = word.charAt(i);</span><br><span class="line">            <span class="comment">// 如果是数字，直接加入，如果不是数字，加入空格</span></span><br><span class="line">            <span class="keyword">if</span> (Character.isDigit(c)) &#123;</span><br><span class="line">                bd.append(c);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                bd.append(<span class="string">&quot; &quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        String s = bd.toString();</span><br><span class="line"></span><br><span class="line">        Set&lt;String&gt; set = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">        <span class="comment">// 遇到空格就split</span></span><br><span class="line">        String[] arr = s.split(<span class="string">&quot;\\s+&quot;</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; arr.length; i++) &#123;</span><br><span class="line">            <span class="comment">// 对于split后的数组,每个元素如果不为空或者为空格</span></span><br><span class="line">            <span class="keyword">if</span> (!arr[i].equals(<span class="string">&quot; &quot;</span>) &amp;&amp; !arr[i].equals(<span class="string">&quot;&quot;</span>)) &#123;</span><br><span class="line">                <span class="keyword">int</span> j = <span class="number">0</span>;</span><br><span class="line">                <span class="comment">// 去掉前导0</span></span><br><span class="line">                <span class="keyword">while</span> (j &lt; arr[i].length() &amp;&amp; arr[i].charAt(j) == <span class="string">&#x27;0&#x27;</span>) &#123;</span><br><span class="line">                    j++;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 将去掉前导0的数字字符串加入集合中(因为数字最多有1000位,所以不能转换成数字在加入进去)</span></span><br><span class="line">                set.add(arr[i].substring(j, arr[i].length()));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 最后返回不相同的数字的个数</span></span><br><span class="line">        <span class="keyword">return</span> set.size();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">字符串</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/03/28/%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%AD%E4%B8%8D%E5%90%8C%E6%95%B4%E6%95%B0%E7%9A%84%E6%95%B0%E7%9B%AE/">展开全文 >></a>
         </p>
       
 
