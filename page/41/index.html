@@ -150,6 +150,112 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-将x减到0的最小操作数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/03/%E5%B0%86x%E5%87%8F%E5%88%B00%E7%9A%84%E6%9C%80%E5%B0%8F%E6%93%8D%E4%BD%9C%E6%95%B0/">将x减到0的最小操作数</a>
+    </h1>
+  
+
+        
+        <a href="/2021/02/03/%E5%B0%86x%E5%87%8F%E5%88%B00%E7%9A%84%E6%9C%80%E5%B0%8F%E6%93%8D%E4%BD%9C%E6%95%B0/" class="archive-article-date">
+  	<time datetime="2021-02-03T15:43:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-03</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<p>给你一个整数数组 nums 和一个整数 x 。每一次操作时，你应当移除数组 nums 最左边或最右边的元素，然后从 x 中减去该元素的值。请注意，需要 修改 数组以供接下来的操作使用。</p>
+<p>如果可以将 x 恰好 减到 0 ，返回 最小操作数 ；否则，返回 -1 。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">示例 1：</span><br><span class="line">输入：nums &#x3D; [1,1,4,2,3], x &#x3D; 5</span><br><span class="line">输出：2</span><br><span class="line">解释：最佳解决方案是移除后两个元素，将 x 减到 0 。</span><br><span class="line"></span><br><span class="line">示例 2：</span><br><span class="line">输入：nums &#x3D; [5,6,7,8,9], x &#x3D; 4</span><br><span class="line">输出：-1</span><br><span class="line"></span><br><span class="line">示例 3：</span><br><span class="line">输入：nums &#x3D; [3,2,20,1,1,3], x &#x3D; 10</span><br><span class="line">输出：5</span><br><span class="line">解释：最佳解决方案是移除后三个元素和前两个元素（总共 5 次操作），将 x 减到 0 。</span><br></pre></td></tr></table></figure>
+<p>提示：</p>
+<p>$1 &lt;= nums.length &lt;= 10^5$</p>
+<p>$1 &lt;= nums[i] &lt;= 10^4$</p>
+<p>$1 &lt;= x &lt;= 10^9$</p>
+<h1 id="前缀和-哈希表"><a href="#前缀和-哈希表" class="headerlink" title="前缀和+哈希表"></a>前缀和+哈希表</h1><ol>
+<li>分别计算从前往后和从后往前的前缀和</li>
+<li>使用哈希表保存前缀和的值与index（用来降低时间复杂度）</li>
+</ol>
+<ul>
+<li>因为每次都从数组的第一个和最后一个元素取，并且取完后删除那个元素，所以说每次取都是连续的从前往后取或者是连续的从后往前取，也就是从前往后的前缀和和从后往前的前缀和，因此使用前缀和可以降低时间复杂度。</li>
+<li>为了求最小值，要使用两层循环分别计算从前往后的前缀和<code>prefix[i]</code>与从后往前的前缀和<code>suffix[j]</code>的和，判断其是否等于<code>x</code>,如果等于<code>x</code>，那么更新<code>i+j</code>的最小值。但是这样计算出现了超时，为了降低时间复杂度，因为 $1 &lt;= nums[i] &lt;= 10^4$ ，所以前缀和是递增的，不会有重复值，我们可以使用哈希表来去掉一层循环，哈希表的键为前缀和，哈希表的值为<code>index</code>，当<code>map.containsKey(x-prefix[i])</code>时，即满足条件更新<code>min=Math.min(i+map.get(x-prefix[i]),min)</code></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">minOperations</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line">        <span class="keyword">int</span>[] prefix = <span class="keyword">new</span> <span class="keyword">int</span>[n + <span class="number">1</span>];</span><br><span class="line">        <span class="keyword">int</span>[] suffix = <span class="keyword">new</span> <span class="keyword">int</span>[n + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 降低时间复杂度的哈希表</span></span><br><span class="line">        Map&lt;Integer, Integer&gt; map1 = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        Map&lt;Integer, Integer&gt; map2 = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        map1.put(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">        map2.put(<span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 计算前缀和</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            prefix[i] = prefix[i - <span class="number">1</span>] + nums[i - <span class="number">1</span>];</span><br><span class="line">            suffix[i] = suffix[i - <span class="number">1</span>] + nums[n - i];</span><br><span class="line">            map1.put(prefix[i], i);</span><br><span class="line">            map2.put(suffix[i], i);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> min = n + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> val = prefix[i];</span><br><span class="line">            <span class="keyword">if</span> (val &gt; x) <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> subtract = x - val;</span><br><span class="line">            <span class="keyword">if</span> (map2.containsKey(subtract)) &#123;</span><br><span class="line">                min = Math.min(min, i + map2.get(subtract));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> val = suffix[i];</span><br><span class="line">            <span class="keyword">if</span> (val &gt; x) <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> subtract = x - val;</span><br><span class="line">            <span class="keyword">if</span> (map1.containsKey(subtract)) &#123;</span><br><span class="line">                min = Math.min(min, i + map1.get(subtract));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> min == n + <span class="number">1</span> ? -<span class="number">1</span> : min;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>时间复杂度$O(n)$,空间复杂度$O(n)$</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">哈希表</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">前缀和</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/02/03/%E5%B0%86x%E5%87%8F%E5%88%B00%E7%9A%84%E6%9C%80%E5%B0%8F%E6%93%8D%E4%BD%9C%E6%95%B0/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-确定两个字符串是否接近" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -984,106 +1090,9 @@ tex2jax: {
 
 
   
-    <article id="post-生成平衡数组的方案数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/02/%E7%94%9F%E6%88%90%E5%B9%B3%E8%A1%A1%E6%95%B0%E7%BB%84%E7%9A%84%E6%96%B9%E6%A1%88%E6%95%B0/">生成平衡数组的方案数</a>
-    </h1>
-  
-
-        
-        <a href="/2021/02/02/%E7%94%9F%E6%88%90%E5%B9%B3%E8%A1%A1%E6%95%B0%E7%BB%84%E7%9A%84%E6%96%B9%E6%A1%88%E6%95%B0/" class="archive-article-date">
-  	<time datetime="2021-02-01T16:13:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-02</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">给你一个整数数组 nums 。你需要选择 恰好 一个下标（下标从 0 开始）并删除对应的元素。请注意剩下元素的下标可能会因为删除操作而发生改变。</span><br><span class="line"></span><br><span class="line">比方说，如果 nums &#x3D; [6,1,7,4,1] ，那么：</span><br><span class="line"></span><br><span class="line">选择删除下标 1 ，剩下的数组为 nums &#x3D; [6,7,4,1] 。</span><br><span class="line">选择删除下标 2 ，剩下的数组为 nums &#x3D; [6,1,4,1] 。</span><br><span class="line">选择删除下标 4 ，剩下的数组为 nums &#x3D; [6,1,7,4] 。</span><br><span class="line">如果一个数组满足奇数下标元素的和与偶数下标元素的和相等，该数组就是一个 平衡数组 。</span><br><span class="line"></span><br><span class="line">请你返回删除操作后，剩下的数组 nums 是 平衡数组 的 方案数 。</span><br><span class="line"></span><br><span class="line">示例 1：</span><br><span class="line">输入：nums &#x3D; [2,1,6,4]</span><br><span class="line">输出：1</span><br><span class="line">解释：</span><br><span class="line">删除下标 0 ：[1,6,4] -&gt; 偶数元素下标为：1 + 4 &#x3D; 5 。奇数元素下标为：6 。不平衡。</span><br><span class="line">删除下标 1 ：[2,6,4] -&gt; 偶数元素下标为：2 + 4 &#x3D; 6 。奇数元素下标为：6 。平衡。</span><br><span class="line">删除下标 2 ：[2,1,4] -&gt; 偶数元素下标为：2 + 4 &#x3D; 6 。奇数元素下标为：1 。不平衡。</span><br><span class="line">删除下标 3 ：[2,1,6] -&gt; 偶数元素下标为：2 + 6 &#x3D; 8 。奇数元素下标为：1 。不平衡。</span><br><span class="line">只有一种让剩余数组成为平衡数组的方案。</span><br><span class="line"></span><br><span class="line">示例 2：</span><br><span class="line">输入：nums &#x3D; [1,1,1]</span><br><span class="line">输出：3</span><br><span class="line">解释：你可以删除任意元素，剩余数组都是平衡数组。</span><br><span class="line"></span><br><span class="line">示例 3：</span><br><span class="line">输入：nums &#x3D; [1,2,3]</span><br><span class="line">输出：0</span><br><span class="line">解释：不管删除哪个元素，剩下数组都不是平衡数组。</span><br><span class="line"> </span><br><span class="line">提示：</span><br><span class="line"></span><br><span class="line">1 &lt;&#x3D; nums.length &lt;&#x3D; 105</span><br><span class="line">1 &lt;&#x3D; nums[i] &lt;&#x3D; 104</span><br></pre></td></tr></table></figure>
-
-<h1 id="前缀和"><a href="#前缀和" class="headerlink" title="前缀和"></a>前缀和</h1><ol>
-<li>分别计算计数的前缀和偶数的前缀和</li>
-<li>枚举要删除的数字$i$</li>
-<li>$i$之前的前缀和是原先是奇数的（偶数的）删除后还是奇数的（偶数的）前缀和，$i$之后的前缀和原先是奇数的（偶数）要变成偶数（奇数）。</li>
-<li>判断删除后重新组合的前缀和是否相等</li>
-</ol>
-<p>本题目难度最大的地方在于边界条件的处理，奇数的前缀和只计算奇数$index$的和，偶数位置要怎么处理？</p>
-<p>本题解中使用重复的方法，计算奇数前缀和的时候偶数位置值使用奇数的前缀和填充</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">waysToMakeFair</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line">        <span class="keyword">int</span>[] odd = <span class="keyword">new</span> <span class="keyword">int</span>[n + <span class="number">1</span>];</span><br><span class="line">        <span class="keyword">int</span>[] even = <span class="keyword">new</span> <span class="keyword">int</span>[n + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= nums.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (i % <span class="number">2</span> == <span class="number">1</span>) &#123;</span><br><span class="line">                odd[i] = odd[i - <span class="number">1</span>] + nums[i - <span class="number">1</span>];</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                odd[i] = odd[i - <span class="number">1</span>];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= nums.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (i % <span class="number">2</span> == <span class="number">0</span>) &#123;</span><br><span class="line">                even[i] = even[i - <span class="number">1</span>] + nums[i - <span class="number">1</span>];</span><br><span class="line">                <span class="keyword">if</span> (i - <span class="number">1</span> &gt; <span class="number">0</span>) even[i - <span class="number">1</span>] = even[i];</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                even[i] = even[i - <span class="number">1</span>];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (i % <span class="number">2</span> == <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">int</span> oddSum = odd[i] + even[n] - even[i];</span><br><span class="line">                <span class="keyword">int</span> evenSum = odd[n] - odd[i] + even[i] - nums[i];</span><br><span class="line">                <span class="keyword">if</span> (oddSum == evenSum) res++;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">int</span> oddSum = odd[i] + even[n] - even[i - <span class="number">1</span>] - nums[i];</span><br><span class="line">                <span class="keyword">int</span> evenSum = odd[n] - odd[i] + even[i - <span class="number">1</span>];</span><br><span class="line">                <span class="keyword">if</span> (oddSum == evenSum) res++;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>时间复杂度$O(n)$,空间复杂度$O(n)$</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">waysToMakeFair</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line">        <span class="keyword">int</span> sumOdd = <span class="number">0</span>;<span class="comment">//奇数下标元素和</span></span><br><span class="line">        <span class="keyword">int</span> sumEven = <span class="number">0</span>;<span class="comment">//偶数下标元素和</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;nums.length;i++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(i%<span class="number">2</span>==<span class="number">0</span>)&#123;<span class="comment">//偶数</span></span><br><span class="line">                sumEven+=nums[i];</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;<span class="comment">//奇数</span></span><br><span class="line">                sumOdd+=nums[i];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=n-<span class="number">1</span>;i&gt;=<span class="number">0</span>;i--)&#123;</span><br><span class="line">            <span class="keyword">if</span>((i)%<span class="number">2</span>==<span class="number">0</span>)&#123;<span class="comment">//偶数下标</span></span><br><span class="line">                sumEven-=nums[i];</span><br><span class="line">                <span class="keyword">if</span>(sumEven==sumOdd) count++;</span><br><span class="line">                sumOdd+=nums[i];</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                sumOdd-=nums[i];</span><br><span class="line">                <span class="keyword">if</span>(sumOdd==sumEven) count++;</span><br><span class="line">                sumEven+=nums[i];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> count++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：zhe-zhi-shi-ta-bu-jin-nao-zi-<span class="number">8</span></span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/ways-to-make-a-fair-array/solution/liang-ci-bian-li-qiu-jie-by-zhe-zhi-shi-ta-bu-jin-/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">前缀和</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/02/02/%E7%94%9F%E6%88%90%E5%B9%B3%E8%A1%A1%E6%95%B0%E7%BB%84%E7%9A%84%E6%96%B9%E6%A1%88%E6%95%B0/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/40/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/39/">39</a><a class="page-number" href="/page/40/">40</a><span class="page-number current">41</span><a class="page-number" href="/page/42/">42</a><a class="page-number" href="/page/43/">43</a><span class="space">&hellip;</span><a class="page-number" href="/page/87/">87</a><a class="extend next" rel="next" href="/page/42/">Next &amp;raquo;</a>
+      <a class="extend prev" rel="prev" href="/page/40/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/39/">39</a><a class="page-number" href="/page/40/">40</a><span class="page-number current">41</span><a class="page-number" href="/page/42/">42</a><a class="page-number" href="/page/43/">43</a><span class="space">&hellip;</span><a class="page-number" href="/page/88/">88</a><a class="extend next" rel="next" href="/page/42/">Next &amp;raquo;</a>
     </nav>
   
 
@@ -2088,6 +2097,10 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">公式推导</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">工具使用</a>
               </li>
             
             <div class="clearfix"></div>
