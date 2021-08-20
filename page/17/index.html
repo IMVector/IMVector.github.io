@@ -150,6 +150,115 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-LFU缓存" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/04/24/LFU%E7%BC%93%E5%AD%98/">LFU缓存</a>
+    </h1>
+  
+
+        
+        <a href="/2021/04/24/LFU%E7%BC%93%E5%AD%98/" class="archive-article-date">
+  	<time datetime="2021-04-24T02:11:56.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-24</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="460-LFU-缓存"><a href="#460-LFU-缓存" class="headerlink" title="460. LFU 缓存"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/lfu-cache/">460. LFU 缓存</a></h4><p>难度困难379</p>
+<p>请你为 <a target="_blank" rel="noopener" href="https://baike.baidu.com/item/缓存算法">最不经常使用（LFU）</a>缓存算法设计并实现数据结构。</p>
+<p>实现 <code>LFUCache</code> 类：</p>
+<ul>
+<li><code>LFUCache(int capacity)</code> - 用数据结构的容量 <code>capacity</code> 初始化对象</li>
+<li><code>int get(int key)</code> - 如果键存在于缓存中，则获取键的值，否则返回 -1。</li>
+<li><code>void put(int key, int value)</code> - 如果键已存在，则变更其值；如果键不存在，请插入键值对。当缓存达到其容量时，则应该在插入新项之前，使最不经常使用的项无效。在此问题中，当存在平局（即两个或更多个键具有相同使用频率）时，应该去除 <strong>最近最久未使用</strong> 的键。</li>
+</ul>
+<p><strong>注意</strong>「项的使用次数」就是自插入该项以来对其调用 <code>get</code> 和 <code>put</code> 函数的次数之和。使用次数会在对应项被移除后置为 0 。</p>
+<p>为了确定最不常使用的键，可以为缓存中的每个键维护一个 <strong>使用计数器</strong> 。使用计数最小的键是最久未使用的键。</p>
+<p>当一个键首次插入到缓存中时，它的使用计数器被设置为 <code>1</code> (由于 put 操作)。对缓存中的键执行 <code>get</code> 或 <code>put</code> 操作，使用计数器的值将会递增。</p>
+<p><strong>示例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">输入：</span><br><span class="line">[&quot;LFUCache&quot;, &quot;put&quot;, &quot;put&quot;, &quot;get&quot;, &quot;put&quot;, &quot;get&quot;, &quot;get&quot;, &quot;put&quot;, &quot;get&quot;, &quot;get&quot;, &quot;get&quot;]</span><br><span class="line">[[2], [1, 1], [2, 2], [1], [3, 3], [2], [3], [4, 4], [1], [3], [4]]</span><br><span class="line">输出：</span><br><span class="line">[null, null, null, 1, null, -1, 3, null, -1, 3, 4]</span><br><span class="line"></span><br><span class="line">解释：</span><br><span class="line">&#x2F;&#x2F; cnt(x) &#x3D; 键 x 的使用计数</span><br><span class="line">&#x2F;&#x2F; cache&#x3D;[] 将显示最后一次使用的顺序（最左边的元素是最近的）</span><br><span class="line">LFUCache lFUCache &#x3D; new LFUCache(2);</span><br><span class="line">lFUCache.put(1, 1);   &#x2F;&#x2F; cache&#x3D;[1,_], cnt(1)&#x3D;1</span><br><span class="line">lFUCache.put(2, 2);   &#x2F;&#x2F; cache&#x3D;[2,1], cnt(2)&#x3D;1, cnt(1)&#x3D;1</span><br><span class="line">lFUCache.get(1);      &#x2F;&#x2F; 返回 1</span><br><span class="line">                      &#x2F;&#x2F; cache&#x3D;[1,2], cnt(2)&#x3D;1, cnt(1)&#x3D;2</span><br><span class="line">lFUCache.put(3, 3);   &#x2F;&#x2F; 去除键 2 ，因为 cnt(2)&#x3D;1 ，使用计数最小</span><br><span class="line">                      &#x2F;&#x2F; cache&#x3D;[3,1], cnt(3)&#x3D;1, cnt(1)&#x3D;2</span><br><span class="line">lFUCache.get(2);      &#x2F;&#x2F; 返回 -1（未找到）</span><br><span class="line">lFUCache.get(3);      &#x2F;&#x2F; 返回 3</span><br><span class="line">                      &#x2F;&#x2F; cache&#x3D;[3,1], cnt(3)&#x3D;2, cnt(1)&#x3D;2</span><br><span class="line">lFUCache.put(4, 4);   &#x2F;&#x2F; 去除键 1 ，1 和 3 的 cnt 相同，但 1 最久未使用</span><br><span class="line">                      &#x2F;&#x2F; cache&#x3D;[4,3], cnt(4)&#x3D;1, cnt(3)&#x3D;2</span><br><span class="line">lFUCache.get(1);      &#x2F;&#x2F; 返回 -1（未找到）</span><br><span class="line">lFUCache.get(3);      &#x2F;&#x2F; 返回 3</span><br><span class="line">                      &#x2F;&#x2F; cache&#x3D;[3,4], cnt(4)&#x3D;1, cnt(3)&#x3D;3</span><br><span class="line">lFUCache.get(4);      &#x2F;&#x2F; 返回 4</span><br><span class="line">                      &#x2F;&#x2F; cache&#x3D;[3,4], cnt(4)&#x3D;2, cnt(3)&#x3D;3</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>0 &lt;= capacity, key, value &lt;= 104</code></li>
+<li>最多调用 <code>105</code> 次 <code>get</code> 和 <code>put</code> 方法</li>
+</ul>
+<p><strong>进阶：</strong>你可以为这两种操作设计时间复杂度为 <code>O(1)</code> 的实现吗？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LFUCache</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Map&lt;Integer, Node&gt; map;</span><br><span class="line">    <span class="keyword">private</span> TreeSet&lt;Node&gt; set;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> capacity;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> time = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LFUCache</span><span class="params">(<span class="keyword">int</span> capacity)</span> </span>&#123;</span><br><span class="line">        map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        set = <span class="keyword">new</span> TreeSet&lt;&gt;();</span><br><span class="line">        <span class="keyword">this</span>.capacity = capacity;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">(<span class="keyword">int</span> key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (map.containsKey(key)) &#123;</span><br><span class="line">            Node node = map.get(key);</span><br><span class="line">            set.remove(node);</span><br><span class="line">            node.cnt++;</span><br><span class="line">            node.time = ++time;</span><br><span class="line">            map.put(key, node);</span><br><span class="line">            set.add(node);</span><br><span class="line">            <span class="keyword">return</span> node.val;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(<span class="keyword">int</span> key, <span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (capacity == <span class="number">0</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (map.containsKey(key)) &#123;</span><br><span class="line">            Node node = map.get(key);</span><br><span class="line">            set.remove(node);</span><br><span class="line">            node.cnt++;</span><br><span class="line">            node.time = ++time;</span><br><span class="line">            node.val = val;</span><br><span class="line">            map.put(key, node);</span><br><span class="line">            set.add(node);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (set.size() &gt;= capacity) &#123;</span><br><span class="line">                Node node = set.first();</span><br><span class="line">                map.remove(node.key);</span><br><span class="line">                set.remove(node);</span><br><span class="line">            &#125;</span><br><span class="line">            Node node = <span class="keyword">new</span> Node(<span class="number">1</span>, ++time, key, val);</span><br><span class="line">            map.put(key, node);</span><br><span class="line">            set.add(node);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span> <span class="keyword">implements</span> <span class="title">Comparable</span>&lt;<span class="title">Node</span>&gt; </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> cnt;</span><br><span class="line">        <span class="keyword">int</span> time;</span><br><span class="line">        <span class="keyword">int</span> key;</span><br><span class="line">        <span class="keyword">int</span> val;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Node</span><span class="params">(<span class="keyword">int</span> cnt, <span class="keyword">int</span> time, <span class="keyword">int</span> key, <span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.cnt = cnt;</span><br><span class="line">            <span class="keyword">this</span>.time = time;</span><br><span class="line">            <span class="keyword">this</span>.key = key;</span><br><span class="line">            <span class="keyword">this</span>.val = val;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(Node o)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.cnt == o.cnt ? <span class="keyword">this</span>.time - o.time : <span class="keyword">this</span>.cnt - o.cnt;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Your LFUCache object will be instantiated and called as such:</span></span><br><span class="line"><span class="comment"> * LFUCache obj = new LFUCache(capacity);</span></span><br><span class="line"><span class="comment"> * int param_1 = obj.get(key);</span></span><br><span class="line"><span class="comment"> * obj.put(key,value);</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">标准写法</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/04/24/LFU%E7%BC%93%E5%AD%98/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-常考题目写法" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1923,129 +2032,6 @@ tex2jax: {
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/04/21/%E5%AD%97%E7%AC%A6%E6%B5%81%E4%B8%AD%E7%AC%AC%E4%B8%80%E4%B8%AA%E4%B8%8D%E9%87%8D%E5%A4%8D%E7%9A%84%E5%AD%97%E7%AC%A6/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-k个一组反转链表" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/04/20/k%E4%B8%AA%E4%B8%80%E7%BB%84%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/">k个一组反转链表</a>
-    </h1>
-  
-
-        
-        <a href="/2021/04/20/k%E4%B8%AA%E4%B8%80%E7%BB%84%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/" class="archive-article-date">
-  	<time datetime="2021-04-20T03:01:12.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-20</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="25-K-个一组翻转链表"><a href="#25-K-个一组翻转链表" class="headerlink" title="25. K 个一组翻转链表"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/reverse-nodes-in-k-group/">25. K 个一组翻转链表</a></h4><p>难度困难1053</p>
-<p>给你一个链表，每 <em>k</em> 个节点一组进行翻转，请你返回翻转后的链表。</p>
-<p><em>k</em> 是一个正整数，它的值小于或等于链表的长度。</p>
-<p>如果节点总数不是 <em>k</em> 的整数倍，那么请将最后剩余的节点保持原有顺序。</p>
-<p><strong>进阶：</strong></p>
-<ul>
-<li>你可以设计一个只使用常数额外空间的算法来解决此问题吗？</li>
-<li><strong>你不能只是单纯的改变节点内部的值</strong>，而是需要实际进行节点交换。</li>
-</ul>
-<p><strong>示例 1：</strong></p>
-<p><img src="https://assets.leetcode.com/uploads/2020/10/03/reverse_ex1.jpg" alt="img"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：head &#x3D; [1,2,3,4,5], k &#x3D; 2</span><br><span class="line">输出：[2,1,4,3,5]</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<p><img src="https://assets.leetcode.com/uploads/2020/10/03/reverse_ex2.jpg" alt="img"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：head &#x3D; [1,2,3,4,5], k &#x3D; 3</span><br><span class="line">输出：[3,2,1,4,5]</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：head &#x3D; [1,2,3,4,5], k &#x3D; 1</span><br><span class="line">输出：[1,2,3,4,5]</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 4：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：head &#x3D; [1], k &#x3D; 1</span><br><span class="line">输出：[1]</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li>列表中节点的数量在范围 <code>sz</code> 内</li>
-<li><code>1 &lt;= sz &lt;= 5000</code></li>
-<li><code>0 &lt;= Node.val &lt;= 1000</code></li>
-<li><code>1 &lt;= k &lt;= sz</code></li>
-</ul>
-<p>通过次数164,265</p>
-<p>提交次数253,968</p>
-<h2 id="虚节点-反转"><a href="#虚节点-反转" class="headerlink" title="虚节点+反转"></a>虚节点+反转</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Definition for singly-linked list.</span></span><br><span class="line"><span class="comment"> * public class ListNode &#123;</span></span><br><span class="line"><span class="comment"> *     int val;</span></span><br><span class="line"><span class="comment"> *     ListNode next;</span></span><br><span class="line"><span class="comment"> *     ListNode() &#123;&#125;</span></span><br><span class="line"><span class="comment"> *     ListNode(int val) &#123; this.val = val; &#125;</span></span><br><span class="line"><span class="comment"> *     ListNode(int val, ListNode next) &#123; this.val = val; this.next = next; &#125;</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">reverseKGroup</span><span class="params">(ListNode head, <span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> len = <span class="number">0</span>;</span><br><span class="line">        ListNode cur = head;</span><br><span class="line">        <span class="comment">// 遍历获得链表的长度</span></span><br><span class="line">        <span class="keyword">while</span>(cur!=<span class="keyword">null</span>)&#123;</span><br><span class="line">            len++;</span><br><span class="line">            cur = cur.next;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ListNode dummyNode = <span class="keyword">new</span> ListNode(<span class="number">0</span>);</span><br><span class="line">        ListNode dNode = dummyNode;</span><br><span class="line">        cur = head;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//反转的组的数量</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;len/k;i++)&#123;</span><br><span class="line">            <span class="comment">// 反转完成后的头结点</span></span><br><span class="line">            ListNode pre = <span class="keyword">null</span>;</span><br><span class="line">            <span class="comment">// 每组内反转的数量</span></span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>;j&lt;k;j++)&#123;</span><br><span class="line">                ListNode nex = cur.next;</span><br><span class="line">                cur.next = pre;</span><br><span class="line">                pre = cur;</span><br><span class="line">                cur = nex;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 将头结点接到dummyNode后面</span></span><br><span class="line">            dNode.next = pre;</span><br><span class="line">            <span class="comment">// 移动dummyNode指针到当前反转的末尾</span></span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>;j&lt;k;j++)&#123;</span><br><span class="line">                dNode=dNode.next;</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">        &#125;</span><br><span class="line">        dNode.next = cur;</span><br><span class="line">        <span class="keyword">return</span> dummyNode.next;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="优化时间复杂度"><a href="#优化时间复杂度" class="headerlink" title="优化时间复杂度"></a>优化时间复杂度</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">reverseKGroup</span><span class="params">(ListNode head, <span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> length = <span class="number">0</span>;</span><br><span class="line">        ListNode cur=head;</span><br><span class="line">        <span class="keyword">while</span>(cur != <span class="keyword">null</span>) &#123;</span><br><span class="line">            length++;</span><br><span class="line">            cur = cur.next;</span><br><span class="line">        &#125;</span><br><span class="line">        ListNode dummy = <span class="keyword">new</span> ListNode(<span class="number">0</span>);</span><br><span class="line">        ListNode prev = dummy;</span><br><span class="line">        dummy.next = head;</span><br><span class="line">        ListNode curr = head;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; length / k; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; k - <span class="number">1</span>; j++) &#123;</span><br><span class="line">                ListNode next = curr.next;</span><br><span class="line">                curr.next = next.next;</span><br><span class="line">                next.next = prev.next;</span><br><span class="line">                prev.next = next;</span><br><span class="line">            &#125;</span><br><span class="line">            prev = curr;</span><br><span class="line">            curr = prev.next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dummy.next;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">链表</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/04/20/k%E4%B8%AA%E4%B8%80%E7%BB%84%E5%8F%8D%E8%BD%AC%E9%93%BE%E8%A1%A8/">展开全文 >></a>
         </p>
       
 
