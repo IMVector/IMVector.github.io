@@ -16,8 +16,9 @@
 <meta property="og:description" content="MathJax.Hub.Config({ tex2jax: {   inlineMath: [[&#39;$&#39;,&#39;$&#39;], [&#39;\\(&#39;,&#39;\\)&#39;]],   processEscapes: true   } });     1052. 爱生气的书店老板难度中等79 今天，书店老板有一家店打算试营业 customers.length 分钟。每分钟都有一些顾客（customers[i]）会进入书店，所有">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-02-23T02:11:33.000Z">
-<meta property="article:modified_time" content="2021-02-23T02:17:53.389Z">
+<meta property="article:modified_time" content="2021-08-21T02:46:41.299Z">
 <meta property="article:author" content="Vector">
+<meta property="article:tag" content="滑动窗口">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="Vector" type="application/atom+xml">
@@ -200,7 +201,8 @@ tex2jax: {
 <li><code>0 &lt;= customers[i] &lt;= 1000</code></li>
 <li><code>0 &lt;= grumpy[i] &lt;= 1</code></li>
 </ul>
-<h1 id="滑动窗口"><a href="#滑动窗口" class="headerlink" title="滑动窗口"></a>滑动窗口</h1><p>使用滑动窗口确定最大边界</p>
+<h1 id="滑动窗口"><a href="#滑动窗口" class="headerlink" title="滑动窗口"></a>滑动窗口</h1><p>首先预处理数组，只统计生气时候的人的数量，然后使用滑动窗口计算当前窗口内的和，在窗口滑动的过程中记录窗口中的最大和与左右边界</p>
+<p>最后再遍历一次数组，计算满意的顾客的数量</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">maxSatisfied</span><span class="params">(<span class="keyword">int</span>[] customers, <span class="keyword">int</span>[] grumpy, <span class="keyword">int</span> X)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n=customers.length;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 预处理数组，只使用书店老板生气时候的人的数量</span></span><br><span class="line">        <span class="keyword">int</span> []temp=<span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;n;i++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(grumpy[i]==<span class="number">1</span>)&#123;</span><br><span class="line">                temp[i]=customers[i];</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                temp[i]=<span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> max=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> c=<span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 最大值时的左右边界</span></span><br><span class="line">        <span class="keyword">int</span> maxLIndex=<span class="number">0</span>,maxRIndex=<span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 滑动窗口边界</span></span><br><span class="line">        <span class="keyword">int</span> l=<span class="number">0</span>,r=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(r&lt;n)&#123;</span><br><span class="line">            c+=temp[r];</span><br><span class="line">            <span class="comment">// 滑动窗口的不能继续扩大边界</span></span><br><span class="line">            <span class="keyword">if</span>(r-l+<span class="number">1</span>&gt;=X)&#123;</span><br><span class="line">                <span class="keyword">if</span>(c&gt;max)&#123;</span><br><span class="line">                    max=c;</span><br><span class="line">                    maxLIndex=l;</span><br><span class="line">                    maxRIndex=r;</span><br><span class="line">                &#125;</span><br><span class="line">                c-=temp[l];</span><br><span class="line">                l++;</span><br><span class="line">            &#125;</span><br><span class="line">            r++;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">int</span> res=<span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 根据找到的边界计算结果值</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;n;i++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(i&gt;=maxLIndex&amp;&amp;i&lt;=maxRIndex)&#123;</span><br><span class="line">                res+=customers[i];</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">if</span>(grumpy[i]==<span class="number">0</span>)&#123;</span><br><span class="line">                    res+=customers[i];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 
@@ -241,6 +243,17 @@ tex2jax: {
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">滑动窗口</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 
       
@@ -1369,6 +1382,10 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">工具使用</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">中序遍历</a>
               </li>
             
             <div class="clearfix"></div>
