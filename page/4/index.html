@@ -150,6 +150,1259 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-天际线问题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/07/13/%E5%A4%A9%E9%99%85%E7%BA%BF%E9%97%AE%E9%A2%98/">天际线问题</a>
+    </h1>
+  
+
+        
+        <a href="/2021/07/13/%E5%A4%A9%E9%99%85%E7%BA%BF%E9%97%AE%E9%A2%98/" class="archive-article-date">
+  	<time datetime="2021-07-13T14:54:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-13</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="218-天际线问题"><a href="#218-天际线问题" class="headerlink" title="218. 天际线问题"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/the-skyline-problem/">218. 天际线问题</a></h4><p>难度困难499</p>
+<p>城市的天际线是从远处观看该城市中所有建筑物形成的轮廓的外部轮廓。给你所有建筑物的位置和高度，请返回由这些建筑物形成的 <strong>天际线</strong> 。</p>
+<p>每个建筑物的几何信息由数组 <code>buildings</code> 表示，其中三元组 <code>buildings[i] = [lefti, righti, heighti]</code> 表示：</p>
+<ul>
+<li><code>lefti</code> 是第 <code>i</code> 座建筑物左边缘的 <code>x</code> 坐标。</li>
+<li><code>righti</code> 是第 <code>i</code> 座建筑物右边缘的 <code>x</code> 坐标。</li>
+<li><code>heighti</code> 是第 <code>i</code> 座建筑物的高度。</li>
+</ul>
+<p><strong>天际线</strong> 应该表示为由 “关键点” 组成的列表，格式 <code>[[x1,y1],[x2,y2],...]</code> ，并按 <strong>x 坐标</strong> 进行 <strong>排序</strong> 。<strong>关键点是水平线段的左端点</strong>。列表中最后一个点是最右侧建筑物的终点，<code>y</code> 坐标始终为 <code>0</code> ，仅用于标记天际线的终点。此外，任何两个相邻建筑物之间的地面都应被视为天际线轮廓的一部分。</p>
+<p><strong>注意：</strong>输出天际线中不得有连续的相同高度的水平线。例如 <code>[...[2 3], [4 5], [7 5], [11 5], [12 7]...]</code> 是不正确的答案；三条高度为 5 的线应该在最终输出中合并为一个：<code>[...[2 3], [4 5], [12 7], ...]</code></p>
+<p><strong>示例 1：</strong></p>
+<p><img src="https://assets.leetcode.com/uploads/2020/12/01/merged.jpg" alt="img"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">输入：buildings &#x3D; [[2,9,10],[3,7,15],[5,12,12],[15,20,10],[19,24,8]]</span><br><span class="line">输出：[[2,10],[3,15],[7,12],[12,0],[15,10],[20,8],[24,0]]</span><br><span class="line">解释：</span><br><span class="line">图 A 显示输入的所有建筑物的位置和高度，</span><br><span class="line">图 B 显示由这些建筑物形成的天际线。图 B 中的红点表示输出列表中的关键点。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：buildings &#x3D; [[0,2,3],[2,5,3]]</span><br><span class="line">输出：[[0,3],[5,0]]</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>1 &lt;= buildings.length &lt;= 104</code></li>
+<li><code>0 &lt;= lefti &lt; righti &lt;= 231 - 1</code></li>
+<li><code>1 &lt;= heighti &lt;= 231 - 1</code></li>
+<li><code>buildings</code> 按 <code>lefti</code> 非递减排序</li>
+</ul>
+<h2 id="优先队列"><a href="#优先队列" class="headerlink" title="优先队列"></a>优先队列</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; getSkyline(<span class="keyword">int</span>[][] buildings) &#123;</span><br><span class="line">        PriorityQueue&lt;<span class="keyword">int</span>[]&gt; pq = <span class="keyword">new</span> PriorityQueue&lt;<span class="keyword">int</span>[]&gt;((a, b) -&gt; b[<span class="number">1</span>] - a[<span class="number">1</span>]);</span><br><span class="line">        List&lt;Integer&gt; boundaries = <span class="keyword">new</span> ArrayList&lt;Integer&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span>[] building : buildings) &#123;</span><br><span class="line">            boundaries.add(building[<span class="number">0</span>]);</span><br><span class="line">            boundaries.add(building[<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">        Collections.sort(boundaries);</span><br><span class="line"></span><br><span class="line">        List&lt;List&lt;Integer&gt;&gt; ret = <span class="keyword">new</span> ArrayList&lt;List&lt;Integer&gt;&gt;();</span><br><span class="line">        <span class="keyword">int</span> n = buildings.length, idx = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> boundary : boundaries) &#123;</span><br><span class="line">            <span class="keyword">while</span> (idx &lt; n &amp;&amp; buildings[idx][<span class="number">0</span>] &lt;= boundary) &#123;</span><br><span class="line">                pq.offer(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;buildings[idx][<span class="number">1</span>], buildings[idx][<span class="number">2</span>]&#125;);</span><br><span class="line">                idx++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">while</span> (!pq.isEmpty() &amp;&amp; pq.peek()[<span class="number">0</span>] &lt;= boundary) &#123;</span><br><span class="line">                pq.poll();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> maxn = pq.isEmpty() ? <span class="number">0</span> : pq.peek()[<span class="number">1</span>];</span><br><span class="line">            <span class="keyword">if</span> (ret.size() == <span class="number">0</span> || maxn != ret.get(ret.size() - <span class="number">1</span>).get(<span class="number">1</span>)) &#123;</span><br><span class="line">                ret.add(Arrays.asList(boundary, maxn));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/the-skyline-problem/solution/tian-ji-xian-wen-ti-by-leetcode-solution-ozse/">天际线问题 - 天际线问题 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
+</blockquote>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">优先队列</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/07/13/%E5%A4%A9%E9%99%85%E7%BA%BF%E9%97%AE%E9%A2%98/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-H指数2" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/07/12/H%E6%8C%87%E6%95%B02/">H指数2</a>
+    </h1>
+  
+
+        
+        <a href="/2021/07/12/H%E6%8C%87%E6%95%B02/" class="archive-article-date">
+  	<time datetime="2021-07-12T14:15:12.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-12</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="275-H-指数-II"><a href="#275-H-指数-II" class="headerlink" title="275. H 指数 II"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/h-index-ii/">275. H 指数 II</a></h4><p>难度中等150</p>
+<p>给定一位研究者论文被引用次数的数组（被引用次数是非负整数），数组已经按照 <strong>升序排列</strong> 。编写一个方法，计算出研究者的 <em>h</em> 指数。</p>
+<p><a target="_blank" rel="noopener" href="https://baike.baidu.com/item/h-index/3991452?fr=aladdin">h 指数的定义</a>: “h 代表“高引用次数”（high citations），一名科研人员的 h 指数是指他（她）的 （N 篇论文中）<strong>总共</strong>有 h 篇论文分别被引用了<strong>至少</strong> h 次。（其余的 <em>N - h</em> 篇论文每篇被引用次数<strong>不多于</strong> <em>h</em> 次。）”</p>
+<p><strong>示例:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入: citations &#x3D; [0,1,3,5,6]</span><br><span class="line">输出: 3 </span><br><span class="line">解释: 给定数组表示研究者总共有 5 篇论文，每篇论文相应的被引用了 0, 1, 3, 5, 6 次。</span><br><span class="line">     由于研究者有 3 篇论文每篇至少被引用了 3 次，其余两篇论文每篇被引用不多于 3 次，所以她的 h 指数是 3。</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>说明:</strong></p>
+<p>如果 <em>h</em> 有多有种可能的值 ，<em>h</em> 指数是其中最大的那个。</p>
+<p><strong>进阶：</strong></p>
+<ul>
+<li>这是 <a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/h-index/description/">H 指数</a> 的延伸题目，本题中的 <code>citations</code> 数组是保证有序的。</li>
+<li>你可以优化你的算法到对数时间复杂度吗？</li>
+</ul>
+<h2 id="二分查找"><a href="#二分查找" class="headerlink" title="二分查找"></a>二分查找</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hIndex</span><span class="params">(<span class="keyword">int</span>[] citations)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = citations.length;</span><br><span class="line">        <span class="keyword">int</span> l = <span class="number">0</span>,r=n-<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span>(l&lt;=r)&#123;</span><br><span class="line">            <span class="keyword">int</span> m = l+(r-l)/<span class="number">2</span>;</span><br><span class="line">            <span class="comment">// 当前的数量小于m对应的引用数量</span></span><br><span class="line">            <span class="keyword">if</span>(n-m&lt;=citations[m])&#123;</span><br><span class="line">                r = m-<span class="number">1</span>;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                l = m+<span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> n-l;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="线性时间-可能有问题"><a href="#线性时间-可能有问题" class="headerlink" title="线性时间(可能有问题)"></a>线性时间(可能有问题)</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hIndex</span><span class="params">(<span class="keyword">int</span>[] citations)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = citations.length;</span><br><span class="line">        <span class="keyword">int</span> i=n-<span class="number">1</span>,h=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(i&gt;=<span class="number">0</span> &amp;&amp; citations[i]&gt;h)&#123;</span><br><span class="line">            i--;</span><br><span class="line">            h++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> h;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">二分查找</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/07/12/H%E6%8C%87%E6%95%B02/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-H指数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/07/11/H%E6%8C%87%E6%95%B0/">H指数</a>
+    </h1>
+  
+
+        
+        <a href="/2021/07/11/H%E6%8C%87%E6%95%B0/" class="archive-article-date">
+  	<time datetime="2021-07-11T15:21:34.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-11</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="274-H-指数"><a href="#274-H-指数" class="headerlink" title="274. H 指数"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/h-index/">274. H 指数</a></h4><p>难度中等196</p>
+<p>给定一位研究者论文被引用次数的数组（被引用次数是非负整数）。编写一个方法，计算出研究者的 <em>h</em> 指数。</p>
+<p><a target="_blank" rel="noopener" href="https://baike.baidu.com/item/h-index/3991452?fr=aladdin">h 指数的定义</a>：h 代表“高引用次数”（high citations），一名科研人员的 h 指数是指他（她）的 （N 篇论文中）<strong>总共</strong>有 h 篇论文分别被引用了<strong>至少</strong> h 次。且其余的 <em>N - h</em> 篇论文每篇被引用次数 <strong>不超过</strong> <em>h</em> 次。</p>
+<p>例如：某人的 h 指数是 20，这表示他已发表的论文中，每篇被引用了至少 20 次的论文总共有 20 篇。</p>
+<p><strong>示例：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：citations &#x3D; [3,0,6,1,5]</span><br><span class="line">输出：3 </span><br><span class="line">解释：给定数组表示研究者总共有 5 篇论文，每篇论文相应的被引用了 3, 0, 6, 1, 5 次。</span><br><span class="line">     由于研究者有 3 篇论文每篇 至少 被引用了 3 次，其余两篇论文每篇被引用 不多于 3 次，所以她的 h 指数是 3。</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong>如果 <em>h</em> 有多种可能的值，<em>h</em> 指数是其中最大的那个。</p>
+<h2 id="双指针"><a href="#双指针" class="headerlink" title="双指针"></a>双指针</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hIndex</span><span class="params">(<span class="keyword">int</span>[] citations)</span> </span>&#123;</span><br><span class="line">        Arrays.sort(citations);</span><br><span class="line">        <span class="keyword">int</span> h = <span class="number">0</span>, i = citations.length - <span class="number">1</span>; </span><br><span class="line">        <span class="keyword">while</span> (i &gt;= <span class="number">0</span> &amp;&amp; citations[i] &gt; h) &#123;</span><br><span class="line">            h++; </span><br><span class="line">            i--;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> h;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">双指针</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/07/11/H%E6%8C%87%E6%95%B0/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-用三种不同的颜色为网格涂色" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/07/11/%E7%94%A8%E4%B8%89%E7%A7%8D%E4%B8%8D%E5%90%8C%E7%9A%84%E9%A2%9C%E8%89%B2%E4%B8%BA%E7%BD%91%E6%A0%BC%E6%B6%82%E8%89%B2/">用三种不同的颜色为网格涂色</a>
+    </h1>
+  
+
+        
+        <a href="/2021/07/11/%E7%94%A8%E4%B8%89%E7%A7%8D%E4%B8%8D%E5%90%8C%E7%9A%84%E9%A2%9C%E8%89%B2%E4%B8%BA%E7%BD%91%E6%A0%BC%E6%B6%82%E8%89%B2/" class="archive-article-date">
+  	<time datetime="2021-07-11T05:10:50.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-11</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="5811-用三种不同颜色为网格涂色"><a href="#5811-用三种不同颜色为网格涂色" class="headerlink" title="5811. 用三种不同颜色为网格涂色"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/painting-a-grid-with-three-different-colors/">5811. 用三种不同颜色为网格涂色</a></h4><p>难度困难3</p>
+<p>给你两个整数 <code>m</code> 和 <code>n</code> 。构造一个 <code>m x n</code> 的网格，其中每个单元格最开始是白色。请你用 <strong>红、绿、蓝</strong> 三种颜色为每个单元格涂色。所有单元格都需要被涂色。</p>
+<p>涂色方案需要满足：<strong>不存在相邻两个单元格颜色相同的情况</strong> 。返回网格涂色的方法数。因为答案可能非常大， 返回 <strong>对</strong> <code>109 + 7</code> <strong>取余</strong> 的结果。</p>
+<p><strong>示例 1：</strong></p>
+<p><img src="https://assets.leetcode.com/uploads/2021/06/22/colorthegrid.png" alt="img"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：m &#x3D; 1, n &#x3D; 1</span><br><span class="line">输出：3</span><br><span class="line">解释：如上图所示，存在三种可能的涂色方案。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<p><img src="https://assets.leetcode.com/uploads/2021/06/22/copy-of-colorthegrid.png" alt="img"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：m &#x3D; 1, n &#x3D; 2</span><br><span class="line">输出：6</span><br><span class="line">解释：如上图所示，存在六种可能的涂色方案。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 3：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：m &#x3D; 5, n &#x3D; 5</span><br><span class="line">输出：580986</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>1 &lt;= m &lt;= 5</code></li>
+<li><code>1 &lt;= n &lt;= 1000</code></li>
+</ul>
+<p>通过次数535</p>
+<p>提交次数1,385</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">动态规划</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/07/11/%E7%94%A8%E4%B8%89%E7%A7%8D%E4%B8%8D%E5%90%8C%E7%9A%84%E9%A2%9C%E8%89%B2%E4%B8%BA%E7%BD%91%E6%A0%BC%E6%B6%82%E8%89%B2/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-长度为3的不同回文子序列" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/07/11/%E9%95%BF%E5%BA%A6%E4%B8%BA3%E7%9A%84%E4%B8%8D%E5%90%8C%E5%9B%9E%E6%96%87%E5%AD%90%E5%BA%8F%E5%88%97/">长度为3的不同回文子序列</a>
+    </h1>
+  
+
+        
+        <a href="/2021/07/11/%E9%95%BF%E5%BA%A6%E4%B8%BA3%E7%9A%84%E4%B8%8D%E5%90%8C%E5%9B%9E%E6%96%87%E5%AD%90%E5%BA%8F%E5%88%97/" class="archive-article-date">
+  	<time datetime="2021-07-11T05:04:15.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-11</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="5809-长度为-3-的不同回文子序列"><a href="#5809-长度为-3-的不同回文子序列" class="headerlink" title="5809. 长度为 3 的不同回文子序列"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/unique-length-3-palindromic-subsequences/">5809. 长度为 3 的不同回文子序列</a></h4><p>难度中等0</p>
+<p>给你一个字符串 <code>s</code> ，返回 <code>s</code> 中 <strong>长度为 3</strong> 的<strong>不同回文子序列</strong> 的个数。</p>
+<p>即便存在多种方法来构建相同的子序列，但相同的子序列只计数一次。</p>
+<p><strong>回文</strong> 是正着读和反着读一样的字符串。</p>
+<p><strong>子序列</strong> 是由原字符串删除其中部分字符（也可以不删除）且不改变剩余字符之间相对顺序形成的一个新字符串。</p>
+<ul>
+<li>例如，<code>&quot;ace&quot;</code> 是 <code>&quot;***a\***b***c\***d***e\***&quot;</code> 的一个子序列。</li>
+</ul>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;aabca&quot;</span><br><span class="line">输出：3</span><br><span class="line">解释：长度为 3 的 3 个回文子序列分别是：</span><br><span class="line">- &quot;aba&quot; (&quot;aabca&quot; 的子序列)</span><br><span class="line">- &quot;aaa&quot; (&quot;aabca&quot; 的子序列)</span><br><span class="line">- &quot;aca&quot; (&quot;aabca&quot; 的子序列)</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;adc&quot;</span><br><span class="line">输出：0</span><br><span class="line">解释：&quot;adc&quot; 不存在长度为 3 的回文子序列。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 3：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;bbcbaba&quot;</span><br><span class="line">输出：4</span><br><span class="line">解释：长度为 3 的 4 个回文子序列分别是：</span><br><span class="line">- &quot;bbb&quot; (&quot;bbcbaba&quot; 的子序列)</span><br><span class="line">- &quot;bcb&quot; (&quot;bbcbaba&quot; 的子序列)</span><br><span class="line">- &quot;bab&quot; (&quot;bbcbaba&quot; 的子序列)</span><br><span class="line">- &quot;aba&quot; (&quot;bbcbaba&quot; 的子序列)</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>3 &lt;= s.length &lt;= 105</code></li>
+<li><code>s</code> 仅由小写英文字母组成</li>
+</ul>
+<p>通过次数2,717</p>
+<p>提交次数6,855</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">countPalindromicSubsequence</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = s.length();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span>[][] hash = <span class="keyword">new</span> <span class="keyword">int</span>[n][<span class="number">26</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span>[] h = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">26</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            h[s.charAt(i) - <span class="string">&#x27;a&#x27;</span>]++;</span><br><span class="line">            hash[i] = Arrays.copyOf(h, <span class="number">26</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        Set&lt;String&gt; set = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">char</span>[] arr = <span class="keyword">new</span> <span class="keyword">char</span>[<span class="number">2</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="comment">// 当前之前的</span></span><br><span class="line">            <span class="keyword">int</span>[] h1 = hash[i - <span class="number">1</span>];</span><br><span class="line">            <span class="comment">// 最后的</span></span><br><span class="line">            <span class="keyword">int</span>[] h2 = Arrays.copyOf(hash[n - <span class="number">1</span>],<span class="number">26</span>);</span><br><span class="line">            <span class="comment">// 当前的</span></span><br><span class="line">            <span class="keyword">int</span>[] h3 = hash[i];</span><br><span class="line">            <span class="comment">// 求后面的数量</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">26</span>; j++) &#123;</span><br><span class="line">                h2[j] -= h3[j];</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">char</span> c = s.charAt(i);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">26</span>; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (h1[j] &gt; <span class="number">0</span> &amp;&amp; h2[j] &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    arr[<span class="number">0</span>] = (<span class="keyword">char</span>) (j + <span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">                    arr[<span class="number">1</span>] = c;</span><br><span class="line">                    String key = String.valueOf(arr);</span><br><span class="line">                    set.add(key);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> set.size();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">哈希表</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">前缀和</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">竞赛题目</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/07/11/%E9%95%BF%E5%BA%A6%E4%B8%BA3%E7%9A%84%E4%B8%8D%E5%90%8C%E5%9B%9E%E6%96%87%E5%AD%90%E5%BA%8F%E5%88%97/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-求和游戏" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/07/11/%E6%B1%82%E5%92%8C%E6%B8%B8%E6%88%8F/">求和游戏</a>
+    </h1>
+  
+
+        
+        <a href="/2021/07/11/%E6%B1%82%E5%92%8C%E6%B8%B8%E6%88%8F/" class="archive-article-date">
+  	<time datetime="2021-07-11T01:41:22.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-11</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="5794-求和游戏"><a href="#5794-求和游戏" class="headerlink" title="5794. 求和游戏"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/sum-game/">5794. 求和游戏</a></h4><p>难度中等2收藏分享切换为英文接收动态反馈</p>
+<p>Alice 和 Bob 玩一个游戏，两人轮流行动，<strong>Alice 先手</strong> 。</p>
+<p>给你一个 <strong>偶数长度</strong> 的字符串 <code>num</code> ，每一个字符为数字字符或者 <code>&#39;?&#39;</code> 。每一次操作中，如果 <code>num</code> 中至少有一个 <code>&#39;?&#39;</code> ，那么玩家可以执行以下操作：</p>
+<ol>
+<li>选择一个下标 <code>i</code> 满足 <code>num[i] == &#39;?&#39;</code> 。</li>
+<li>将 <code>num[i]</code> 用 <code>&#39;0&#39;</code> 到 <code>&#39;9&#39;</code> 之间的一个数字字符替代。</li>
+</ol>
+<p>当 <code>num</code> 中没有 <code>&#39;?&#39;</code> 时，游戏结束。</p>
+<p>Bob 获胜的条件是 <code>num</code> 中前一半数字的和 <strong>等于</strong> 后一半数字的和。Alice 获胜的条件是前一半的和与后一半的和 <strong>不相等</strong> 。</p>
+<ul>
+<li>比方说，游戏结束时 <code>num = &quot;243801&quot;</code> ，那么 Bob 获胜，因为 <code>2+4+3 = 8+0+1</code> 。如果游戏结束时 <code>num = &quot;243803&quot;</code> ，那么 Alice 获胜，因为 <code>2+4+3 != 8+0+3</code> 。</li>
+</ul>
+<p>在 Alice 和 Bob 都采取 <strong>最优</strong> 策略的前提下，如果 Alice 获胜，请返回 <code>true</code> ，如果 Bob 获胜，请返回 <code>false</code> 。</p>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：num &#x3D; &quot;5023&quot;</span><br><span class="line">输出：false</span><br><span class="line">解释：num 中没有 &#39;?&#39; ，没法进行任何操作。</span><br><span class="line">前一半的和等于后一半的和：5 + 0 &#x3D; 2 + 3 。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：num &#x3D; &quot;25??&quot;</span><br><span class="line">输出：true</span><br><span class="line">解释：Alice 可以将两个 &#39;?&#39; 中的一个替换为 &#39;9&#39; ，Bob 无论如何都无法使前一半的和等于后一半的和。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 3：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">输入：num &#x3D; &quot;?3295???&quot;</span><br><span class="line">输出：false</span><br><span class="line">解释：Bob 总是能赢。一种可能的结果是：</span><br><span class="line">- Alice 将第一个 &#39;?&#39; 用 &#39;9&#39; 替换。num &#x3D; &quot;93295???&quot; 。</span><br><span class="line">- Bob 将后面一半中的一个 &#39;?&#39; 替换为 &#39;9&#39; 。num &#x3D; &quot;932959??&quot; 。</span><br><span class="line">- Alice 将后面一半中的一个 &#39;?&#39; 替换为 &#39;2&#39; 。num &#x3D; &quot;9329592?&quot; 。</span><br><span class="line">- Bob 将后面一半中最后一个 &#39;?&#39; 替换为 &#39;7&#39; 。num &#x3D; &quot;93295927&quot; 。</span><br><span class="line">Bob 获胜，因为 9 + 3 + 2 + 9 &#x3D; 5 + 9 + 2 + 7 。</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>2 &lt;= num.length &lt;= 105</code></li>
+<li><code>num.length</code> 是 <strong>偶数</strong> 。</li>
+<li><code>num</code> 只包含数字字符和 <code>&#39;?&#39;</code> 。</li>
+</ul>
+<h2 id="数学"><a href="#数学" class="headerlink" title="数学"></a>数学</h2><p>分类讨论：<br>1、因为Alice先手，所以如果问号个数为奇数，则Alice必赢（Alice做最后一次问号置换）；<br>2、统计前后部分数字和，分为三种情况：<br>三点结论：<br>【1】由于Alice和Bob都做最优策略，所以左右两边的问号数目可以抵消（彼此做相反策略），且抵消后剩余问号数目一定为偶数（问号总数为奇数的情况已经被排除，precnt + postcnt为偶数，则abs(precnt - postcnt)必为偶数），抵消问号后，仅讨论剩余问号一侧。<br>【2】问号置换为的数字可以认为只有0和9，剩余问号个数为偶数个，每两个为一个周期，Alice只有两种策略（走极端）：1、增大，Alice回合置换问号为9（Bob阻止，Bob回合置换问号为0）；2、减小，Alice回合置换问号为0（Bob阻止，Bob回合置换问号为9），所以，每个周期剩余问号一侧都会增加9，如果最终两侧相等，则Bob赢，否则Alice赢。<br>【3】有剩余问号一侧只增不减。<br>所以，<br>(1) presum &gt; postsum，如果precnt &gt;= postcnt，则Alice必赢（结论【3】）；如果precnt &lt; postcnt，则return (postcnt - precnt) / 2 * 9 + postsum != presum（结论【2】）。<br>(2) presum == postsum，如果precnt == postcnt，前后问号两相抵消（结论【1】），Bob赢，否则，Alice赢。<br>(3) presum &lt; postsum，与（1）同理。<br>注：<br>presum — 前半部分数字和<br>postsum — 后半部分数字和<br>precnt — 前半部分问号数<br>postcnt — 后半部分问号数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">sumGame</span><span class="params">(String num)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = num.length();</span><br><span class="line">        <span class="keyword">int</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> cnt = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">char</span> ch = num.charAt(i);</span><br><span class="line">            <span class="keyword">if</span> (i &lt; n / <span class="number">2</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (ch == <span class="string">&#x27;?&#x27;</span>) cnt++;</span><br><span class="line">                <span class="keyword">else</span> sum += (ch - <span class="string">&#x27;0&#x27;</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (ch == <span class="string">&#x27;?&#x27;</span>) cnt--;</span><br><span class="line">                <span class="keyword">else</span> sum -= (ch - <span class="string">&#x27;0&#x27;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (cnt % <span class="number">2</span> == <span class="number">1</span>) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (sum == cnt / <span class="number">2</span> * -<span class="number">9</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>作者：mei-mi-xiao-gan-xing<br>链接：<a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/sum-game/solution/mo-ni-yi-xia-si-lu-by-mei-mi-xiao-gan-xi-nnuf/">https://leetcode-cn.com/problems/sum-game/solution/mo-ni-yi-xia-si-lu-by-mei-mi-xiao-gan-xi-nnuf/</a><br>来源：力扣（LeetCode）<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
+</blockquote>
+<blockquote>
+<p>作者：Faith_Previal<br>链接：<a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/sum-game/solution/alice-ke-jin-kai-gua-de-xie-beats-shuang-8gu8/">https://leetcode-cn.com/problems/sum-game/solution/alice-ke-jin-kai-gua-de-xie-beats-shuang-8gu8/</a><br>来源：力扣（LeetCode）<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
+</blockquote>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数学</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">竞赛题目</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/07/11/%E6%B1%82%E5%92%8C%E6%B8%B8%E6%88%8F/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-迷宫中离入口最近的出口" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/07/11/%E8%BF%B7%E5%AE%AB%E4%B8%AD%E7%A6%BB%E5%85%A5%E5%8F%A3%E6%9C%80%E8%BF%91%E7%9A%84%E5%87%BA%E5%8F%A3/">迷宫中离入口最近的出口</a>
+    </h1>
+  
+
+        
+        <a href="/2021/07/11/%E8%BF%B7%E5%AE%AB%E4%B8%AD%E7%A6%BB%E5%85%A5%E5%8F%A3%E6%9C%80%E8%BF%91%E7%9A%84%E5%87%BA%E5%8F%A3/" class="archive-article-date">
+  	<time datetime="2021-07-11T01:40:47.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-11</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="5793-迷宫中离入口最近的出口"><a href="#5793-迷宫中离入口最近的出口" class="headerlink" title="5793. 迷宫中离入口最近的出口"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/nearest-exit-from-entrance-in-maze/">5793. 迷宫中离入口最近的出口</a></h4><p>难度中等0收藏分享切换为英文接收动态反馈</p>
+<p>给你一个 <code>m x n</code> 的迷宫矩阵 <code>maze</code> （<strong>下标从 0 开始</strong>），矩阵中有空格子（用 <code>&#39;.&#39;</code> 表示）和墙（用 <code>&#39;+&#39;</code> 表示）。同时给你迷宫的入口 <code>entrance</code> ，用 <code>entrance = [entrancerow, entrancecol]</code> 表示你一开始所在格子的行和列。</p>
+<p>每一步操作，你可以往 <strong>上</strong>，<strong>下</strong>，<strong>左</strong> 或者 <strong>右</strong> 移动一个格子。你不能进入墙所在的格子，你也不能离开迷宫。你的目标是找到离 <code>entrance</code> <strong>最近</strong> 的出口。<strong>出口</strong> 的含义是 <code>maze</code> <strong>边界</strong> 上的 <strong>空格子</strong>。<code>entrance</code> 格子 <strong>不算</strong> 出口。</p>
+<p>请你返回从 <code>entrance</code> 到最近出口的最短路径的 <strong>步数</strong> ，如果不存在这样的路径，请你返回 <code>-1</code> 。</p>
+<p><strong>示例 1：</strong></p>
+<p><img src="https://assets.leetcode.com/uploads/2021/06/04/nearest1-grid.jpg" alt="img"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">输入：maze &#x3D; [[&quot;+&quot;,&quot;+&quot;,&quot;.&quot;,&quot;+&quot;],[&quot;.&quot;,&quot;.&quot;,&quot;.&quot;,&quot;+&quot;],[&quot;+&quot;,&quot;+&quot;,&quot;+&quot;,&quot;.&quot;]], entrance &#x3D; [1,2]</span><br><span class="line">输出：1</span><br><span class="line">解释：总共有 3 个出口，分别位于 (1,0)，(0,2) 和 (2,3) 。</span><br><span class="line">一开始，你在入口格子 (1,2) 处。</span><br><span class="line">- 你可以往左移动 2 步到达 (1,0) 。</span><br><span class="line">- 你可以往上移动 1 步到达 (0,2) 。</span><br><span class="line">从入口处没法到达 (2,3) 。</span><br><span class="line">所以，最近的出口是 (0,2) ，距离为 1 步。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<p><img src="https://assets.leetcode.com/uploads/2021/06/04/nearesr2-grid.jpg" alt="img"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">输入：maze &#x3D; [[&quot;+&quot;,&quot;+&quot;,&quot;+&quot;],[&quot;.&quot;,&quot;.&quot;,&quot;.&quot;],[&quot;+&quot;,&quot;+&quot;,&quot;+&quot;]], entrance &#x3D; [1,0]</span><br><span class="line">输出：2</span><br><span class="line">解释：迷宫中只有 1 个出口，在 (1,2) 处。</span><br><span class="line">(1,0) 不算出口，因为它是入口格子。</span><br><span class="line">初始时，你在入口与格子 (1,0) 处。</span><br><span class="line">- 你可以往右移动 2 步到达 (1,2) 处。</span><br><span class="line">所以，最近的出口为 (1,2) ，距离为 2 步。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 3：</strong></p>
+<p><img src="https://assets.leetcode.com/uploads/2021/06/04/nearest3-grid.jpg" alt="img"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：maze &#x3D; [[&quot;.&quot;,&quot;+&quot;]], entrance &#x3D; [0,0]</span><br><span class="line">输出：-1</span><br><span class="line">解释：这个迷宫中没有出口。</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>maze.length == m</code></li>
+<li><code>maze[i].length == n</code></li>
+<li><code>1 &lt;= m, n &lt;= 100</code></li>
+<li><code>maze[i][j]</code> 要么是 <code>&#39;.&#39;</code> ，要么是 <code>&#39;+&#39;</code> 。</li>
+<li><code>entrance.length == 2</code></li>
+<li><code>0 &lt;= entrancerow &lt; m</code></li>
+<li><code>0 &lt;= entrancecol &lt; n</code></li>
+<li><code>entrance</code> 一定是空格子。</li>
+</ul>
+<h2 id="BFS（DFS）超时"><a href="#BFS（DFS）超时" class="headerlink" title="BFS（DFS）超时"></a>BFS（DFS）超时</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span>[] nextx = &#123;<span class="number">1</span>, -<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>&#125;;</span><br><span class="line">    <span class="keyword">int</span>[] nexty = &#123;<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, -<span class="number">1</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">nearestExit</span><span class="params">(<span class="keyword">char</span>[][] maze, <span class="keyword">int</span>[] entrance)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> row = maze.length, col = maze[<span class="number">0</span>].length;</span><br><span class="line">        <span class="keyword">boolean</span>[][] vis = <span class="keyword">new</span> <span class="keyword">boolean</span>[row][col];</span><br><span class="line">        Queue&lt;Integer&gt; queue = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        queue.offer(entrance[<span class="number">0</span>]);</span><br><span class="line">        queue.offer(entrance[<span class="number">1</span>]);</span><br><span class="line">        queue.offer(<span class="number">1</span>);</span><br><span class="line">        vis[entrance[<span class="number">0</span>]][entrance[<span class="number">1</span>]] = <span class="keyword">true</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">while</span> (!queue.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">int</span> size = queue.size();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i += <span class="number">3</span>) &#123;</span><br><span class="line">                <span class="keyword">int</span> cx = queue.poll();</span><br><span class="line">                <span class="keyword">int</span> cy = queue.poll();</span><br><span class="line">                <span class="keyword">int</span> cstep = queue.poll();</span><br><span class="line"></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">4</span>; ++j) &#123;</span><br><span class="line">                    <span class="keyword">int</span> nx = cx + nextx[j];</span><br><span class="line">                    <span class="keyword">int</span> ny = cy + nexty[j];</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (nx &lt; <span class="number">0</span> || nx &gt;= row || ny &lt; <span class="number">0</span> || ny &gt;= col) <span class="keyword">continue</span>;</span><br><span class="line">                    <span class="keyword">if</span> (vis[nx][ny]) <span class="keyword">continue</span>;</span><br><span class="line">                    vis[nx][ny] = <span class="keyword">true</span>;</span><br><span class="line">                    <span class="keyword">if</span> (maze[nx][ny] == <span class="string">&#x27;+&#x27;</span>) &#123;</span><br><span class="line">                        vis[nx][ny] = <span class="keyword">true</span>;</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (nx == <span class="number">0</span> || nx == row - <span class="number">1</span> || ny == <span class="number">0</span> || ny == col - <span class="number">1</span>) &#123;</span><br><span class="line">                        <span class="keyword">return</span> cstep;</span><br><span class="line">                    &#125;</span><br><span class="line">                    queue.offer(nx);</span><br><span class="line">                    queue.offer(ny);</span><br><span class="line">                    queue.offer(cstep + <span class="number">1</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">竞赛题目</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">BFS</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/07/11/%E8%BF%B7%E5%AE%AB%E4%B8%AD%E7%A6%BB%E5%85%A5%E5%8F%A3%E6%9C%80%E8%BF%91%E7%9A%84%E5%87%BA%E5%8F%A3/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-金融市场基本知识" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/07/10/%E9%87%91%E8%9E%8D%E5%B8%82%E5%9C%BA%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/">金融市场基本知识</a>
+    </h1>
+  
+
+        
+        <a href="/2021/07/10/%E9%87%91%E8%9E%8D%E5%B8%82%E5%9C%BA%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/" class="archive-article-date">
+  	<time datetime="2021-07-10T08:06:11.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-10</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<p>作者：一叶知秋<br>链接：<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/36714446/answer/416582749">https://www.zhihu.com/question/36714446/answer/416582749</a><br>来源：知乎<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
+<p><strong>【一、基础知识部分】</strong></p>
+<p>1、资本市场：</p>
+<p>资本市场是指证券融资和经营一年以上中长期资金借贷的金融市场。货币市场是经营一年以内短期资金融通的金融市场，资金需求者通过资本市场筹集长期资金，通过货币市场筹集短期资金。</p>
+<p>2、股票：</p>
+<p>股票是股份有限公司在筹集资本时向出资人发行的股份凭证，代表着其持有者对股份公司的所有权。具有以下基本特征：不可偿还性，参与性，收益性（股票通常被高通货膨胀期间可优先选择的投资对象），流通性，价格波动性和风险性。</p>
+<p>3、债券：</p>
+<p>债券是政府、金融机构、工商企业等机构直接向社会借债筹措资金时，向投资者发行，并且承诺按一定利率支付利息并按约定条件偿还本金的债权债务凭证。具有如下特征：偿还性，流通性，安全性，收益性。</p>
+<p>4、可转换证券：</p>
+<p>是一种其持有人有权将其转换成为另一种不同性质的证券，主要包括可转换公司债券和可转换优先股。</p>
+<p>5、权证：</p>
+<p>是指标的证券发行人或其以外的第三人发行的，约定持有人在规定期间内或特定到期日，有权按约定价格向发行人购买或出售标的证券，或以现金结算方式收取结算差价的有价证券。</p>
+<p>6、认购权证：</p>
+<p>发行人发行的，约定持有人在规定期间内或特定到期日，有权按约定价格向发行人购买标的证券的有价证券。</p>
+<p>7、认沽权证：</p>
+<p>发行人发行的，约定持有人在规定期间内或特定到期日，有权按约定价格向发行人出售标的证券的有价证券。</p>
+<p>8、证券投资基金：</p>
+<p>基金是指一种利益共享、风险共担的集合证券投资方式，即通过发行基金单位，集中投资者的资金，由基金托管人托管，由基金管理人管理和运用资金，从事股票、债券等金融工具投资。</p>
+<p>9、开放式基金：</p>
+<p>是指基金发行总额不固定，基金单位总数随时增减，投资者可以按基金的报价在国家规定的营业场所申购或者赎回基金单位的一种基金。</p>
+<p>10、封闭式基金：</p>
+<p>是指事先确定发行总额，在封闭期内基金单位总数不变，基金上市后投资者可以通过证券市场转让、买卖基金单位的一种基金。</p>
+<p>11、一级市场：</p>
+<p>指股票的初级市场也即发行市场，在这个市场上投资者可以认购公司发行的股票。</p>
+<p>12、IPO：</p>
+<p>全称Initial public offering（首次公开募股）指某公司（股份有限公司或有限责任公司）首次向社会公众公开招股的发行方式。</p>
+<p>13、发行价：</p>
+<p>当股票上市发行时，上市公司从公司自身利益及确保股票上市成功等角度出发，对上市的股票不按面值发行，而制订一个较为合理的价格来发行，这个价格就称为股票的发行价。</p>
+<p>14、溢价发行：</p>
+<p>指新上市公司以高于面值的价格办理公开发行或已上市公司以高于面值的价格办理现金增资。</p>
+<p>15、折价发行：</p>
+<p>指以低于面前的价格发行。</p>
+<p>16、二级市场：</p>
+<p>指流通市场，是已发行股票进行买卖交易的场所。</p>
+<p>17、A股：</p>
+<p>A股的正式名称是人民币普通股票。</p>
+<p>18、B股：</p>
+<p>B股的正式名称是人民币特种股票。</p>
+<p>19、H股：</p>
+<p>H股即注册地在内地、上市地在香港的外资股。</p>
+<p>20、S股：</p>
+<p>沪深证券交易所2006年10月9日起一次性调整有关A股股票的证券简称。其中，1014家G公司取消“G”标记，恢复股改方案实施前的股票简称；其余276家未进行股改或已进行股改但尚未实施的公司，其简称前被冠以“S”标记，以提示投资者。</p>
+<p>21、ST股票：</p>
+<p>ST板块股就是指在沪深股市上挂牌的股票，因经营亏损或其他异常情况中国证监会为了提醒股民注意特别处理的股票。</p>
+<p>23、蓝筹股：</p>
+<p>蓝筹股是指资本雄厚,股本和市值较大的信誉优良的上市公司发行的股票。</p>
+<p>24、红筹股：</p>
+<p>红筹股是香港和国际投资者把在境外注册、在香港上市的那些带有中国大陆概念的股票。</p>
+<p>25、绩优股：</p>
+<p>是指过去几年业绩和盈余较佳,展望未来几年仍可看好，只是不会再有高度成长的可能的股票。该行业远景尚佳，投资报酬率也能维持一定的高水平。</p>
+<p>26、垃圾股：</p>
+<p>垃圾股指的是业绩较差的公司的股票。这类上中公司或者由于行业前景不好，或者由于经营不善等，有的甚至进入亏损行列。其股票在市场上的表现萎靡不振，股价走低，交投不活跃，年终分红也差。</p>
+<p>27、成长股：</p>
+<p>指新添的有前途的产业中，利润增长率较高的企业股票。成长股的股价呈不断上涨趋势。</p>
+<p>28、冷门股：</p>
+<p>是指交易量小，流通性差，价格变动小的股票。</p>
+<p>29、龙头股：</p>
+<p>龙头股指的是某一时期在股票市场的炒作中对同行业板块的其他股票具有影响和号召力的股票，它的涨跌往往对其他同行业板块股票的涨跌起引导和示范作用。龙头股并不是一成不变的，它的地位往往只能维持一段时间。</p>
+<p>30、国家股：</p>
+<p>国家股是指有权代表国家投资的部门或机构（国资委）以国有资产向公司投资形成的股份，包括公司现有国有资产折算成的股份。它是国有股权的一个组成部分。</p>
+<p>31、法人股：</p>
+<p>法人股是指企业法人或具有法人资格的事业单位和社会团体，以其依法可支配的资产投入公司形成的非上市流通的股份。</p>
+<p>32、公众股：</p>
+<p>公众股是指社会公众依法以其拥有的财产投入公司时形成的可上市流通的股份。</p>
+<p>33、基本面：</p>
+<p>基本面包括宏观经济运行态势和上市公司基本情况。宏观经济运行态势反映出上市公司整体经营业绩，也为上市公司进一步的发展确定了背景，因此宏观经济与上市公司及相应的股票价格有密切的关系。上市公司的基本面包括财务状况、盈利状况、市场占有率、经营管理体制、人才构成等各个方面。</p>
+<p>34、技术面：</p>
+<p>技术面指反映介变化的技术指标、走势形态以及K线组合等。技术分析有三个前提假设，即市场行为包容一切信息；价格变化有一定的趋势或规律；历史会重演。由于认为市场行为包括了所有信息，那么对于宏观面、政策面等因素都可以忽略，而认为价格变化具有规律和历史会重演，就使得以历史交易数据判断未来趋势变得简单了。</p>
+<p>35、牛市：</p>
+<p>牛市也称多头市场，指市场行情普通看涨，延续时间较长的大升市。</p>
+<p>36、熊市：</p>
+<p>熊市也称空头市场，指行情普通看淡，延续时间相对较长的大跌市。</p>
+<p>37、牛皮市：</p>
+<p>指在所考察交易日里，证券价格上升、下降的幅度很小，价格变化不大，市价像被钉住了似的，如牛皮之坚韧。</p>
+<p>38、集合竞价：</p>
+<p>所谓集合竞价就是在当天还没有成交价的时候，根据前一天的收盘价和对当日股市的预测来输入股票价格，而在这段时间里输入计算机主机的所有价格都是平等的，不需要按照时间优先和价格优先的原则交易，而是按最大成交量的原则来定出股票的价位，这个价位就被称为集合竞价的价位，而这个过程被称为集合竞价。</p>
+<p>39、连续竞价：</p>
+<p>所谓连续竞价，即是指对申报的每一笔买卖委托。</p>
+<p>40、零股交易：</p>
+<p>不到一个成交单位（1手=100股）的股票，如1股、10股，称为零股．在卖出股票时，可以用零股进行委托；但买进股票时不能以零股进行委托，最小单位是1手，即100股。</p>
+<p>41、涨跌幅限制：</p>
+<p>涨跌幅限制是指在一个交易日内，除上市首日证券外，证券的交易价格相对上一交易日收市价格的涨跌幅度不得超过10%；超过涨跌限价的委托为无效委托。</p>
+<p>42、涨停板：</p>
+<p>证券市场中交易当天股价的最高限度称为涨停板，涨停板时的股价叫涨停板价。</p>
+<p>43、跌停板：</p>
+<p>证券交易当天股价的最低限度称为跌停板，跌停板时的股价称跌停板价。</p>
+<p>44、托管：</p>
+<p>托管是在托管券商制度下，投资者在一个或几个券商处以认购、买入、转换等方式委托这些券商管理自己的股份，并且只可以在这些券商处卖出自己的证券；券商为投资者提供证券买、分红派息自动到帐、证券与资金的查询、转托管等各项业务服务。</p>
+<p>45、转托管：</p>
+<p>转托管是在托管券商制度下，投资者要将其托管股份从一个券商处转移到另一个券商处托管，就必须办理一定的手续，实现股份委托管理的转移，即所谓的转托管。</p>
+<p>46、指定交易：</p>
+<p>指定交易指投资者可以指定某一证券营业部为自己买卖证券的唯一的交易营业部。</p>
+<p>47、派息：</p>
+<p>股票前一日收盘价减去上市公司发放的股息称为派息。</p>
+<p>48、含权：</p>
+<p>凡是有股票有权未送配的均称含权。</p>
+<p>49、除权：</p>
+<p>除权是由于公司股本增加，每股股票所代表的企业实际价值（每股净资产）有所减少，需要在发生该事实之后从股票市场价格中剔除这部分因素，而形成的剔除行为。</p>
+<p>50、填权：</p>
+<p>指除权后该股票价格出现上涨，将除权前后的价格落差部分完全补回的情形。</p>
+<p>51、贴权：</p>
+<p>贴权是指在除权除息后的一段时间里，如果多数人不看好该股，交易市价低于除权（除息）基准价，即股价比除权除息前有所下降，则为贴权。</p>
+<p>52、XR：</p>
+<p>证券名称前记上XR，表示该股已除权，购买这样的股票后将不再享有分红的权利。当股票名称前出现XR 的字样时，表明当日是这只股票的除权日。</p>
+<p>53、除息：</p>
+<p>除息由于公司股东分配红利，每股股票所代表的企业实际价值（每股净资产）有所减少，需要在发生该事实之后从股票市场价格中剔除这部分因素，而形成的剔除行为。</p>
+<p>54、DR：</p>
+<p>证券代码前标上DR，表示除权除息，购买这样的股票不再享有送股派息的权利。</p>
+<p>55、XD：</p>
+<p>证券代码前标上XD，表示股票除息，购买这样的股票后将不再享有派息的权利。</p>
+<p>56、配股：</p>
+<p>配股是上市公司根据公司发展的需要，依据有关规定和相应程序，旨在向原股东进一步发行新股、筹集资金的行为。</p>
+<p>57、分红配股：</p>
+<p>分红即是上市公司对股东的投资回报；配股是上市公司按照公司发展的需要，根据有关规定和相应程序，向原股东增发新股，进一步筹集资金的行为。</p>
+<p>58、送红股：</p>
+<p>送红股是上市公司将本年的利润留在公司里，发放股票作为红利，从而将利润转化为股本。</p>
+<p>59、转增股本：</p>
+<p>转增股本是指公司将资本公积转化为股本，转增股本并没有改变股东的权股益，但却增加了股本规模，因而客观结果与送红股相似。</p>
+<p>60、股权登记日：</p>
+<p>上市公司在送股、配股和派息的时候，需要定出某一天，界定哪些股东可以参加分红或参与配股，定出的这一天就是股权登记日。</p>
+<p>61、买壳上市：</p>
+<p>买壳上市是指一些非上市公司通过收购一些业绩较差、筹资能力弱化的上市公司，剥离被购公司资产，注入自己的资产，从而实现间接上市的目的。</p>
+<p>62、大小非减持：</p>
+<p>非是指非流通股，由于股改使非流通股可以流通持股低于5%的非流通股叫小非,大于5%的叫大非。非流通股可以流通后,他们就会抛出来套现，就叫减持。</p>
+<p>63、估值：</p>
+<p>股票估值是使用一定的方法发现股票内在价值，并买入价值被低估的股票或卖出价值被高估的股票来获得投资收益的股票投资方法和理念。</p>
+<p>64、价值回归：</p>
+<p>当股指或股票价格和其内在价值严重背离后，股指或股票价格降低至其内在价值的过程。</p>
+<p>65、QFII：</p>
+<p>合格境外机构投资者。</p>
+<p>66、DQII：</p>
+<p>合格境内机构投资者。</p>
+<p><strong>【二、技术分析部分】</strong></p>
+<p>67、K线：</p>
+<p>又称为日本线，起源于日本。K线是一条柱状的线条，由影线和实体组成。影线在实体上方的部分叫上影线，下方的部分叫下影线。实体分阳线和阴线两种，又称红（阳）线和黑（阴）线。一条K线的记录就是某一种股票一天的价格变动情况。</p>
+<p>68、实体：</p>
+<p>当日收盘价与开盘价之差。收盘价大于开盘价叫做阳实体，收盘价小于开盘价叫做阴实体。一般情况下，出现阳实体说明买盘比较旺盛，推动股价向上攀升，出现阴实体说明卖盘踊跃，迫使股价节节走低。</p>
+<p>69、阳线(红线)：</p>
+<p>在K线图中中间的矩形长条叫实体，如果开盘价高于收盘价，则实体为阳线或红线。</p>
+<p>70、阴线(黑线)：</p>
+<p>在K线图中中间的矩形长条叫实体，如果收盘价高于开盘价，则实体为阴线或黑线。</p>
+<p>71、上影线：</p>
+<p>在K线图中，从实体向上延伸的细线叫上影线。在阳线中，它是当日最高价与收盘价之差；在阴线中，它是当日最高价与开盘价之差。</p>
+<p>72、下影线：</p>
+<p>在K线图中，从实体向下延伸的细线叫下影线。在阳线中，它是当日开盘价与最低价之差；在阴线中，它是当日收盘价与最低价之差。</p>
+<p>73、趋势：</p>
+<p>就是股票价格市场运动的方向；趋势的方向有三个：上升方向；下降方向和水平方向。趋势的类型有主要趋势、次要趋势和短暂趋势三种。</p>
+<p>74、趋势线：</p>
+<p>趋势线是用来衡量价格波动的方向的直线，由趋势线的方向可以明确地看出股价的趋势。在上升趋势中，将两个低点连成一条直线，就得到上升趋势线。在下降趋势中，将两个高点连成一条直线，就得到下降趋势线。上升趋势线起支撑作用，下降趋势线起压力作用，也就是说，上升趋势线是支撑线的一种，下降趋势线是压力线的一种。</p>
+<p>75、支撑线：</p>
+<p>又称为抵抗线。当股价跌到某个价位附近时，股价停止下跌甚至有可能回升，这是因为多方在此买入造成的。支撑线起阻止股价继续下跌的作用。这个起着阻止股价继续下跌的价位就是支撑线所在的位置。</p>
+<p>76、压力线：</p>
+<p>又称为阻力线。当股价上涨到某个价位附近时，股价会停止上涨，甚至回落，这是因为空方在此抛出造成的。压力线起阻止股价继续上市的作用。这个起着阻止股价继续上升的价位就是压力线所在的位置。</p>
+<p>77、轨道线：</p>
+<p>又称通道线或管道线，是基于趋势线的一种方法。在已经得到了趋势线后，通过第一个峰和谷可以做出这条趋势线的平行线，这条平行线就是轨道线。轨道的作用是限制股价的变动范围，让它不能变得太离谱。一个轨道一旦得到确认，那么价格将在这个通道里变动。对上面的或下面的直线的突破将意味着有一个大的变化。</p>
+<p>78、骗线：</p>
+<p>主力或大户利用市场心理，在趋势线上做手脚，使散户做出错误的决定。</p>
+<p><strong>【三、交易术语部分】</strong></p>
+<p>79、筹码：</p>
+<p>投资人手中持有一定数量的股票。</p>
+<p>80、多头：</p>
+<p>预期未来价格上涨，以目前价格买入一定数量的股票等价格上涨后，高价卖出，从而赚取差价利润的交易行为，特点为先买后卖的交易行为。</p>
+<p>81、空头：</p>
+<p>预期未来行情下跌，将手中股票按目前价格卖出，待行情跌后买进，获利差价利润。其特点为先卖后买的交易行为。</p>
+<p>82、利多：</p>
+<p>对于多头有利，能刺激股价上涨的各种因素和消息，如：银根放松，GDP增长加速等。</p>
+<p>83、利空：</p>
+<p>对空头有利，能促使股价下跌的因素和信息，如：利率上升，经济衰退，公司经营亏损等。</p>
+<p>84、多头陷阱（诱多）：</p>
+<p>即为多头设置的陷阱，通常发生在指数或股价屡创新高，并迅速突破原来的指数区且达到新高点，随后迅速滑跌破以前的支撑位，结果使在高位买进的投资者严重被套。</p>
+<p>85、空头陷阱（诱空）：</p>
+<p>通常出现在指数或股价从高位区以高成交量跌至一个新的低点区，并造成向下突破的假象，使恐慌性抛盘涌出后迅速回升至原先的密集成交区，并向上突破原压力线，使在低点卖出者踏空。</p>
+<p>86、跳空缺口与回补：</p>
+<p>是指相邻的两根 K线间没有发生任何交易,由于突发消息的影响,或者投资者比较看好或看空时,股价在走势图上出现空白区域,这就是跳空缺口；在股价之后的走势中，将跳空的缺口补回，称之为补空。</p>
+<p>87、反弹：</p>
+<p>在股市上，股价呈不断下跌趋势，终因股价下跌速度过快而反转回升到某一价位的调整现象称为反弹。</p>
+<p>88、反转：</p>
+<p>股价朝原来趋势的相反方向移动分为向上反转和向下反转。</p>
+<p>89、回档：</p>
+<p>在股市上，股价呈不断上涨趋势，终因股价上涨速度过快而反转回跌到某一价位，这一调整现象称为回档。</p>
+<p>90、回探：</p>
+<p>股指或股票价格在缓慢上升后，趋势发生改变，缓慢下跌到前期低点区域时，即为回探。</p>
+<p>91、盘整：</p>
+<p>股价经过一段快捷上升或下降后，遭遇阻力或支撑而呈小幅涨跌变动，做换手整理。股价在有限幅度内波动，一般是指上下5%的幅度内的波动。</p>
+<p>92、超买：</p>
+<p>股价持续上升到一定高度，买方力量基本用尽，股价即将下跌。</p>
+<p>93、超卖：</p>
+<p>股价持续下跌到一定低点，卖方力量基本用尽，股价即将回升。</p>
+<p>94、吃货：</p>
+<p>指庄家在低价时暗中买进股票，叫做吃货。</p>
+<p>95、出货：</p>
+<p>指庄家在高价时，不动声色地卖出股票，称为出货。</p>
+<p>96、多翻空：</p>
+<p>原本看好行情的买方，看法改变，变为卖方。</p>
+<p>97、空翻多：</p>
+<p>原本打算卖出股票的一方，看法改变，变为买方。</p>
+<p>98、多杀多：</p>
+<p>普遍认为当天股价将上涨，于是抢多头帽子的人持多，然而股价却没有大幅上涨，无法高价卖出，等到交易快要结束时，竟相卖出，因而造成收盘时股价大幅下挫的情形。</p>
+<p>99、满仓：</p>
+<p>手上全是股票，钱都买了股票。</p>
+<p>100、半仓：</p>
+<p>一半股票，一半资金。</p>
+<p>101、空仓：</p>
+<p>手上没有股票，全都卖空了。</p>
+<p>102、斩仓：</p>
+<p>一般来说是忍痛把赔了钱的股票卖掉。</p>
+<p>103、建仓：</p>
+<p>投资者开始买入看涨的股票。</p>
+<p>104、补仓：</p>
+<p>把以前卖掉的股票再买回来，或许是在某只股票上再追买一些。</p>
+<p>105、增仓：</p>
+<p>你的第一笔买入某股票称建仓；在以后的过程中继续买入称增仓。</p>
+<p>106、突破：</p>
+<p>指股价经过一段盘档时间后，产生的一种价格波动。</p>
+<p>107、探底：</p>
+<p>股价持续跌挫至某价位时便止跌回升，如此一次或数次。</p>
+<p>108、割肉：</p>
+<p>指高价买进股票后，大势下跌，为避免继续损失，低价赔本卖出股票。</p>
+<p>109、追高：</p>
+<p>当股价处于绝对高位时，不断的买入股票。</p>
+<p>110、逼空：</p>
+<p>是指多头连续大幅上涨，逼迫空头止损投降。</p>
+<p>111、抛售：</p>
+<p>立刻卖出手中所有的股票。</p>
+<p>112、离场：</p>
+<p>当下跌趋势形成时，预计未来一段时间不参与操作股票，简称离场。</p>
+<p>113、死多：</p>
+<p>是看好股市前景，买进股票后，如果股价下跌，宁愿放上几年，不赚钱绝不脱手。</p>
+<p>114、护盘：</p>
+<p>庄家为了保持股价稳定，而投入资金购买市场上抛售的股票，以保持股价相对稳定。</p>
+<p>115、崩盘：</p>
+<p>崩盘即证券市场上由于某种利空原因，出现了证券大量抛出，导致证券市场价格无限度下跌，不知到什么程度才可以停止。这种接连不断地大量抛出证券的现象也称为卖盘大量涌现。</p>
+<p>116、跳水：</p>
+<p>跳水即指短时间内快速下跌；大盘或某股票不顾一切大幅度迅猛地下跌，即走势像高台挑水一样在短时间内直线向下。</p>
+<p>117、抬拉：</p>
+<p>抬拉是用非常方法，将股价大幅度抬起。通常大户在抬拉之后便大抛出以牟取暴利。</p>
+<p>118、打压：</p>
+<p>打是用非常方法，将股价大幅度压低。通常大户在打压之后便大量买进以取暴利。</p>
+<p>118、洗盘：</p>
+<p>指庄家大户为降低拉升成本和阻力，先把股价大幅度杀低，回收散户恐慌抛售的股票，然后抬高股价乘机获取价差利益的行为。</p>
+<p>119、整理：</p>
+<p>股市上的股价经过大幅度迅速上涨或下跌后，遇到阻力线或支撑线，原先上涨或下跌趋势明显放慢，开始出现幅度为15％左右的上下跳动，并持续一段时间，这种现象称为整理。</p>
+<p>120、获利盘和套牢盘：</p>
+<p>获利盘一般是指股票交易中，能够卖出赚钱的那部分股票。每一只股票都有获利盘和套牢盘，套牢盘就是买入的股票亏本。他们相互作用。</p>
+<p>121、放量缩量：</p>
+<p>它们是指股票的交易量，与前一天或者前一段时间相比，放大了或是缩小了，称为放量，缩量。</p>
+<p>122、止损：</p>
+<p>是指当某一投资出现的亏损达到预定数额时，及时斩仓出局，以避免形成 更大的亏损。其目的就在于投资失误时把损失限定在较小的范围内。</p>
+<p>123、利空出尽：</p>
+<p>在证券市场上，证券价格因各种不利消息的影响而下跌，这种趋势持续一段时间，跌到一定的程度，空方的力量开始减弱，投资者须不再被这些利空的因素所影响，证券价格开始反弹上升，这种现象就被称作利空出尽。</p>
+<p>124、强势调整：</p>
+<p>就是主力在洗盘，通过洗盘，将意志不坚定的获利盘和解套盘清洗出去，同时又抬高了行情的市场成本，从而为主力扫清障碍和减轻上行压力。</p>
+<p>125、惯性：</p>
+<p>处于涨势或者跌势的时候，其趋势一般将延续。</p>
+<p>126、冲高回落：</p>
+<p>指股指或股价在一段时间内涨到一定位置后，趋势发生改变，形成下跌。</p>
+<p>127、大幅振荡：</p>
+<p>指在较短时间内股指或股票价格在最高点与最低点不断变化，幅度大于5%。</p>
+<p>128、震荡调整：</p>
+<p>买方与卖方的力量相当，在某一价格上上下波动，把价格尽力调整到它的价值，围绕着价值而上下波动、震荡。</p>
+<p>129、背离：</p>
+<p>背离是指当股票或指数在下跌或上涨过程中，不断创新低（高），而一些技术指标不跟随创新低（高），称为背离。</p>
+<p>130、钝化：</p>
+<p>当股票走势形成单边上涨（或下跌）时，技术指标产生死叉（或金叉）后，股价并不向相反方向运行，只是在高位（或低位）横盘，指标线有时会拧在一起，像绳子一样。这种情况被称为“钝化”。</p>
+<p>131、震仓：</p>
+<p>震仓就是指主力明明想把股价做上去，但是由于有短线买家利用图表分析跟风持货，或收到该股票的小道消息入货，而主力又不想让这些人白坐轿子白赚钱，于是明明想往上拉抬的，偏偏有意把股价打下去。多数短线炒家都是买涨不买跌，或追涨杀跌的，当股价出乎意料地向下跌，就会令很多数短线跟风者斩仓离场，被主力震出来。也有人称此为洗盘。</p>
+<p>132、套牢：</p>
+<p>预期股价上涨而买入股票，结果股价却下跌，又不甘心将股票卖出，被动等等获利时机的出现。</p>
+<p>133、阴跌：</p>
+<p>指股价进一步退两步，缓慢下滑的情况，如阴雨连绵，长期不止。</p>
+<p>134、做多动能：</p>
+<p>支持股价上涨的所有条件。</p>
+<p>135、空仓观望：</p>
+<p>判断未来不易操作股票，即空仓观望。</p>
+<p><strong>【四、行情术语部分】</strong></p>
+<p>136、日开盘价：</p>
+<p>日开盘价是指每个交易日的第一笔成交价格，这是传统的开盘价定义。目前中国市场采用集合竞价的方式产生开盘价。</p>
+<p>137、日收盘价：</p>
+<p>日收盘价是指每个交易日的最后一笔成交价格。因为收盘价是当日行情的标准，又是下一个交易日开盘价的依据，可据以预测未来证券市场行情，所以投资者对行情分析时一般采用收盘价作为计算依据。</p>
+<p>138、日最低价：</p>
+<p>指当天该股票成交价格中的最低价格。</p>
+<p>139、日最高价：</p>
+<p>指当天该股票成交价格中的最高价格。</p>
+<p>140、日成交额：</p>
+<p>指当天已成交股票的金额总数。</p>
+<p>141、日成交量：</p>
+<p>指当天成交的股票数量。</p>
+<p>142、总手：</p>
+<p>总手是到目前为止该股的总成交量（手数）。</p>
+<p>143、现手：</p>
+<p>现手是刚成交的一笔交易的手数。</p>
+<p>144、盘口：</p>
+<p>股票交易中，具体到个股买进\卖出5个挡位的交易信息。“盘口”是在股市交易过程中，看盘观察交易动向的俗称。</p>
+<p>145、内盘：</p>
+<p>委托以买方成交的纳入“内盘”，成交价是买入价时成交的手数总和称为内盘。 当外盘累计数量比内盘累计数量大很多，而股价也在上涨时，表明很多人在抢盘买入股票。</p>
+<p>146、外盘：</p>
+<p>委托以卖方成交的纳入“外盘”，成交价是卖出价时成交的手数总和称为外盘。</p>
+<p>147、量比：</p>
+<p>当日总成交手数与近期平均成交手数的比值。如果量比数值大于1，表示这个时刻的成交总手量已经放大；若量比数值小于1，表示这个时刻成交总手萎缩。</p>
+<p>148、委比：</p>
+<p>通过对委买手数和委卖手数之差与委买手数和委卖手。</p>
+<p>149、换手率：</p>
+<p>换手率是指在一定时间内市场中股票转手买卖的频率，是反映股票流通性的指标之一。计算公式为：换手率=（某一段时间内的成交量/流通股数）×100%。</p>
+<p><strong>【五、财务名词部分】</strong></p>
+<p>150、市盈率（PE）：</p>
+<p>市盈率又称股份收益比率或本益比，是股票市价与其每股收益的比值，计算公式是：市盈率=当前每股市场价格/每股税后利润。</p>
+<p>151、市净率（PB）：</p>
+<p>是股票市价与每股净资产的比值，市净率=股票市价/每股净资产。</p>
+<p>152、每股税后利润：</p>
+<p>每股税后利润又称每股盈利，可用公司税后利润除以公司总股数来计算。</p>
+<p>153、市值：</p>
+<p>即为股票的市场价值，亦可以说是股票的市场价格，它包括股票的发行价格和交易买卖价格。股票的市场价格是由市场决定的。股票的面值和市值往往事不一致的。</p>
+<p><strong>【六、宏观经济名词部分】</strong></p>
+<p>154、货币政策：</p>
+<p>指中央银行为实现既定的经济目标（稳定物价，促进经济增长，实现充分就业和平衡国际收支）运用各种工具调节货币供给和利率，进而影响宏观经济的方针和措施的总合。</p>
+<p>155、财政政策：</p>
+<p>是指国家根据一定时期政治、经济、社会发展的任务而规定的财政工作的指导原则，通过财政支出与税收政策来调节总需求。增加政府支出，可以刺激总需求，从而增加国民收入，反之则压抑总需求，减少国民收入。税收对国民收入是一种收缩性力量，因此，增加政府税收，可以抑制总需求从而减少国民收入，反之，则刺激总需求增加国民收入。</p>
+<p>156、通货紧缩：</p>
+<p>当市场上流通的货币减少，人民的货币所得减少，购买力下降，影响物价之下跌，造成通货紧缩。长期的货币紧缩会抑制投资与生产，导致失业率升高及经济衰退。</p>
+<p>157、通货膨胀：</p>
+<p>通货膨胀是指流通中货币量超过实际需要量所引起的货币贬值、物价上涨的经济现象。</p>
+<p>158、消费者物价指数（CPI）：</p>
+<p>是反映与居民生活有关的商品及劳务价格统计出来的物价变动指标，通常作为观察通货膨胀水平的重要指标。</p>
+<p>159、生产者物价指数（PPI）：</p>
+<p>生产者物价指数主要的目的在衡量各种商品在不同的生产阶段的价格变化情形。PPI是衡量工业企业产品出厂价格变动趋势和变动程度的指数，是反映某一时期生产领域价格变动情况的重要经济指标，也是制定有关经济政策和国民经济核算的重要依据。</p>
+<p>160、再贴现率：</p>
+<p>商业银行在票据未到期以前将票据卖给中央银行，得到中央银行的贷款，称为再贴现。中央银行在对商业银行办理贴现贷款中所收取的利息率，称为再贴现率。</p>
+<p>161、公开市场业务：</p>
+<p>是指中央银行通过买进或卖出有价证券，吞吐基础货币，调节货币供应量的活动。</p>
+<p>162、法定存款准备金率：</p>
+<p>是法律规定的商业银行准备金与商业银行吸收存款的比率。商业银行吸收的存款不能全部放贷出去，必须按照法定比率留存一部分作为随时应付存款人提款的准备金。</p>
+<p><strong>【七、基金名词部分】</strong></p>
+<p>163、指数基金：</p>
+<p>是一种以拟和目标指数、跟踪目标指数变化为原则，实现与市场同步成长的基金品种。</p>
+<p>164、保本基金：</p>
+<p>是指在其招募说明书中明确规定相关的担保条款，即在满足一定持有期限后，为投资人提供本金或收益保障的一类基金。</p>
+<p>165、货币市场基金：</p>
+<p>指投资于货币市场（一年以内，平均期限120天）的投资基金。</p>
+<p>166、交易所交易基金（ETFs）：</p>
+<p>指可以在交易所上市交易的基金，其代表的是一揽子股票的投资组合。</p>
+<p>167、上市型开放式基金（LOF）：</p>
+<p>即可以在一级市场申购赎回又可以在二级市场买卖的开放式基金。</p>
+<p>168、基金成立日：</p>
+<p>指基金达到成立条件后，基金管理人宣布基金成立的日期。</p>
+<p>169、基金募集期：</p>
+<p>指自招募说明书公告之日起到基金成立日的时间段。</p>
+<p>170、存续期：</p>
+<p>指基金合同生效至终止之间的不定期期限。</p>
+<p>171、认购：</p>
+<p>指在基金募集期内，投资者按照基金合同的规定申请购买基金份额的行为。</p>
+<p>172、申购：</p>
+<p>指在基金合同生效后的存续期间，投资者申请购买基金份额的行为。</p>
+<p>173、赎回：</p>
+<p>指在基金合同生效后的存续期间，基金份额持有人按基金合同规定的条件要求基金管理人购回基金份额的行为。</p>
+<p>174、基金转换：</p>
+<p>指基金份额持有人按基金管理人规定的条件，申请将其持有的基金管理人管理的某一基金的基金份额转换为基金管理人管理的，且由同一登记结算机构办理登记结算的其他基金的基金份额的行为。</p>
+<p>175、开放日：</p>
+<p>指为投资者办理基金申购、赎回等业务的工作日。</p>
+<p>176、基金单位净值：</p>
+<p>基金所拥有的资产每个营业日根据市场收盘价所计算出之总资产价值，扣除基金当日之各类成本及费用后，所得到的就是该基金当日之净资产价值。除以基金当日所发行在外的单位总数，就是每单位净值。</p>
+<p>177、基金累计净值：</p>
+<p>是指基金最新净值与成立以来的分红业绩之和，体现了基金从成立以来所取得的累计收益（减去一元面值即是实际收益），可以比较直观和全面地反映基金在运作期间的历史表现，结合基金的运作时间，则可以更准确地体现基金的真实业绩水平。</p>
+<p>178、资本利得：</p>
+<p>二级市场上买卖证券的价差。</p>
+<p>179、红利再投资：</p>
+<p>将投资者分得的收益再投资于基金，并折算成相应数量的基金单位，这实际上是将应分配的收益折为等额的新的基金单位送给投资者。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">金融知识</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/07/10/%E9%87%91%E8%9E%8D%E5%B8%82%E5%9C%BA%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-两个链表相加生成相加链表" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -356,859 +1609,9 @@ tex2jax: {
 
 
   
-    <article id="post-主要元素" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/07/10/%E4%B8%BB%E8%A6%81%E5%85%83%E7%B4%A0/">主要元素</a>
-    </h1>
-  
-
-        
-        <a href="/2021/07/10/%E4%B8%BB%E8%A6%81%E5%85%83%E7%B4%A0/" class="archive-article-date">
-  	<time datetime="2021-07-10T01:40:12.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-10</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="面试题-17-10-主要元素"><a href="#面试题-17-10-主要元素" class="headerlink" title="面试题 17.10. 主要元素"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/find-majority-element-lcci/">面试题 17.10. 主要元素</a></h4><p>难度简单165</p>
-<p>数组中占比超过一半的元素称之为主要元素。给你一个 <strong>整数</strong> 数组，找出其中的主要元素。若没有，返回 <code>-1</code> 。请设计时间复杂度为 <code>O(N)</code> 、空间复杂度为 <code>O(1)</code> 的解决方案。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：[1,2,5,9,5,9,5,5,5]</span><br><span class="line">输出：5</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：[3,2]</span><br><span class="line">输出：-1</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：[2,2,1,1,1,2,2]</span><br><span class="line">输出：2</span><br></pre></td></tr></table></figure>
-
-<p>通过次数62,390</p>
-<p>提交次数109,523</p>
-<h2 id="摩尔投票"><a href="#摩尔投票" class="headerlink" title="摩尔投票"></a>摩尔投票</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">majorityElement</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> cnt = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> last = -<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;n;i++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(nums[i]==last)&#123;</span><br><span class="line">                cnt++;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">if</span>(cnt&gt;<span class="number">0</span>)&#123;</span><br><span class="line">                    cnt--;</span><br><span class="line">                &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                    last = nums[i];</span><br><span class="line">                    cnt = <span class="number">1</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        cnt = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;n;i++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(nums[i]==last)&#123;</span><br><span class="line">                cnt++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(cnt&gt;n/<span class="number">2</span>)&#123;</span><br><span class="line">            <span class="keyword">return</span> last;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">摩尔投票</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/07/10/%E4%B8%BB%E8%A6%81%E5%85%83%E7%B4%A0/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-和相同的二元子数组" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/07/08/%E5%92%8C%E7%9B%B8%E5%90%8C%E7%9A%84%E4%BA%8C%E5%85%83%E5%AD%90%E6%95%B0%E7%BB%84/">和相同的二元子数组</a>
-    </h1>
-  
-
-        
-        <a href="/2021/07/08/%E5%92%8C%E7%9B%B8%E5%90%8C%E7%9A%84%E4%BA%8C%E5%85%83%E5%AD%90%E6%95%B0%E7%BB%84/" class="archive-article-date">
-  	<time datetime="2021-07-08T15:16:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-08</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="930-和相同的二元子数组"><a href="#930-和相同的二元子数组" class="headerlink" title="930. 和相同的二元子数组"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/binary-subarrays-with-sum/">930. 和相同的二元子数组</a></h4><p>难度中等192</p>
-<p>给你一个二元数组 <code>nums</code> ，和一个整数 <code>goal</code> ，请你统计并返回有多少个和为 <code>goal</code> 的 <strong>非空</strong> 子数组。</p>
-<p><strong>子数组</strong> 是数组的一段连续部分。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [1,0,1,0,1], goal &#x3D; 2</span><br><span class="line">输出：4</span><br><span class="line">解释：</span><br><span class="line">有 4 个满足题目要求的子数组：[1,0,1]、[1,0,1,0]、[0,1,0,1]、[1,0,1]</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [0,0,0,0,0], goal &#x3D; 0</span><br><span class="line">输出：15</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= nums.length &lt;= 3 * 104</code></li>
-<li><code>nums[i]</code> 不是 <code>0</code> 就是 <code>1</code></li>
-<li><code>0 &lt;= goal &lt;= nums.length</code></li>
-</ul>
-<p>通过次数27,053</p>
-<p>提交次数50,435</p>
-<h2 id="哈希表"><a href="#哈希表" class="headerlink" title="哈希表"></a>哈希表</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">numSubarraysWithSum</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> goal)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line">        Map&lt;Integer,Integer&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        <span class="keyword">int</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> num:nums)&#123;</span><br><span class="line">            map.put(sum,map.getOrDefault(sum,<span class="number">0</span>)+<span class="number">1</span>);</span><br><span class="line">            sum += num;</span><br><span class="line">            res += map.getOrDefault(sum-goal,<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<blockquote>
-<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/binary-subarrays-with-sum/solution/he-xiang-tong-de-er-yuan-zi-shu-zu-by-le-5caf/">和相同的二元子数组 - 和相同的二元子数组 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
-</blockquote>
-<blockquote>
-<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/binary-subarrays-with-sum/comments/380146">https://leetcode-cn.com/problems/binary-subarrays-with-sum/comments/380146</a></p>
-</blockquote>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">哈希表</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/07/08/%E5%92%8C%E7%9B%B8%E5%90%8C%E7%9A%84%E4%BA%8C%E5%85%83%E5%AD%90%E6%95%B0%E7%BB%84/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-点菜表示法" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/07/06/%E7%82%B9%E8%8F%9C%E8%A1%A8%E7%A4%BA%E6%B3%95/">点菜表示法</a>
-    </h1>
-  
-
-        
-        <a href="/2021/07/06/%E7%82%B9%E8%8F%9C%E8%A1%A8%E7%A4%BA%E6%B3%95/" class="archive-article-date">
-  	<time datetime="2021-07-06T14:48:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-06</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="1418-点菜展示表"><a href="#1418-点菜展示表" class="headerlink" title="1418. 点菜展示表"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/display-table-of-food-orders-in-a-restaurant/">1418. 点菜展示表</a></h4><p>难度中等61收藏分享切换为英文接收动态反馈</p>
-<p>给你一个数组 <code>orders</code>，表示客户在餐厅中完成的订单，确切地说， <code>orders[i]=[customerNamei,tableNumberi,foodItemi]</code> ，其中 <code>customerNamei</code> 是客户的姓名，<code>tableNumberi</code> 是客户所在餐桌的桌号，而 <code>foodItemi</code> 是客户点的餐品名称。</p>
-<p>请你返回该餐厅的 <strong>点菜展示表</strong> <em>。</em>在这张表中，表中第一行为标题，其第一列为餐桌桌号 “Table” ，后面每一列都是按字母顺序排列的餐品名称。接下来每一行中的项则表示每张餐桌订购的相应餐品数量，第一列应当填对应的桌号，后面依次填写下单的餐品数量。</p>
-<p>注意：客户姓名不是点菜展示表的一部分。此外，表中的数据行应该按餐桌桌号升序排列。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">输入：orders &#x3D; [[&quot;David&quot;,&quot;3&quot;,&quot;Ceviche&quot;],[&quot;Corina&quot;,&quot;10&quot;,&quot;Beef Burrito&quot;],[&quot;David&quot;,&quot;3&quot;,&quot;Fried Chicken&quot;],[&quot;Carla&quot;,&quot;5&quot;,&quot;Water&quot;],[&quot;Carla&quot;,&quot;5&quot;,&quot;Ceviche&quot;],[&quot;Rous&quot;,&quot;3&quot;,&quot;Ceviche&quot;]]</span><br><span class="line">输出：[[&quot;Table&quot;,&quot;Beef Burrito&quot;,&quot;Ceviche&quot;,&quot;Fried Chicken&quot;,&quot;Water&quot;],[&quot;3&quot;,&quot;0&quot;,&quot;2&quot;,&quot;1&quot;,&quot;0&quot;],[&quot;5&quot;,&quot;0&quot;,&quot;1&quot;,&quot;0&quot;,&quot;1&quot;],[&quot;10&quot;,&quot;1&quot;,&quot;0&quot;,&quot;0&quot;,&quot;0&quot;]] </span><br><span class="line">解释：</span><br><span class="line">点菜展示表如下所示：</span><br><span class="line">Table,Beef Burrito,Ceviche,Fried Chicken,Water</span><br><span class="line">3    ,0           ,2      ,1            ,0</span><br><span class="line">5    ,0           ,1      ,0            ,1</span><br><span class="line">10   ,1           ,0      ,0            ,0</span><br><span class="line">对于餐桌 3：David 点了 &quot;Ceviche&quot; 和 &quot;Fried Chicken&quot;，而 Rous 点了 &quot;Ceviche&quot;</span><br><span class="line">而餐桌 5：Carla 点了 &quot;Water&quot; 和 &quot;Ceviche&quot;</span><br><span class="line">餐桌 10：Corina 点了 &quot;Beef Burrito&quot; </span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">输入：orders &#x3D; [[&quot;James&quot;,&quot;12&quot;,&quot;Fried Chicken&quot;],[&quot;Ratesh&quot;,&quot;12&quot;,&quot;Fried Chicken&quot;],[&quot;Amadeus&quot;,&quot;12&quot;,&quot;Fried Chicken&quot;],[&quot;Adam&quot;,&quot;1&quot;,&quot;Canadian Waffles&quot;],[&quot;Brianna&quot;,&quot;1&quot;,&quot;Canadian Waffles&quot;]]</span><br><span class="line">输出：[[&quot;Table&quot;,&quot;Canadian Waffles&quot;,&quot;Fried Chicken&quot;],[&quot;1&quot;,&quot;2&quot;,&quot;0&quot;],[&quot;12&quot;,&quot;0&quot;,&quot;3&quot;]] </span><br><span class="line">解释：</span><br><span class="line">对于餐桌 1：Adam 和 Brianna 都点了 &quot;Canadian Waffles&quot;</span><br><span class="line">而餐桌 12：James, Ratesh 和 Amadeus 都点了 &quot;Fried Chicken&quot;</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：orders &#x3D; [[&quot;Laura&quot;,&quot;2&quot;,&quot;Bean Burrito&quot;],[&quot;Jhon&quot;,&quot;2&quot;,&quot;Beef Burrito&quot;],[&quot;Melissa&quot;,&quot;2&quot;,&quot;Soda&quot;]]</span><br><span class="line">输出：[[&quot;Table&quot;,&quot;Bean Burrito&quot;,&quot;Beef Burrito&quot;,&quot;Soda&quot;],[&quot;2&quot;,&quot;1&quot;,&quot;1&quot;,&quot;1&quot;]]</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= orders.length &lt;= 5 * 10^4</code></li>
-<li><code>orders[i].length == 3</code></li>
-<li><code>1 &lt;= customerNamei.length, foodItemi.length &lt;= 20</code></li>
-<li><code>customerNamei</code> 和 <code>foodItemi</code> 由大小写英文字母及空格字符 <code>&#39; &#39;</code> 组成。</li>
-<li><code>tableNumberi</code> 是 <code>1</code> 到 <code>500</code> 范围内的整数。</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;String&gt;&gt; displayTable(List&lt;List&lt;String&gt;&gt; orders) &#123;</span><br><span class="line">        <span class="comment">// 从订单中获取餐品名称和桌号，统计每桌点餐数量</span></span><br><span class="line">        Set&lt;String&gt; nameSet = <span class="keyword">new</span> HashSet&lt;String&gt;();</span><br><span class="line">        Map&lt;Integer, Map&lt;String, Integer&gt;&gt; foodsCnt = <span class="keyword">new</span> HashMap&lt;Integer, Map&lt;String, Integer&gt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (List&lt;String&gt; order : orders) &#123;</span><br><span class="line">            nameSet.add(order.get(<span class="number">2</span>));</span><br><span class="line">            <span class="keyword">int</span> id = Integer.parseInt(order.get(<span class="number">1</span>));</span><br><span class="line">            Map&lt;String, Integer&gt; map = foodsCnt.getOrDefault(id, <span class="keyword">new</span> HashMap&lt;String, Integer&gt;());</span><br><span class="line">            map.put(order.get(<span class="number">2</span>), map.getOrDefault(order.get(<span class="number">2</span>), <span class="number">0</span>) + <span class="number">1</span>);</span><br><span class="line">            foodsCnt.put(id, map);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 提取餐品名称，并按字母顺序排列</span></span><br><span class="line">        <span class="keyword">int</span> n = nameSet.size();</span><br><span class="line">        List&lt;String&gt; names = <span class="keyword">new</span> ArrayList&lt;String&gt;();</span><br><span class="line">        <span class="keyword">for</span> (String name : nameSet) &#123;</span><br><span class="line">            names.add(name);</span><br><span class="line">        &#125;</span><br><span class="line">        Collections.sort(names);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 提取桌号，并按餐桌桌号升序排列</span></span><br><span class="line">        <span class="keyword">int</span> m = foodsCnt.size();</span><br><span class="line">        List&lt;Integer&gt; ids = <span class="keyword">new</span> ArrayList&lt;Integer&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> id : foodsCnt.keySet()) &#123;</span><br><span class="line">            ids.add(id);</span><br><span class="line">        &#125;</span><br><span class="line">        Collections.sort(ids);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 填写点菜展示表</span></span><br><span class="line">        List&lt;List&lt;String&gt;&gt; table = <span class="keyword">new</span> ArrayList&lt;List&lt;String&gt;&gt;();</span><br><span class="line">        List&lt;String&gt; header = <span class="keyword">new</span> ArrayList&lt;String&gt;();</span><br><span class="line">        header.add(<span class="string">&quot;Table&quot;</span>);</span><br><span class="line">        <span class="keyword">for</span> (String name : names) &#123;</span><br><span class="line">            header.add(name);</span><br><span class="line">        &#125;</span><br><span class="line">        table.add(header);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; m; ++i) &#123;</span><br><span class="line">            <span class="keyword">int</span> id = ids.get(i);</span><br><span class="line">            Map&lt;String, Integer&gt; cnt = foodsCnt.get(id);</span><br><span class="line">            List&lt;String&gt; row = <span class="keyword">new</span> ArrayList&lt;String&gt;();</span><br><span class="line">            row.add(Integer.toString(id));</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; n; ++j) &#123;</span><br><span class="line">                row.add(Integer.toString(cnt.getOrDefault(names.get(j), <span class="number">0</span>)));</span><br><span class="line">            &#125;</span><br><span class="line">            table.add(row);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> table;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">哈希表</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/07/06/%E7%82%B9%E8%8F%9C%E8%A1%A8%E7%A4%BA%E6%B3%95/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-统计好数字的数目" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/07/04/%E7%BB%9F%E8%AE%A1%E5%A5%BD%E6%95%B0%E5%AD%97%E7%9A%84%E6%95%B0%E7%9B%AE/">统计好数字的数目</a>
-    </h1>
-  
-
-        
-        <a href="/2021/07/04/%E7%BB%9F%E8%AE%A1%E5%A5%BD%E6%95%B0%E5%AD%97%E7%9A%84%E6%95%B0%E7%9B%AE/" class="archive-article-date">
-  	<time datetime="2021-07-04T05:45:29.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-04</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="5802-统计好数字的数目"><a href="#5802-统计好数字的数目" class="headerlink" title="5802. 统计好数字的数目"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/count-good-numbers/">5802. 统计好数字的数目</a></h4><p>难度中等0</p>
-<p>我们称一个数字字符串是 <strong>好数字</strong> 当它满足（下标从 <strong>0</strong> 开始）<strong>偶数</strong> 下标处的数字为 <strong>偶数</strong> 且 <strong>奇数</strong> 下标处的数字为 <strong>质数</strong> （<code>2</code>，<code>3</code>，<code>5</code> 或 <code>7</code>）。</p>
-<ul>
-<li>比方说，<code>&quot;2582&quot;</code> 是好数字，因为偶数下标处的数字（<code>2</code> 和 <code>8</code>）是偶数且奇数下标处的数字（<code>5</code> 和 <code>2</code>）为质数。但 <code>&quot;3245&quot;</code> <strong>不是</strong> 好数字，因为 <code>3</code> 在偶数下标处但不是偶数。</li>
-</ul>
-<p>给你一个整数 <code>n</code> ，请你返回长度为 <code>n</code> 且为好数字的数字字符串 <strong>总数</strong> 。由于答案可能会很大，请你将它对 <code>109 + 7</code> <strong>取余后返回</strong> 。</p>
-<p>一个 <strong>数字字符串</strong> 是每一位都由 <code>0</code> 到 <code>9</code> 组成的字符串，且可能包含前导 0 。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 1</span><br><span class="line">输出：5</span><br><span class="line">解释：长度为 1 的好数字包括 &quot;0&quot;，&quot;2&quot;，&quot;4&quot;，&quot;6&quot;，&quot;8&quot; 。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 4</span><br><span class="line">输出：400</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 50</span><br><span class="line">输出：564908303</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= n &lt;= 10^15</code></li>
-</ul>
-<h2 id="快速幂"><a href="#快速幂" class="headerlink" title="快速幂"></a>快速幂</h2><p>计算20的n/2次幂，当n为偶数时，直接返回快速幂的结果，</p>
-<p>如果n为奇数时，返回n/2次幂再乘以5</p>
-<p>注意过程中的取余数计算！</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> MOD = (<span class="keyword">int</span>) (<span class="number">1e9</span> + <span class="number">7</span>);</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">fastPower</span><span class="params">(<span class="keyword">long</span> base, <span class="keyword">long</span> power)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> result = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span> (power &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">// 与运算代替求模</span></span><br><span class="line">            <span class="keyword">if</span> ((power &amp; <span class="number">1</span>) == <span class="number">1</span>) &#123;</span><br><span class="line">                <span class="comment">// 如果指数为奇数</span></span><br><span class="line">                result = (result * base) % MOD; <span class="comment">//把指数为奇数时分离出来的底数的一次幂计算上</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 右移代替除法</span></span><br><span class="line">            power = power &gt;&gt; <span class="number">1</span>;</span><br><span class="line">            base = (base * base) % MOD;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (<span class="keyword">int</span>) (result % MOD);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">countGoodNumbers</span><span class="params">(<span class="keyword">long</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (n &lt; <span class="number">2</span>) <span class="keyword">return</span> <span class="number">5</span>;</span><br><span class="line">        <span class="keyword">long</span> power = n / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (n % <span class="number">2</span> == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> fastPower(<span class="number">20L</span>, power);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> (<span class="keyword">int</span>)(((<span class="keyword">long</span>)fastPower(<span class="number">20L</span>, power)*<span class="number">5</span>)% MOD);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">竞赛题目</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">快速幂</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/07/04/%E7%BB%9F%E8%AE%A1%E5%A5%BD%E6%95%B0%E5%AD%97%E7%9A%84%E6%95%B0%E7%9B%AE/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-消灭怪物的最大数量" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/07/04/%E6%B6%88%E7%81%AD%E6%80%AA%E7%89%A9%E7%9A%84%E6%9C%80%E5%A4%A7%E6%95%B0%E9%87%8F/">消灭怪物的最大数量</a>
-    </h1>
-  
-
-        
-        <a href="/2021/07/04/%E6%B6%88%E7%81%AD%E6%80%AA%E7%89%A9%E7%9A%84%E6%9C%80%E5%A4%A7%E6%95%B0%E9%87%8F/" class="archive-article-date">
-  	<time datetime="2021-07-04T05:42:23.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-04</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="5801-消灭怪物的最大数量"><a href="#5801-消灭怪物的最大数量" class="headerlink" title="5801. 消灭怪物的最大数量"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/eliminate-maximum-number-of-monsters/">5801. 消灭怪物的最大数量</a></h4><p>难度中等2</p>
-<p>你正在玩一款电子游戏，在游戏中你需要保护城市免受怪物侵袭。给你一个 <strong>下标从 0 开始</strong> 且长度为 <code>n</code> 的整数数组 <code>dist</code> ，其中 <code>dist[i]</code> 是第 <code>i</code> 个怪物与城市的 <strong>初始距离</strong>（单位：米）。</p>
-<p>怪物以 <strong>恒定</strong> 的速度走向城市。给你一个长度为 <code>n</code> 的整数数组 <code>speed</code> 表示每个怪物的速度，其中 <code>speed[i]</code> 是第 <code>i</code> 个怪物的速度（单位：米/分）。</p>
-<p>怪物从 <strong>第 0 分钟</strong> 时开始移动。你有一把武器，并可以 <strong>选择</strong> 在每一分钟的开始时使用，包括第 0 分钟。但是你无法在一分钟的中间使用武器。这种武器威力惊人，一次可以消灭任一还活着的怪物。</p>
-<p>一旦任一怪物到达城市，你就输掉了这场游戏。如果某个怪物 <strong>恰</strong> 在某一分钟开始时到达城市，这会被视为 <strong>输掉</strong> 游戏，在你可以使用武器之前，游戏就会结束。</p>
-<p>返回在你输掉游戏前可以消灭的怪物的 <strong>最大</strong> 数量。如果你可以在所有怪物到达城市前将它们全部消灭，返回 <code>n</code> 。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">输入：dist &#x3D; [1,3,4], speed &#x3D; [1,1,1]</span><br><span class="line">输出：3</span><br><span class="line">解释：</span><br><span class="line">第 0 分钟开始时，怪物的距离是 [1,3,4]，你消灭了第一个怪物。</span><br><span class="line">第 1 分钟开始时，怪物的距离是 [X,2,3]，你没有消灭任何怪物。</span><br><span class="line">第 2 分钟开始时，怪物的距离是 [X,1,2]，你消灭了第二个怪物。</span><br><span class="line">第 3 分钟开始时，怪物的距离是 [X,X,1]，你消灭了第三个怪物。</span><br><span class="line">所有 3 个怪物都可以被消灭。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">输入：dist &#x3D; [1,1,2,3], speed &#x3D; [1,1,1,1]</span><br><span class="line">输出：1</span><br><span class="line">解释：</span><br><span class="line">第 0 分钟开始时，怪物的距离是 [1,1,2,3]，你消灭了第一个怪物。</span><br><span class="line">第 1 分钟开始时，怪物的距离是 [X,0,1,2]，你输掉了游戏。</span><br><span class="line">你只能消灭 1 个怪物。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">输入：dist &#x3D; [3,2,4], speed &#x3D; [5,3,2]</span><br><span class="line">输出：1</span><br><span class="line">解释：</span><br><span class="line">第 0 分钟开始时，怪物的距离是 [3,2,4]，你消灭了第一个怪物。</span><br><span class="line">第 1 分钟开始时，怪物的距离是 [X,0,2]，你输掉了游戏。 </span><br><span class="line">你只能消灭 1 个怪物。</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>n == dist.length == speed.length</code></li>
-<li><code>1 &lt;= n &lt;= 105</code></li>
-<li><code>1 &lt;= dist[i], speed[i] &lt;= 105</code></li>
-</ul>
-<p>通过次数2,916</p>
-<p>提交次数9,873</p>
-<h2 id="贪心"><a href="#贪心" class="headerlink" title="贪心"></a>贪心</h2><p>首先计算每个怪物到达城市的时间，根据到达时间排序，先消灭到达时间小的怪物，如果某个怪物的到达时间小于当前的时间，那么任务失败，记录下过程中的最大值。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">eliminateMaximum</span><span class="params">(<span class="keyword">int</span>[] dist, <span class="keyword">int</span>[] speed)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = dist.length;</span><br><span class="line">        <span class="keyword">float</span>[] time = <span class="keyword">new</span> <span class="keyword">float</span>[n];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            time[i] = (<span class="keyword">float</span>) (dist[i]*<span class="number">1.0</span> / speed[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        Arrays.sort(time);</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (time[i] - i &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                res++;</span><br><span class="line">            &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">贪心</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">竞赛题目</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/07/04/%E6%B6%88%E7%81%AD%E6%80%AA%E7%89%A9%E7%9A%84%E6%9C%80%E5%A4%A7%E6%95%B0%E9%87%8F/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-ArrayList源码阅读" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/07/03/ArrayList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/">ArrayList源码阅读</a>
-    </h1>
-  
-
-        
-        <a href="/2021/07/03/ArrayList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" class="archive-article-date">
-  	<time datetime="2021-07-03T06:09:37.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-03</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">源码阅读</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/07/03/ArrayList%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-根据字符串出现频率排序" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/07/03/%E6%A0%B9%E6%8D%AE%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%87%BA%E7%8E%B0%E9%A2%91%E7%8E%87%E6%8E%92%E5%BA%8F/">根据字符串出现频率排序</a>
-    </h1>
-  
-
-        
-        <a href="/2021/07/03/%E6%A0%B9%E6%8D%AE%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%87%BA%E7%8E%B0%E9%A2%91%E7%8E%87%E6%8E%92%E5%BA%8F/" class="archive-article-date">
-  	<time datetime="2021-07-03T05:16:19.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-03</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="451-根据字符出现频率排序"><a href="#451-根据字符出现频率排序" class="headerlink" title="451. 根据字符出现频率排序"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/sort-characters-by-frequency/">451. 根据字符出现频率排序</a></h4><p>难度中等297</p>
-<p>给定一个字符串，请将字符串里的字符按照出现的频率降序排列。</p>
-<p><strong>示例 1:</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">输入:</span><br><span class="line">&quot;tree&quot;</span><br><span class="line"></span><br><span class="line">输出:</span><br><span class="line">&quot;eert&quot;</span><br><span class="line"></span><br><span class="line">解释:</span><br><span class="line">&#39;e&#39;出现两次，&#39;r&#39;和&#39;t&#39;都只出现一次。</span><br><span class="line">因此&#39;e&#39;必须出现在&#39;r&#39;和&#39;t&#39;之前。此外，&quot;eetr&quot;也是一个有效的答案。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2:</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">输入:</span><br><span class="line">&quot;cccaaa&quot;</span><br><span class="line"></span><br><span class="line">输出:</span><br><span class="line">&quot;cccaaa&quot;</span><br><span class="line"></span><br><span class="line">解释:</span><br><span class="line">&#39;c&#39;和&#39;a&#39;都出现三次。此外，&quot;aaaccc&quot;也是有效的答案。</span><br><span class="line">注意&quot;cacaca&quot;是不正确的，因为相同的字母必须放在一起。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3:</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">输入:</span><br><span class="line">&quot;Aabb&quot;</span><br><span class="line"></span><br><span class="line">输出:</span><br><span class="line">&quot;bbAa&quot;</span><br><span class="line"></span><br><span class="line">解释:</span><br><span class="line">此外，&quot;bbaA&quot;也是一个有效的答案，但&quot;Aabb&quot;是不正确的。</span><br><span class="line">注意&#39;A&#39;和&#39;a&#39;被认为是两种不同的字符。</span><br></pre></td></tr></table></figure>
-
-<h2 id="哈希表"><a href="#哈希表" class="headerlink" title="哈希表"></a>哈希表</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">frequencySort</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[][]hash = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">256</span>][<span class="number">2</span>];</span><br><span class="line">        <span class="keyword">int</span> n = s.length();</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;n;i++)&#123;</span><br><span class="line">            <span class="keyword">int</span> index = s.charAt(i)-<span class="string">&#x27;0&#x27;</span>; </span><br><span class="line">            System.out.println(index);</span><br><span class="line">            hash[index][<span class="number">0</span>]++;</span><br><span class="line">            hash[index][<span class="number">1</span>] = index;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Arrays.sort(hash,(a,b)-&gt;b[<span class="number">0</span>]-a[<span class="number">0</span>]);</span><br><span class="line">        StringBuilder bd = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">256</span>;i++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(hash[i][<span class="number">0</span>]!=<span class="number">0</span>)&#123;</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>;j&lt;hash[i][<span class="number">0</span>];j++)&#123;</span><br><span class="line">                    bd.append((<span class="keyword">char</span>)(<span class="string">&#x27;0&#x27;</span>+hash[i][<span class="number">1</span>]));        </span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> bd.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="哈希表高效版"><a href="#哈希表高效版" class="headerlink" title="哈希表高效版"></a>哈希表高效版</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">frequencySort</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">        Map&lt;Character, Integer&gt; map = <span class="keyword">new</span> HashMap&lt;Character, Integer&gt;();</span><br><span class="line">        <span class="keyword">int</span> length = s.length();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; length; i++) &#123;</span><br><span class="line">            <span class="keyword">char</span> c = s.charAt(i);</span><br><span class="line">            <span class="keyword">int</span> frequency = map.getOrDefault(c, <span class="number">0</span>) + <span class="number">1</span>;</span><br><span class="line">            map.put(c, frequency);</span><br><span class="line">        &#125;</span><br><span class="line">        List&lt;Character&gt; list = <span class="keyword">new</span> ArrayList&lt;Character&gt;(map.keySet());</span><br><span class="line">        Collections.sort(list, (a, b) -&gt; map.get(b) - map.get(a));</span><br><span class="line">        StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">        <span class="keyword">int</span> size = list.size();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i++) &#123;</span><br><span class="line">            <span class="keyword">char</span> c = list.get(i);</span><br><span class="line">            <span class="keyword">int</span> frequency = map.get(c);</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; frequency; j++) &#123;</span><br><span class="line">                sb.append(c);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="桶排序"><a href="#桶排序" class="headerlink" title="桶排序"></a>桶排序</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">frequencySort</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">        Map&lt;Character, Integer&gt; map = <span class="keyword">new</span> HashMap&lt;Character, Integer&gt;();</span><br><span class="line">        <span class="keyword">int</span> maxFreq = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> length = s.length();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; length; i++) &#123;</span><br><span class="line">            <span class="keyword">char</span> c = s.charAt(i);</span><br><span class="line">            <span class="keyword">int</span> frequency = map.getOrDefault(c, <span class="number">0</span>) + <span class="number">1</span>;</span><br><span class="line">            map.put(c, frequency);</span><br><span class="line">            maxFreq = Math.max(maxFreq, frequency);</span><br><span class="line">        &#125;</span><br><span class="line">        StringBuffer[] buckets = <span class="keyword">new</span> StringBuffer[maxFreq + <span class="number">1</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= maxFreq; i++) &#123;</span><br><span class="line">            buckets[i] = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (Map.Entry&lt;Character, Integer&gt; entry : map.entrySet()) &#123;</span><br><span class="line">            <span class="keyword">char</span> c = entry.getKey();</span><br><span class="line">            <span class="keyword">int</span> frequency = entry.getValue();</span><br><span class="line">            buckets[frequency].append(c);</span><br><span class="line">        &#125;</span><br><span class="line">        StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = maxFreq; i &gt; <span class="number">0</span>; i--) &#123;</span><br><span class="line">            StringBuffer bucket = buckets[i];</span><br><span class="line">            <span class="keyword">int</span> size = bucket.length();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; size; j++) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; i; k++) &#123;</span><br><span class="line">                    sb.append(bucket.charAt(j));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">哈希表</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">桶排序</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/07/03/%E6%A0%B9%E6%8D%AE%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%87%BA%E7%8E%B0%E9%A2%91%E7%8E%87%E6%8E%92%E5%BA%8F/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-树洞202107" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/07/01/%E6%A0%91%E6%B4%9E202107/">树洞202107</a>
-    </h1>
-  
-
-        
-        <a href="/2021/07/01/%E6%A0%91%E6%B4%9E202107/" class="archive-article-date">
-  	<time datetime="2021-07-01T15:07:21.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-01</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h2 id="2021-07-01"><a href="#2021-07-01" class="headerlink" title="2021.07.01"></a>2021.07.01</h2><p>为啥自己总散发一种生人勿近的气息啊</p>
-<h2 id="2021-07-03"><a href="#2021-07-03" class="headerlink" title="2021.07.03"></a>2021.07.03</h2><p>在理发店好像突然回到了几个月之前的场景，明明记得两个人的一模一样对话好像在几个月之前发生过一次，此时的我究竟是哪个时空中的我😰</p>
-<h2 id="2021-07-05"><a href="#2021-07-05" class="headerlink" title="2021.07.05"></a>2021.07.05</h2><p>今天听到的陌生人一句最有感觉的话是：</p>
-<p>我不希望我的孩子今后能跨越阶层，只想他能够做一个快乐善良的人，我能多努力一些为他提供更多的试错空间。</p>
-<h2 id="2021-07-07"><a href="#2021-07-07" class="headerlink" title="2021.07.07"></a>2021.07.07</h2><p>看到了一个好棒的妈妈和孩子，孩子摔倒了不是第一时间跑上去，而是鼓励孩子自己爬起来，孩子爬起来了还夸奖孩子做的真棒（孩子也好棒，摔倒了一点没哭，还自己主动爬起来）。</p>
-<h2 id="2021-07-09"><a href="#2021-07-09" class="headerlink" title="2021.07.09"></a>2021.07.09</h2><p>自己开心最重要</p>
-<h2 id="2021-07-12"><a href="#2021-07-12" class="headerlink" title="2021.07.12"></a>2021.07.12</h2><p>多大仇啊，至于吗</p>
-<img src="https://i.imgur.com/QujfSle.jpg" alt="Imgur" style="zoom:23%;" />
-
-<h2 id="2021-07-22"><a href="#2021-07-22" class="headerlink" title="2021.07.22"></a>2021.07.22</h2><p>世事岂能尽如^(*￣(oo)￣)^</p>
-<p>继续加油吧，须知少时凌云志，曾许人间第一流</p>
-<h2 id="2021-07-25"><a href="#2021-07-25" class="headerlink" title="2021.07.25"></a>2021.07.25</h2><p>一地鸡毛紧接着一地鸡毛</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">树洞</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/07/01/%E6%A0%91%E6%B4%9E202107/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/3/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/88/">88</a><a class="extend next" rel="next" href="/page/5/">Next &amp;raquo;</a>
+      <a class="extend prev" rel="prev" href="/page/3/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/89/">89</a><a class="extend next" rel="next" href="/page/5/">Next &amp;raquo;</a>
     </nav>
   
 
