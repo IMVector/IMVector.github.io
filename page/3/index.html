@@ -150,6 +150,236 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-字符串压缩-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/08/21/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8E%8B%E7%BC%A9-1/">字符串压缩</a>
+    </h1>
+  
+
+        
+        <a href="/2021/08/21/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8E%8B%E7%BC%A9-1/" class="archive-article-date">
+  	<time datetime="2021-08-21T02:08:33.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-21</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<p>给你一个字符数组 <code>chars</code> ，请使用下述算法压缩：</p>
+<p>从一个空字符串 <code>s</code> 开始。对于 <code>chars</code> 中的每组 <strong>连续重复字符</strong> ：</p>
+<ul>
+<li>如果这一组长度为 <code>1</code> ，则将字符追加到 <code>s</code> 中。</li>
+<li>否则，需要向 <code>s</code> 追加字符，后跟这一组的长度。</li>
+</ul>
+<p>压缩后得到的字符串 <code>s</code> <strong>不应该直接返回</strong> ，需要转储到字符数组 <code>chars</code> 中。需要注意的是，如果组长度为 <code>10</code> 或 <code>10</code> 以上，则在 <code>chars</code> 数组中会被拆分为多个字符。</p>
+<p>请在 <strong>修改完输入数组后</strong> ，返回该数组的新长度。</p>
+<p>你必须设计并实现一个只使用常量额外空间的算法来解决此问题。</p>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：chars &#x3D; [&quot;a&quot;,&quot;a&quot;,&quot;b&quot;,&quot;b&quot;,&quot;c&quot;,&quot;c&quot;,&quot;c&quot;]</span><br><span class="line">输出：返回 6 ，输入数组的前 6 个字符应该是：[&quot;a&quot;,&quot;2&quot;,&quot;b&quot;,&quot;2&quot;,&quot;c&quot;,&quot;3&quot;]</span><br><span class="line">解释：</span><br><span class="line">&quot;aa&quot; 被 &quot;a2&quot; 替代。&quot;bb&quot; 被 &quot;b2&quot; 替代。&quot;ccc&quot; 被 &quot;c3&quot; 替代。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：chars &#x3D; [&quot;a&quot;]</span><br><span class="line">输出：返回 1 ，输入数组的前 1 个字符应该是：[&quot;a&quot;]</span><br><span class="line">解释：</span><br><span class="line">没有任何字符串被替代。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 3：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">输入：chars &#x3D; [&quot;a&quot;,&quot;b&quot;,&quot;b&quot;,&quot;b&quot;,&quot;b&quot;,&quot;b&quot;,&quot;b&quot;,&quot;b&quot;,&quot;b&quot;,&quot;b&quot;,&quot;b&quot;,&quot;b&quot;,&quot;b&quot;]</span><br><span class="line">输出：返回 4 ，输入数组的前 4 个字符应该是：[&quot;a&quot;,&quot;b&quot;,&quot;1&quot;,&quot;2&quot;]。</span><br><span class="line">解释：</span><br><span class="line">由于字符 &quot;a&quot; 不重复，所以不会被压缩。&quot;bbbbbbbbbbbb&quot; 被 “b12” 替代。</span><br><span class="line">注意每个数字在数组中都有它自己的位置。</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>1 &lt;= chars.length &lt;= 2000</code></li>
+<li><code>chars[i]</code> 可以是小写英文字母、大写英文字母、数字或符号</li>
+</ul>
+<h2 id="模拟"><a href="#模拟" class="headerlink" title="模拟"></a>模拟</h2><p><strong>思路</strong>：先写一个统计数量的函数，计算相同的字符的数量。根据相同字符的数量确定chars数组的index步进长度。还要维护一个额外的index来维护当前的新数组应放元素的位置。</p>
+<p>统计相同的字符的数量时：相同统计数量，不同时直接返回结果</p>
+<p>计算真正的结果时，需要注意：首先设置当前位置处的元素为当前的元素（否则会导致不能覆盖，显示的还是原来的元素）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compress</span><span class="params">(<span class="keyword">char</span>[] chars)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = chars.length;</span><br><span class="line">        <span class="keyword">int</span> cnt = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> index=<span class="number">0</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;n;i+=cnt)&#123;</span><br><span class="line">            cnt = count(chars,i);</span><br><span class="line">            <span class="comment">// 这里一定要注意，需要设置一下当前的元素，否则不会覆盖</span></span><br><span class="line">            chars[index++] = chars[i];</span><br><span class="line">            <span class="comment">// 如果数量是1的时候不需要在后面添加元素</span></span><br><span class="line">            <span class="keyword">if</span>(cnt==<span class="number">1</span>)<span class="keyword">continue</span>;</span><br><span class="line">            <span class="comment">// 将数字转换成字符，一一填充</span></span><br><span class="line">            <span class="keyword">char</span>[]arr = String.valueOf(cnt).toCharArray();</span><br><span class="line">            <span class="keyword">int</span> len = arr.length;</span><br><span class="line">            <span class="keyword">int</span> j =<span class="number">0</span>;</span><br><span class="line">            <span class="keyword">while</span>(j&lt;len)&#123;</span><br><span class="line">                chars[index++] =arr[j++];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> index;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">count</span><span class="params">(<span class="keyword">char</span> [] chars,<span class="keyword">int</span> index)</span></span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = chars.length;</span><br><span class="line">        <span class="keyword">char</span> c = chars[index];</span><br><span class="line">        <span class="keyword">int</span> cnt = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=index;i&lt;n;i++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(chars[i]==c)&#123;</span><br><span class="line">                cnt+=<span class="number">1</span>;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> cnt;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">模拟</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/08/21/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8E%8B%E7%BC%A9-1/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-反转字符串2" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/08/20/%E5%8F%8D%E8%BD%AC%E5%AD%97%E7%AC%A6%E4%B8%B22/">反转字符串2</a>
+    </h1>
+  
+
+        
+        <a href="/2021/08/20/%E5%8F%8D%E8%BD%AC%E5%AD%97%E7%AC%A6%E4%B8%B22/" class="archive-article-date">
+  	<time datetime="2021-08-20T13:34:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-20</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="541-反转字符串-II"><a href="#541-反转字符串-II" class="headerlink" title="541. 反转字符串 II"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/reverse-string-ii/">541. 反转字符串 II</a></h4><p>难度简单177收藏分享切换为英文接收动态反馈</p>
+<p>给定一个字符串 <code>s</code> 和一个整数 <code>k</code>，从字符串开头算起，每 <code>2k</code> 个字符反转前 <code>k</code> 个字符。</p>
+<ul>
+<li>如果剩余字符少于 <code>k</code> 个，则将剩余字符全部反转。</li>
+<li>如果剩余字符小于 <code>2k</code> 但大于或等于 <code>k</code> 个，则反转前 <code>k</code> 个字符，其余字符保持原样。</li>
+</ul>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;abcdefg&quot;, k &#x3D; 2</span><br><span class="line">输出：&quot;bacdfeg&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;abcd&quot;, k &#x3D; 2</span><br><span class="line">输出：&quot;bacd&quot;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>1 &lt;= s.length &lt;= 104</code></li>
+<li><code>s</code> 仅由小写英文组成</li>
+<li><code>1 &lt;= k &lt;= 104</code></li>
+</ul>
+<p>通过次数62,703</p>
+<p>提交次数103,780</p>
+<h2 id="模拟"><a href="#模拟" class="headerlink" title="模拟"></a>模拟</h2><p>每次步进2k，在 第一个k反转，第二个k不变</p>
+<p>如果剩余的第一个部分小于k，那么从当前的位置到n全部反转</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">reverseStr</span><span class="params">(String s, <span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = s.length();</span><br><span class="line">        <span class="keyword">int</span> mod = <span class="number">2</span>*k;</span><br><span class="line">        <span class="keyword">char</span> []arr = s.toCharArray();</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;n;i+=mod)&#123;</span><br><span class="line">            reverse(arr,i,Math.min(i+k,n)-<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> String.valueOf(arr);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">reverse</span><span class="params">(<span class="keyword">char</span>[]arr,<span class="keyword">int</span> l ,<span class="keyword">int</span> r)</span></span>&#123;</span><br><span class="line">        <span class="keyword">while</span>(l&lt;r)&#123;</span><br><span class="line">            <span class="keyword">char</span> temp = arr[l];</span><br><span class="line">            arr[l] = arr[r];</span><br><span class="line">            arr[r] = temp;</span><br><span class="line">            l++;</span><br><span class="line">            r--;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">字符串</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">重要题型</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/08/20/%E5%8F%8D%E8%BD%AC%E5%AD%97%E7%AC%A6%E4%B8%B22/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-excel获取当前的列的index" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1012,229 +1242,6 @@ tex2jax: {
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/07/24/%E8%A1%A8%E7%A4%BA%E6%95%B0%E5%80%BC%E7%9A%84%E5%AD%97%E7%AC%A6%E4%B8%B2/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-替换隐藏数字得到的最晚时间" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/07/24/%E6%9B%BF%E6%8D%A2%E9%9A%90%E8%97%8F%E6%95%B0%E5%AD%97%E5%BE%97%E5%88%B0%E7%9A%84%E6%9C%80%E6%99%9A%E6%97%B6%E9%97%B4/">替换隐藏数字得到的最晚时间</a>
-    </h1>
-  
-
-        
-        <a href="/2021/07/24/%E6%9B%BF%E6%8D%A2%E9%9A%90%E8%97%8F%E6%95%B0%E5%AD%97%E5%BE%97%E5%88%B0%E7%9A%84%E6%9C%80%E6%99%9A%E6%97%B6%E9%97%B4/" class="archive-article-date">
-  	<time datetime="2021-07-24T02:13:21.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-24</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="1736-替换隐藏数字得到的最晚时间"><a href="#1736-替换隐藏数字得到的最晚时间" class="headerlink" title="1736. 替换隐藏数字得到的最晚时间"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/latest-time-by-replacing-hidden-digits/">1736. 替换隐藏数字得到的最晚时间</a></h4><p>难度简单19收藏分享切换为英文接收动态反馈</p>
-<p>给你一个字符串 <code>time</code> ，格式为 <code>hh:mm</code>（小时：分钟），其中某几位数字被隐藏（用 <code>?</code> 表示）。</p>
-<p>有效的时间为 <code>00:00</code> 到 <code>23:59</code> 之间的所有时间，包括 <code>00:00</code> 和 <code>23:59</code> 。</p>
-<p>替换 <code>time</code> 中隐藏的数字，返回你可以得到的最晚有效时间。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：time &#x3D; &quot;2?:?0&quot;</span><br><span class="line">输出：&quot;23:50&quot;</span><br><span class="line">解释：以数字 &#39;2&#39; 开头的最晚一小时是 23 ，以 &#39;0&#39; 结尾的最晚一分钟是 50 。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：time &#x3D; &quot;0?:3?&quot;</span><br><span class="line">输出：&quot;09:39&quot;</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：time &#x3D; &quot;1?:22&quot;</span><br><span class="line">输出：&quot;19:22&quot;</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>time</code> 的格式为 <code>hh:mm</code></li>
-<li>题目数据保证你可以由输入的字符串生成有效的时间</li>
-</ul>
-<p>通过次数10,635</p>
-<p>提交次数24,838</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">maximumTime</span><span class="params">(String time)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">char</span> []t = time.toCharArray();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(t[<span class="number">0</span>]==<span class="string">&#x27;?&#x27;</span>)&#123;</span><br><span class="line">            <span class="keyword">if</span>(t[<span class="number">1</span>]&gt;=<span class="string">&#x27;4&#x27;</span>&amp;&amp;t[<span class="number">1</span>]&lt;=<span class="string">&#x27;9&#x27;</span>)&#123;</span><br><span class="line">                t[<span class="number">0</span>] = <span class="string">&#x27;1&#x27;</span>;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                t[<span class="number">0</span>] = <span class="string">&#x27;2&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(t[<span class="number">1</span>]==<span class="string">&#x27;?&#x27;</span>)&#123;</span><br><span class="line">            <span class="keyword">if</span>(t[<span class="number">0</span>]&lt;<span class="string">&#x27;2&#x27;</span>)&#123;</span><br><span class="line">                t[<span class="number">1</span>] = <span class="string">&#x27;9&#x27;</span>;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                t[<span class="number">1</span>] = <span class="string">&#x27;3&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(t[<span class="number">3</span>]==<span class="string">&#x27;?&#x27;</span>)&#123;</span><br><span class="line">            t[<span class="number">3</span>] = <span class="string">&#x27;5&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(t[<span class="number">4</span>]==<span class="string">&#x27;?&#x27;</span>)&#123;</span><br><span class="line">            t[<span class="number">4</span>] =<span class="string">&#x27;9&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> String.valueOf(t);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">逻辑判断</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/07/24/%E6%9B%BF%E6%8D%A2%E9%9A%90%E8%97%8F%E6%95%B0%E5%AD%97%E5%BE%97%E5%88%B0%E7%9A%84%E6%9C%80%E6%99%9A%E6%97%B6%E9%97%B4/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-检查是否区域内所有证书都被覆盖" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/07/23/%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E5%8C%BA%E5%9F%9F%E5%86%85%E6%89%80%E6%9C%89%E8%AF%81%E4%B9%A6%E9%83%BD%E8%A2%AB%E8%A6%86%E7%9B%96/">检查是否区域内所有证书都被覆盖</a>
-    </h1>
-  
-
-        
-        <a href="/2021/07/23/%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E5%8C%BA%E5%9F%9F%E5%86%85%E6%89%80%E6%9C%89%E8%AF%81%E4%B9%A6%E9%83%BD%E8%A2%AB%E8%A6%86%E7%9B%96/" class="archive-article-date">
-  	<time datetime="2021-07-23T13:30:35.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-07-23</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="1893-检查是否区域内所有整数都被覆盖"><a href="#1893-检查是否区域内所有整数都被覆盖" class="headerlink" title="1893. 检查是否区域内所有整数都被覆盖"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/check-if-all-the-integers-in-a-range-are-covered/">1893. 检查是否区域内所有整数都被覆盖</a></h4><p>难度简单75收藏分享切换为英文接收动态反馈</p>
-<p>给你一个二维整数数组 <code>ranges</code> 和两个整数 <code>left</code> 和 <code>right</code> 。每个 <code>ranges[i] = [starti, endi]</code> 表示一个从 <code>starti</code> 到 <code>endi</code> 的 <strong>闭区间</strong> 。</p>
-<p>如果闭区间 <code>[left, right]</code> 内每个整数都被 <code>ranges</code> 中 <strong>至少一个</strong> 区间覆盖，那么请你返回 <code>true</code> ，否则返回 <code>false</code> 。</p>
-<p>已知区间 <code>ranges[i] = [starti, endi]</code> ，如果整数 <code>x</code> 满足 <code>starti &lt;= x &lt;= endi</code> ，那么我们称整数<code>x</code> 被覆盖了。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">输入：ranges &#x3D; [[1,2],[3,4],[5,6]], left &#x3D; 2, right &#x3D; 5</span><br><span class="line">输出：true</span><br><span class="line">解释：2 到 5 的每个整数都被覆盖了：</span><br><span class="line">- 2 被第一个区间覆盖。</span><br><span class="line">- 3 和 4 被第二个区间覆盖。</span><br><span class="line">- 5 被第三个区间覆盖。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：ranges &#x3D; [[1,10],[10,20]], left &#x3D; 21, right &#x3D; 21</span><br><span class="line">输出：false</span><br><span class="line">解释：21 没有被任何一个区间覆盖。</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= ranges.length &lt;= 50</code></li>
-<li><code>1 &lt;= starti &lt;= endi &lt;= 50</code></li>
-<li><code>1 &lt;= left &lt;= right &lt;= 50</code></li>
-</ul>
-<p>通过次数24,620</p>
-<p>提交次数42,049</p>
-<h2 id="差分数组"><a href="#差分数组" class="headerlink" title="差分数组"></a>差分数组</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isCovered</span><span class="params">(<span class="keyword">int</span>[][] ranges, <span class="keyword">int</span> left, <span class="keyword">int</span> right)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] diff = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">52</span>];   <span class="comment">// 差分数组</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span>[] range : ranges) &#123;</span><br><span class="line">            ++diff[range[<span class="number">0</span>]];</span><br><span class="line">            --diff[range[<span class="number">1</span>] + <span class="number">1</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 前缀和</span></span><br><span class="line">        <span class="keyword">int</span> curr = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= <span class="number">50</span>; ++i) &#123;</span><br><span class="line">            curr += diff[i];</span><br><span class="line">            <span class="keyword">if</span> (i &gt;= left &amp;&amp; i &lt;= right &amp;&amp; curr &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/check-if-all-the-integers-in-a-range-are-covered/solution/jian-cha-shi-fou-qu-yu-nei-suo-you-zheng-5hib/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-
-<h2 id="暴力"><a href="#暴力" class="headerlink" title="暴力"></a>暴力</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isCovered</span><span class="params">(<span class="keyword">int</span>[][] ranges, <span class="keyword">int</span> left, <span class="keyword">int</span> right)</span> </span>&#123;</span><br><span class="line">        Set&lt;Integer&gt; set = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span>[]val:ranges)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> i=val[<span class="number">0</span>];i&lt;=val[<span class="number">1</span>];i++)&#123;</span><br><span class="line">                set.add(i);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=left;i&lt;=right;i++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(!set.contains(i))<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<blockquote>
-<p>作者：LeetCode-Solution<br>链接：<a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/check-if-all-the-integers-in-a-range-are-covered/solution/jian-cha-shi-fou-qu-yu-nei-suo-you-zheng-5hib/">https://leetcode-cn.com/problems/check-if-all-the-integers-in-a-range-are-covered/solution/jian-cha-shi-fou-qu-yu-nei-suo-you-zheng-5hib/</a><br>来源：力扣（LeetCode）<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
-</blockquote>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">差分数组</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/07/23/%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E5%8C%BA%E5%9F%9F%E5%86%85%E6%89%80%E6%9C%89%E8%AF%81%E4%B9%A6%E9%83%BD%E8%A2%AB%E8%A6%86%E7%9B%96/">展开全文 >></a>
         </p>
       
 

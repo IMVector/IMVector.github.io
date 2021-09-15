@@ -150,6 +150,230 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-采购方案" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/04/05/%E9%87%87%E8%B4%AD%E6%96%B9%E6%A1%88/">采购方案</a>
+    </h1>
+  
+
+        
+        <a href="/2021/04/05/%E9%87%87%E8%B4%AD%E6%96%B9%E6%A1%88/" class="archive-article-date">
+  	<time datetime="2021-04-05T10:30:43.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-05</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="LCP-28-采购方案"><a href="#LCP-28-采购方案" class="headerlink" title="LCP 28. 采购方案"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/4xy4Wx/">LCP 28. 采购方案</a></h4><p>难度 简单</p>
+<p>小力将 N 个零件的报价存于数组 <code>nums</code>。小力预算为 <code>target</code>，假定小力仅购买两个零件，要求购买零件的花费不超过预算，请问他有多少种采购方案。</p>
+<p>注意：答案需要以 <code>1e9 + 7 (1000000007)</code> 为底取模，如：计算初始结果为：<code>1000000008</code>，请返回 <code>1</code></p>
+<p><strong>示例 1：</strong></p>
+<blockquote>
+<p>输入：<code>nums = [2,5,3,5], target = 6</code></p>
+<p>输出：<code>1</code></p>
+<p>解释：预算内仅能购买 nums[0] 与 nums[2]。</p>
+</blockquote>
+<p><strong>示例 2：</strong></p>
+<blockquote>
+<p>输入：<code>nums = [2,2,1,9], target = 10</code></p>
+<p>输出：<code>4</code></p>
+<p>解释：符合预算的采购方案如下：<br>nums[0] + nums[1] = 4<br>nums[0] + nums[2] = 3<br>nums[1] + nums[2] = 3<br>nums[2] + nums[3] = 10</p>
+</blockquote>
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>2 &lt;= nums.length &lt;= 10^5</code></li>
+<li><code>1 &lt;= nums[i], target &lt;= 10^5</code></li>
+</ul>
+<h2 id="双指针解法"><a href="#双指针解法" class="headerlink" title="双指针解法"></a>双指针解法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">purchasePlans</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> mod = <span class="number">1_000_000_007</span>;</span><br><span class="line">        <span class="keyword">int</span> ans = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 首先对整体进行排序</span></span><br><span class="line">        Arrays.sort(nums);</span><br><span class="line">        <span class="comment">// 双指针，left 从前往后找，right 从后往前</span></span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span> (left &lt; right) &#123;</span><br><span class="line">            <span class="comment">// 如果当前左右之和大于了目标值，说明偏大了，就把右指针往左移动</span></span><br><span class="line">            <span class="keyword">if</span> (nums[left] + nums[right] &gt; target) right--;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 否则的话，说明找到了合适的，需要把两者中间的元素个数都累加起来</span></span><br><span class="line">                ans += right - left;</span><br><span class="line">                <span class="comment">// 然后再向右移动左指针</span></span><br><span class="line">                left++;</span><br><span class="line">            &#125;</span><br><span class="line">            ans %= mod;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans % mod;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：hxz1998</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/4xy4Wx/solution/java-shuang-zhi-zhen-fa-zhu-xing-zhu-shi-pja9/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+<h2 id="二分查找解法"><a href="#二分查找解法" class="headerlink" title="二分查找解法"></a>二分查找解法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">purchasePlans</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">        Arrays.sort(nums);</span><br><span class="line">        <span class="keyword">int</span> result = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>;i&lt;nums.length - <span class="number">1</span>;i++)&#123;</span><br><span class="line">            <span class="keyword">int</span> low = i;</span><br><span class="line">            <span class="keyword">int</span> high = nums.length - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            <span class="keyword">while</span>(low&lt;=high)&#123;</span><br><span class="line">                <span class="keyword">int</span> mid = (high + low) /<span class="number">2</span>;</span><br><span class="line">                <span class="keyword">if</span>(mid == i)&#123;</span><br><span class="line">                    low++;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span>(nums[i] + nums[mid] &lt; target)&#123;</span><br><span class="line">                    low = mid + <span class="number">1</span>;</span><br><span class="line">                &#125;<span class="keyword">else</span> <span class="keyword">if</span> (nums[i] + nums[mid] &gt; target)&#123;</span><br><span class="line">                    high = mid - <span class="number">1</span>;</span><br><span class="line">                &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">                    low = mid + <span class="number">1</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            result += (high - i);</span><br><span class="line">            result %= <span class="number">1000000007</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> result%<span class="number">1000000007</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：lanwu</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/4xy4Wx/solution/java-pai-xu-jia-er-fen-by-lanwu-xv3u/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="两数之和解法"><a href="#两数之和解法" class="headerlink" title="两数之和解法"></a>两数之和解法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">purchasePlans</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> mod = (<span class="keyword">int</span>) <span class="number">1e9</span> + <span class="number">7</span>;</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line">        Arrays.sort(nums);</span><br><span class="line">        Set&lt;Integer&gt; set = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">        <span class="keyword">int</span>[][] big = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">100001</span>][<span class="number">2</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            big[nums[i]][<span class="number">0</span>] = i + <span class="number">1</span>;</span><br><span class="line">            big[nums[i]][<span class="number">1</span>]++;</span><br><span class="line">            set.add(nums[i]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; <span class="number">100000</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (big[i][<span class="number">0</span>] == <span class="number">0</span>) &#123;</span><br><span class="line">                big[i][<span class="number">0</span>] = big[i - <span class="number">1</span>][<span class="number">0</span>];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> res = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> val : set) &#123;</span><br><span class="line">            <span class="keyword">int</span> t = target - val;</span><br><span class="line">            <span class="keyword">if</span> (val &lt;= t) &#123;</span><br><span class="line">                <span class="keyword">int</span> v = big[t][<span class="number">0</span>];</span><br><span class="line">                res = (res + ((<span class="keyword">long</span>)big[val][<span class="number">1</span>] * (big[val][<span class="number">1</span>] - <span class="number">1</span>) / <span class="number">2</span>)) % mod;</span><br><span class="line">                res = (res + ((<span class="keyword">long</span>)big[val][<span class="number">1</span>] * (v - big[val][<span class="number">0</span>]))) % mod;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (<span class="keyword">int</span>) (res % mod);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">双指针</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">两数之和</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/04/05/%E9%87%87%E8%B4%AD%E6%96%B9%E6%A1%88/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-合并两个有序数组" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/04/05/%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/">合并两个有序数组</a>
+    </h1>
+  
+
+        
+        <a href="/2021/04/05/%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/" class="archive-article-date">
+  	<time datetime="2021-04-05T01:11:56.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-05</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="88-合并两个有序数组"><a href="#88-合并两个有序数组" class="headerlink" title="88. 合并两个有序数组"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/merge-sorted-array/">88. 合并两个有序数组</a></h4><p>难度简单</p>
+<p>给你两个有序整数数组 <code>nums1</code> 和 <code>nums2</code>，请你将 <code>nums2</code> 合并到 <code>nums1</code> 中<em>，</em>使 <code>nums1</code> 成为一个有序数组。</p>
+<p>初始化 <code>nums1</code> 和 <code>nums2</code> 的元素数量分别为 <code>m</code> 和 <code>n</code> 。你可以假设 <code>nums1</code> 的空间大小等于 <code>m + n</code>，这样它就有足够的空间保存来自 <code>nums2</code> 的元素。</p>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：nums1 &#x3D; [1,2,3,0,0,0], m &#x3D; 3, nums2 &#x3D; [2,5,6], n &#x3D; 3</span><br><span class="line">输出：[1,2,2,3,5,6]</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：nums1 &#x3D; [1], m &#x3D; 1, nums2 &#x3D; [], n &#x3D; 0</span><br><span class="line">输出：[1]</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>nums1.length == m + n</code></li>
+<li><code>nums2.length == n</code></li>
+<li><code>0 &lt;= m, n &lt;= 200</code></li>
+<li><code>1 &lt;= m + n &lt;= 200</code></li>
+<li><code>-109 &lt;= nums1[i], nums2[i] &lt;= 109</code></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">merge</span><span class="params">(<span class="keyword">int</span>[] nums1, <span class="keyword">int</span> m, <span class="keyword">int</span>[] nums2, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> p1=m-<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> p2=n-<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> index=n+m-<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span>(p1&gt;=<span class="number">0</span>&amp;&amp;p2&gt;=<span class="number">0</span>)&#123;</span><br><span class="line">            <span class="keyword">if</span>(nums1[p1]&gt;nums2[p2])&#123;</span><br><span class="line">                nums1[index--]=nums1[p1--];</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                nums1[index--]=nums2[p2--];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(p1&gt;=<span class="number">0</span>)&#123;</span><br><span class="line">            nums1[index--] = nums1[p1--];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span>(p2&gt;=<span class="number">0</span>)&#123;</span><br><span class="line">            nums1[index--] = nums2[p2--];</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数组</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/04/05/%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-绝对差值和" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1011,209 +1235,6 @@ tex2jax: {
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/04/03/volatile%E5%85%B3%E9%94%AE%E5%AD%97/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-上升的温度" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/04/03/%E4%B8%8A%E5%8D%87%E7%9A%84%E6%B8%A9%E5%BA%A6/">上升的温度</a>
-    </h1>
-  
-
-        
-        <a href="/2021/04/03/%E4%B8%8A%E5%8D%87%E7%9A%84%E6%B8%A9%E5%BA%A6/" class="archive-article-date">
-  	<time datetime="2021-04-03T02:13:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-03</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="197-上升的温度"><a href="#197-上升的温度" class="headerlink" title="197. 上升的温度"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/rising-temperature/">197. 上升的温度</a></h4><p>难度简单194</p>
-<p>SQL架构</p>
-<p>表 <code>Weather</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+---------------+---------+</span><br><span class="line">| Column Name   | Type    |</span><br><span class="line">+---------------+---------+</span><br><span class="line">| id            | int     |</span><br><span class="line">| recordDate    | date    |</span><br><span class="line">| temperature   | int     |</span><br><span class="line">+---------------+---------+</span><br><span class="line">id 是这个表的主键</span><br><span class="line">该表包含特定日期的温度信息</span><br></pre></td></tr></table></figure>
-
-
-
-<p>编写一个 SQL 查询，来查找与之前（昨天的）日期相比温度更高的所有日期的 <code>id</code> 。</p>
-<p>返回结果 <strong>不要求顺序</strong> 。</p>
-<p>查询结果格式如下例：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Weather</span><br><span class="line">+----+------------+-------------+</span><br><span class="line">| id | recordDate | Temperature |</span><br><span class="line">+----+------------+-------------+</span><br><span class="line">| 1  | 2015-01-01 | 10          |</span><br><span class="line">| 2  | 2015-01-02 | 25          |</span><br><span class="line">| 3  | 2015-01-03 | 20          |</span><br><span class="line">| 4  | 2015-01-04 | 30          |</span><br><span class="line">+----+------------+-------------+</span><br><span class="line"></span><br><span class="line">Result table:</span><br><span class="line">+----+</span><br><span class="line">| id |</span><br><span class="line">+----+</span><br><span class="line">| 2  |</span><br><span class="line">| 4  |</span><br><span class="line">+----+</span><br><span class="line">2015-01-02 的温度比前一天高（10 -&gt; 25）</span><br><span class="line">2015-01-04 的温度比前一天高（20 -&gt; 30）</span><br></pre></td></tr></table></figure>
-
-<h2 id="日期差函数"><a href="#日期差函数" class="headerlink" title="日期差函数"></a>日期差函数</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">select </span><br><span class="line">    w1.id as Id</span><br><span class="line">from </span><br><span class="line">    Weather w1</span><br><span class="line">    Weather w2</span><br><span class="line">where </span><br><span class="line">    DATEDIFF(w1.recordDate, w2.recordDate) &#x3D;1</span><br><span class="line">and </span><br><span class="line">    w1.Temperature &gt; w2.Temperature</span><br></pre></td></tr></table></figure>
-
-<h2 id="加join的"><a href="#加join的" class="headerlink" title="加join的"></a>加join的</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">SELECT</span><br><span class="line">    weather.id AS &#39;Id&#39;</span><br><span class="line">FROM</span><br><span class="line">    weather</span><br><span class="line">        JOIN</span><br><span class="line">    weather w ON DATEDIFF(weather.date, w.date) &#x3D; 1</span><br><span class="line">        AND weather.Temperature &gt; w.Temperature;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">sql</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/04/03/%E4%B8%8A%E5%8D%87%E7%9A%84%E6%B8%A9%E5%BA%A6/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-删除重复的电子邮箱" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/04/03/%E5%88%A0%E9%99%A4%E9%87%8D%E5%A4%8D%E7%9A%84%E7%94%B5%E5%AD%90%E9%82%AE%E7%AE%B1/">删除重复的电子邮箱</a>
-    </h1>
-  
-
-        
-        <a href="/2021/04/03/%E5%88%A0%E9%99%A4%E9%87%8D%E5%A4%8D%E7%9A%84%E7%94%B5%E5%AD%90%E9%82%AE%E7%AE%B1/" class="archive-article-date">
-  	<time datetime="2021-04-03T01:59:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-03</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="196-删除重复的电子邮箱"><a href="#196-删除重复的电子邮箱" class="headerlink" title="196. 删除重复的电子邮箱"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/delete-duplicate-emails/">196. 删除重复的电子邮箱</a></h4><p>难度简单357</p>
-<p>SQL架构</p>
-<p>编写一个 SQL 查询，来删除 <code>Person</code> 表中所有重复的电子邮箱，重复的邮箱里只保留 <strong>Id</strong> <em>最小</em> 的那个。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+----+------------------+</span><br><span class="line">| Id | Email            |</span><br><span class="line">+----+------------------+</span><br><span class="line">| 1  | john@example.com |</span><br><span class="line">| 2  | bob@example.com  |</span><br><span class="line">| 3  | john@example.com |</span><br><span class="line">+----+------------------+</span><br><span class="line">Id 是这个表的主键。</span><br></pre></td></tr></table></figure>
-
-<p>例如，在运行你的查询语句之后，上面的 <code>Person</code> 表应返回以下几行:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+----+------------------+</span><br><span class="line">| Id | Email            |</span><br><span class="line">+----+------------------+</span><br><span class="line">| 1  | john@example.com |</span><br><span class="line">| 2  | bob@example.com  |</span><br><span class="line">+----+------------------+</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li>执行 SQL 之后，输出是整个 <code>Person</code> 表。</li>
-<li>使用 <code>delete</code> 语句。</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># Write your MySQL query statement below</span><br><span class="line"></span><br><span class="line">delete </span><br><span class="line">p1 </span><br><span class="line">from</span><br><span class="line">Person p1,</span><br><span class="line">Person p2</span><br><span class="line">where </span><br><span class="line">p1.Id &gt; p2.Id</span><br><span class="line">and </span><br><span class="line">p1.Email &#x3D; p2.Email;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">sql</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/04/03/%E5%88%A0%E9%99%A4%E9%87%8D%E5%A4%8D%E7%9A%84%E7%94%B5%E5%AD%90%E9%82%AE%E7%AE%B1/">展开全文 >></a>
         </p>
       
 
