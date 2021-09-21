@@ -150,6 +150,173 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-大数相乘学习" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/08/13/%E5%A4%A7%E6%95%B0%E7%9B%B8%E4%B9%98%E5%AD%A6%E4%B9%A0/">大数相乘学习（中等题）</a>
+    </h1>
+  
+
+        
+        <a href="/2020/08/13/%E5%A4%A7%E6%95%B0%E7%9B%B8%E4%B9%98%E5%AD%A6%E4%B9%A0/" class="archive-article-date">
+  	<time datetime="2020-08-13T14:08:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-08-13</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="43-字符串相乘"><a href="#43-字符串相乘" class="headerlink" title="43. 字符串相乘"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/multiply-strings/">43. 字符串相乘</a></h4><p>难度：中等</p>
+<p>给定两个以字符串形式表示的非负整数 <code>num1</code> 和 <code>num2</code>，返回 <code>num1</code> 和 <code>num2</code> 的乘积，它们的乘积也表示为字符串形式。</p>
+<p><strong>示例 1:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: num1 &#x3D; &quot;2&quot;, num2 &#x3D; &quot;3&quot;</span><br><span class="line">输出: &quot;6&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: num1 &#x3D; &quot;123&quot;, num2 &#x3D; &quot;456&quot;</span><br><span class="line">输出: &quot;56088&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>说明：</strong></p>
+<ol>
+<li><code>num1</code> 和 <code>num2</code> 的长度小于110。</li>
+<li><code>num1</code> 和 <code>num2</code> 只包含数字 <code>0-9</code>。</li>
+<li><code>num1</code> 和 <code>num2</code> 均不以零开头，除非是数字 0 本身。</li>
+<li><strong>不能使用任何标准库的大数类型（比如 BigInteger）</strong>或<strong>直接将输入转换为整数来处理</strong>。</li>
+</ol>
+<p>优美的解题方式：</p>
+<p>Start from right to left, perform multiplication on every pair of digits, and add them together. Let’s draw the process! From the following draft, we can immediately conclude:</p>
+<p> <code>num1[i] * num2[j]</code> will be placed at indices <code>[i + j</code>, <code>i + j + 1]</code><br><a target="_blank" rel="noopener" href="https://sbimg.cn/image/3Xwq1"><img src="https://wx2.sbimg.cn/2020/08/13/3Xwq1.md.png" alt="3Xwq1.md.png"></a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">multiply</span><span class="params">(String num1, String num2)</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     num1的第i位(高位从0开始)和num2的第j位相乘的结果在乘积中的位置是[i+j, i+j+1]</span></span><br><span class="line"><span class="comment">     例: 123 * 45,  123的第1位 2 和45的第0位 4 乘积 08 存放在结果的第[1, 2]位中</span></span><br><span class="line"><span class="comment">     index:    0 1 2 3 4</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">         1 2 3</span></span><br><span class="line"><span class="comment">     *     4 5</span></span><br><span class="line"><span class="comment">     ---------</span></span><br><span class="line"><span class="comment">           1 5</span></span><br><span class="line"><span class="comment">         1 0</span></span><br><span class="line"><span class="comment">       0 5</span></span><br><span class="line"><span class="comment">     ---------</span></span><br><span class="line"><span class="comment">       0 6 1 5</span></span><br><span class="line"><span class="comment">         1 2</span></span><br><span class="line"><span class="comment">       0 8</span></span><br><span class="line"><span class="comment">     0 4</span></span><br><span class="line"><span class="comment">     ---------</span></span><br><span class="line"><span class="comment">     0 5 5 3 5</span></span><br><span class="line"><span class="comment">     这样我们就可以单独都对每一位进行相乘计算把结果存入相应的index中</span></span><br><span class="line"><span class="comment">     **/</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> n1 = num1.length()-<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> n2 = num2.length()-<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span>(n1 &lt; <span class="number">0</span> || n2 &lt; <span class="number">0</span>) <span class="keyword">return</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">    <span class="keyword">int</span>[] mul = <span class="keyword">new</span> <span class="keyword">int</span>[n1+n2+<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = n1; i &gt;= <span class="number">0</span>; --i) &#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> j = n2; j &gt;= <span class="number">0</span>; --j) &#123;</span><br><span class="line">            <span class="keyword">int</span> bitmul = (num1.charAt(i)-<span class="string">&#x27;0&#x27;</span>) * (num2.charAt(j)-<span class="string">&#x27;0&#x27;</span>);</span><br><span class="line">            bitmul += mul[i+j+<span class="number">1</span>]; <span class="comment">// 先加低位判断是否有新的进位</span></span><br><span class="line"></span><br><span class="line">            mul[i+j] += bitmul / <span class="number">10</span>;</span><br><span class="line">            mul[i+j+<span class="number">1</span>] = bitmul % <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 去掉前导0</span></span><br><span class="line">    <span class="keyword">while</span>(i &lt; mul.length-<span class="number">1</span> &amp;&amp; mul[i] == <span class="number">0</span>)</span><br><span class="line">        i++;</span><br><span class="line">    <span class="keyword">for</span>(; i &lt; mul.length; ++i)</span><br><span class="line">        sb.append(mul[i]);</span><br><span class="line">    <span class="keyword">return</span> sb.toString();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/08/13/%E5%A4%A7%E6%95%B0%E7%9B%B8%E4%B9%98%E5%AD%A6%E4%B9%A0/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-迷宫问题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/08/11/%E8%BF%B7%E5%AE%AB%E9%97%AE%E9%A2%98/">迷宫问题</a>
+    </h1>
+  
+
+        
+        <a href="/2020/08/11/%E8%BF%B7%E5%AE%AB%E9%97%AE%E9%A2%98/" class="archive-article-date">
+  	<time datetime="2020-08-11T12:57:18.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-08-11</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">给定一个二维的矩阵，包含 &#39;X&#39; 和 &#39;O&#39;（字母 O）。</span><br><span class="line"></span><br><span class="line">找到所有被 &#39;X&#39; 围绕的区域，并将这些区域里所有的 &#39;O&#39; 用 &#39;X&#39; 填充。</span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line"></span><br><span class="line">X X X X</span><br><span class="line">X O O X</span><br><span class="line">X X O X</span><br><span class="line">X O X X</span><br><span class="line">运行你的函数后，矩阵变为：</span><br><span class="line"></span><br><span class="line">X X X X</span><br><span class="line">X X X X</span><br><span class="line">X X X X</span><br><span class="line">X O X X</span><br><span class="line">解释:</span><br><span class="line"></span><br><span class="line">被围绕的区间不会存在于边界上，换句话说，任何边界上的 &#39;O&#39; 都不会被填充为 &#39;X&#39;。 任何不在边界上，或不与边界上的 &#39;O&#39; 相连的 &#39;O&#39; 最终都会被填充为 &#39;X&#39;。如果两个元素在水平或垂直方向相邻，则称它们是“相连”的。</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;surrounded-regions</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>走迷宫问题，思路是遍历四个边，如果边上的O可达里面的O，所有可达的O都不能消除<br>如果边上的O不可达里面的O，那么里面的O都可以被消除。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">solve</span><span class="params">(<span class="keyword">char</span>[][] board)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(board.length==<span class="number">0</span>)&#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">boolean</span>[][] flags = <span class="keyword">new</span> <span class="keyword">boolean</span>[board.length][board[<span class="number">0</span>].length];<span class="comment">//是否可达标志</span></span><br><span class="line">        <span class="keyword">boolean</span>[][] flags_repeat = <span class="keyword">new</span> <span class="keyword">boolean</span>[board.length][board[<span class="number">0</span>].length];<span class="comment">//重复走标志</span></span><br><span class="line">        <span class="keyword">int</span> width = board[<span class="number">0</span>].length - <span class="number">1</span>, height = board.length - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//固定第一维，遍历第二维的第一行和最后一行</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; board.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (board[i][<span class="number">0</span>] == <span class="string">&#x27;O&#x27;</span>) &#123;</span><br><span class="line">                flags[i][<span class="number">0</span>] = <span class="keyword">true</span>;</span><br><span class="line">                walk(board, i, <span class="number">0</span>, flags, flags_repeat);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (board[i][width] == <span class="string">&#x27;O&#x27;</span>) &#123;</span><br><span class="line">                flags[i][width] = <span class="keyword">true</span>;</span><br><span class="line">                walk(board, i, width, flags, flags_repeat);</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//固定第二维，遍历第一维的第一列和最后一列</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; board[<span class="number">0</span>].length; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (board[<span class="number">0</span>][j] == <span class="string">&#x27;O&#x27;</span>) &#123;</span><br><span class="line">                flags[<span class="number">0</span>][j] = <span class="keyword">true</span>;</span><br><span class="line">                walk(board, <span class="number">0</span>, j, flags, flags_repeat);</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (board[height][j] == <span class="string">&#x27;O&#x27;</span>) &#123;</span><br><span class="line">                flags[height][j] = <span class="keyword">true</span>;</span><br><span class="line">                walk(board, height, j, flags, flags_repeat);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; board.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; board[<span class="number">0</span>].length; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (!flags[i][j]) &#123;<span class="comment">//如果是内部的O那么它不可达，就更改为X</span></span><br><span class="line">                    board[i][j] = <span class="string">&#x27;X&#x27;</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">walk</span><span class="params">(<span class="keyword">char</span>[][] board, <span class="keyword">int</span> i, <span class="keyword">int</span> j, <span class="keyword">boolean</span>[][] flags, <span class="keyword">boolean</span>[][] flags_repeat)</span> </span>&#123;</span><br><span class="line">        flags_repeat[i][j] = <span class="keyword">true</span>;<span class="comment">//已经走过了</span></span><br><span class="line">        <span class="keyword">if</span> (i - <span class="number">1</span> &gt;= <span class="number">0</span> &amp;&amp; board[i - <span class="number">1</span>][j] == <span class="string">&#x27;O&#x27;</span> &amp;&amp; !flags_repeat[i - <span class="number">1</span>][j]) &#123;<span class="comment">//左边的一格，如果是O并且没有被访问过</span></span><br><span class="line">            flags[i - <span class="number">1</span>][j] = <span class="keyword">true</span>;</span><br><span class="line">            walk(board, i - <span class="number">1</span>, j, flags, flags_repeat);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (j - <span class="number">1</span> &gt;= <span class="number">0</span> &amp;&amp; board[i][j - <span class="number">1</span>] == <span class="string">&#x27;O&#x27;</span> &amp;&amp; !flags_repeat[i][j - <span class="number">1</span>]) &#123;<span class="comment">//下边的一格，如果是O并且没有被访问过</span></span><br><span class="line">            flags[i][j - <span class="number">1</span>] = <span class="keyword">true</span>;</span><br><span class="line">            walk(board, i, j-<span class="number">1</span>, flags, flags_repeat);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (i + <span class="number">1</span> &lt; board.length &amp;&amp; board[i + <span class="number">1</span>][j] == <span class="string">&#x27;O&#x27;</span> &amp;&amp; !flags_repeat[i + <span class="number">1</span>][j]) &#123;<span class="comment">//右边的一格，如果是O并且没有被访问过</span></span><br><span class="line">            flags[i+<span class="number">1</span>][j] = <span class="keyword">true</span>;</span><br><span class="line">            walk(board, i + <span class="number">1</span>, j, flags, flags_repeat);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (j + <span class="number">1</span> &lt; board[<span class="number">0</span>].length &amp;&amp; board[i][j + <span class="number">1</span>] == <span class="string">&#x27;O&#x27;</span> &amp;&amp; !flags_repeat[i][j + <span class="number">1</span>]) &#123;<span class="comment">//上边的一格，如果是O并且没有被访问过</span></span><br><span class="line">            flags[i][j+<span class="number">1</span>] = <span class="keyword">true</span>;</span><br><span class="line">            walk(board, i, j+<span class="number">1</span>, flags, flags_repeat);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/08/11/%E8%BF%B7%E5%AE%AB%E9%97%AE%E9%A2%98/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-原地删除数组元素" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -751,165 +918,6 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2020/08/05/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F%E8%AF%BE%E7%A8%8B%E9%97%AE%E9%A2%98/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-pip问题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/08/01/pip%E9%97%AE%E9%A2%98/">pip 安装其余包时出错</a>
-    </h1>
-  
-
-        
-        <a href="/2020/08/01/pip%E9%97%AE%E9%A2%98/" class="archive-article-date">
-  	<time datetime="2020-07-31T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-08-01</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>安装其他包时出现了这个错误，强制重新安装pip解决了我的问题</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">&quot;/home/vector/.local/bin/pip&quot;</span>, line 7, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">    from pip._internal.cli.main import main</span><br><span class="line">ImportError: No module named _internal.cli.main</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>我的解决方案：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo -H python get-pip.py --force-reinstall</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/08/01/pip%E9%97%AE%E9%A2%98/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-python多进程类内部回调函数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/07/27/python%E5%A4%9A%E8%BF%9B%E7%A8%8B%E7%B1%BB%E5%86%85%E9%83%A8%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/">python多进程类内部回调函数</a>
-    </h1>
-  
-
-        
-        <a href="/2020/07/27/python%E5%A4%9A%E8%BF%9B%E7%A8%8B%E7%B1%BB%E5%86%85%E9%83%A8%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/" class="archive-article-date">
-  	<time datetime="2020-07-26T16:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-27</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>python多进程中，如果回调函数需要写类的属性，那么该类的属性应该设置为多进程共享变量，否则在回调函数中将无法写入该类变量，其余函数访问到的数据仍然是该回调函数写入之前的数据。</p>
-<p>不同的进程默认有自己独立的内存空间，互相之间不能直接访问。所以，通常的全局变量或者传递参数，在创建新进程时，都是拷贝一份到新进程里使用。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> multiprocessing</span><br><span class="line"><span class="comment">#截取的部分代码   截取的部分代码    截取的部分代码</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Moudle</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    control_flag=multiprocessing.Value(<span class="string">&quot;i&quot;</span>,-<span class="number">1</span>)<span class="comment">#多进程共享变量</span></span><br><span class="line">    <span class="comment">#control_flag=-1#这种写法是有问题的，在多进程情况下无法修改该变量的值</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">on_message</span>(<span class="params">self,client, userdata, msg</span>):</span><span class="comment">#回调函数返回消息时调用该方法</span></span><br><span class="line">        self.control_flag.value = msg.data[<span class="string">&#x27;index&#x27;</span>]</span><br><span class="line">        <span class="comment">#self.control_flag=msg.data[&#x27;index&#x27;]#这种写法是有问题的，在多进程情况下无法修改该变量的值</span></span><br><span class="line">        print(<span class="string">&quot;control_flag&quot;</span>,self.control_flag)</span><br><span class="line"></span><br><span class="line"><span class="comment">#截取的部分代码   截取的部分代码    截取的部分代码</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Env</span>(<span class="params">gym.Env</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, name</span>):</span></span><br><span class="line">        self.mqtt_util=Moudle()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">step</span>():</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        程序逻辑</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br></pre></td></tr></table></figure>
-
-
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> multiprocessing</span><br><span class="line"><span class="keyword">from</span> environment <span class="keyword">import</span> Env</span><br><span class="line">os.environ[<span class="string">&quot;OMP_NUM_THREADS&quot;</span>] = <span class="string">&quot;1&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Worker</span>(<span class="params">mp.Process</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span>  <span class="comment">#</span></span><br><span class="line">        <span class="built_in">super</span>(Worker, self).__init__()</span><br><span class="line">        self.env = Env(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">100</span>):</span><br><span class="line">            done = self.env.step()</span><br><span class="line">            <span class="keyword">while</span> <span class="keyword">not</span> done:</span><br><span class="line">                 done =self.env,step()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    workers = [Worker()<span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>)]</span><br><span class="line">    [w.start() <span class="keyword">for</span> w <span class="keyword">in</span> workers]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>参考文献<br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/68828849">multiprocessing中的共享变量</a></p>
-</blockquote>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/07/27/python%E5%A4%9A%E8%BF%9B%E7%A8%8B%E7%B1%BB%E5%86%85%E9%83%A8%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/">展开全文 >></a>
         </p>
       
 
@@ -1966,6 +1974,10 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">差分思想</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">分解质因数</a>
               </li>
             
             <div class="clearfix"></div>
