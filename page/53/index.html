@@ -150,6 +150,234 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-整数拆分" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/01/16/%E6%95%B4%E6%95%B0%E6%8B%86%E5%88%86/">整数拆分</a>
+    </h1>
+  
+
+        
+        <a href="/2021/01/16/%E6%95%B4%E6%95%B0%E6%8B%86%E5%88%86/" class="archive-article-date">
+  	<time datetime="2021-01-16T10:56:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-01-16</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">给定一个正整数 n，将其拆分为至少两个正整数的和，并使这些整数的乘积最大化。 返回你可以获得的最大乘积。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: 2</span><br><span class="line">输出: 1</span><br><span class="line">解释: 2 &#x3D; 1 + 1, 1 × 1 &#x3D; 1。</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: 10</span><br><span class="line">输出: 36</span><br><span class="line">解释: 10 &#x3D; 3 + 3 + 4, 3 × 3 × 4 &#x3D; 36。</span><br><span class="line">说明: 你可以假设 n 不小于 2 且不大于 58。</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;integer-break</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+<h2 id="自顶向下的动态规划"><a href="#自顶向下的动态规划" class="headerlink" title="自顶向下的动态规划"></a>自顶向下的动态规划</h2><p>对于一根长度为n的绳子，当n为1和2时，结果只能是1，当n大于2时，有两种处理方式：</p>
+<ul>
+<li>先把它在i处切一刀，然后将继续切割剩下的绳子，当前的值是i*cut（n-i）;</li>
+<li>把它在i处切一刀，不再继续切割剩下的绳子，当前的值是i<em>（n-i）;<br>为了最大化乘积，需要选择二者中较大的那种切割方法因此Math.max(i</em>cut（n-i）,i*（n-i）);</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">   <span class="keyword">int</span>[] mem = <span class="keyword">null</span>;<span class="comment">//备忘录</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">cuttingRope</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        mem = <span class="keyword">new</span> <span class="keyword">int</span>[n + <span class="number">1</span>];</span><br><span class="line">        <span class="keyword">return</span> dp(n);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">dp</span><span class="params">(<span class="keyword">int</span> len)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mem[len] != <span class="number">0</span>) &#123;<span class="comment">//如果已经计算过，无需再次计算</span></span><br><span class="line">            <span class="keyword">return</span> mem[len];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> max = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span> (len ==<span class="number">1</span>||len==<span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; len; i++) &#123;</span><br><span class="line">                max = Math.max(Math.max(i * dp(len - i), i * (len - i)), max);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        mem[len] = max;</span><br><span class="line">        <span class="keyword">return</span> max;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="非递归实现"><a href="#非递归实现" class="headerlink" title="非递归实现"></a>非递归实现</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">cuttingRope</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] dp = <span class="keyword">new</span> <span class="keyword">int</span>[n + <span class="number">1</span>];</span><br><span class="line">        Arrays.fill(dp, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//dp[i]=max(max(j*dp[i-j],j*(i-j)),dp[i]);//当j&lt;i时dp[j]*(n-j)代表在j处切，dp[i]代表不切</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">2</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; j &lt; i; j++) &#123;</span><br><span class="line">                dp[i] = Math.max(Math.max(j * dp[i - j], j * (i - j)), dp[i]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[n];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="相关题目"><a href="#相关题目" class="headerlink" title="相关题目"></a>相关题目</h2><p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/jian-sheng-zi-lcof/">切绳子</a></p>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/integer-break/">整数拆分</a></p>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/maximize-number-of-nice-divisors/">好因子的最大数目</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数学</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">动态规划</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/01/16/%E6%95%B4%E6%95%B0%E6%8B%86%E5%88%86/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-完全平方数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/01/16/%E5%AE%8C%E5%85%A8%E5%B9%B3%E6%96%B9%E6%95%B0/">完全平方数</a>
+    </h1>
+  
+
+        
+        <a href="/2021/01/16/%E5%AE%8C%E5%85%A8%E5%B9%B3%E6%96%B9%E6%95%B0/" class="archive-article-date">
+  	<time datetime="2021-01-16T09:14:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-01-16</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="279-完全平方数"><a href="#279-完全平方数" class="headerlink" title="279. 完全平方数"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/perfect-squares/">279. 完全平方数</a></h4><p>难度中等966</p>
+<p>给定正整数 <em>n</em>，找到若干个完全平方数（比如 <code>1, 4, 9, 16, ...</code>）使得它们的和等于 <em>n</em>。你需要让组成和的完全平方数的个数最少。</p>
+<p>给你一个整数 <code>n</code> ，返回和为 <code>n</code> 的完全平方数的 <strong>最少数量</strong> 。</p>
+<p><strong>完全平方数</strong> 是一个整数，其值等于另一个整数的平方；换句话说，其值等于一个整数自乘的积。例如，<code>1</code>、<code>4</code>、<code>9</code> 和 <code>16</code> 都是完全平方数，而 <code>3</code> 和 <code>11</code> 不是。</p>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 12</span><br><span class="line">输出：3 </span><br><span class="line">解释：12 &#x3D; 4 + 4 + 4</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：n &#x3D; 13</span><br><span class="line">输出：2</span><br><span class="line">解释：13 &#x3D; 4 + 9</span><br></pre></td></tr></table></figure>
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>1 &lt;= n &lt;= 104</code></li>
+</ul>
+<h1 id="动态规划方法"><a href="#动态规划方法" class="headerlink" title="动态规划方法"></a>动态规划方法</h1><p><strong>将给定的数字看成背包的容量，将生成的完全平方数看成物品，转换成0-1背包问题，外层枚举背包的容量，内层枚举物品的重量</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">numSquares</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 计算不大于n的完全平方数的个数</span></span><br><span class="line">        <span class="keyword">int</span> sqNum = (<span class="keyword">int</span>) Math.sqrt(n) + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span>[] sqArray = <span class="keyword">new</span> <span class="keyword">int</span>[sqNum];</span><br><span class="line">        <span class="comment">// 生成完全平方数</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; sqNum; i++) &#123;</span><br><span class="line">            sqArray[i] = i * i;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span>[] dp = <span class="keyword">new</span> <span class="keyword">int</span>[n + <span class="number">1</span>];</span><br><span class="line">        <span class="comment">// 初始化</span></span><br><span class="line">        Arrays.fill(dp, Integer.MAX_VALUE);</span><br><span class="line">        dp[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 0-1背包的动态规划，外层枚举背包的容量，内层枚举物品的重量</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; j &lt; sqNum; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (i &lt; sqArray[j]) <span class="keyword">break</span>;</span><br><span class="line">                dp[i] = Math.min(dp[i], dp[i - sqArray[j]] + <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[n];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="数学方法"><a href="#数学方法" class="headerlink" title="数学方法"></a>数学方法</h1><p>四平方和定理，也称为 Bachet 猜想，它指出每个自然数都可以表示为四个整数平方和:</p>
+<p>$p=a_{0}^{2}+a_{1}^{2}+a_{2}^{2}+a_{3}^{2}$</p>
+<p>三平方定理完成了四平方定理，证明了正整数可以表示为三个平方和的一个特殊条件:</p>
+<p>$n \neq 4^{k}(8 m+7) \Longleftrightarrow n=a_{0}^{2}+a_{1}^{2}+a_{2}^{2}$</p>
+<p>其中 $k$ 和 $m$ 是整数。</p>
+<p>首先，三平方定理告诉我们，如果 $n$ 的形式是 $n = 4^{k}(8m+7)$，那么 n 不能分解为 3 个平方的和。此外，我们还可以断言 $n$ 不能分解为两个平方和，数本身也不是完全平方数。因为假设数 $n$ 可以分解为 $n = a_{0}^{2}+a_{1}^{2}$，然后通过在表达式中添加平方数 $0$，即 $n = a_{0}^{2}+a_{1}^{2} + 0^2$，我们得到了数 $n$ 可以分解为 3 个平方的结论，这与三平方定理相矛盾。因此，结合四平方定理，我们可以断言，如果这个数不满足三平方定理的条件，它只能分解成四个平方和。</p>
+<p>如果这个数满足三平方定理的条件，则可以分解成三个完全平方数。但我们不知道的是，如果这个数可以分解成更少的完全平方数，即一个或两个完全平方数。</p>
+<p>所以在我们把这个数视为底部情况（三平方定理）之前，还有两种情况需要检查，即：</p>
+<ul>
+<li><p>情况 1：如果数字本身是一个完全平方数，这很容易检查，例如 $n == int(sqrt(n)) ^ 2$。</p>
+</li>
+<li><p>情况 2：如果这个数可以分解成两个完全平方数和。不幸的是，没有任何数学定理可以帮助我们检查这个情况。我们需要使用枚举方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">作者：LeetCode</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;perfect-squares&#x2F;solution&#x2F;wan-quan-ping-fang-shu-by-leetcode&#x2F;</span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">isSquare</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> sq = (<span class="keyword">int</span>) Math.sqrt(n);</span><br><span class="line">    <span class="keyword">return</span> n == sq * sq;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">numSquares</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// four-square and three-square theorems.</span></span><br><span class="line">    <span class="keyword">while</span> (n % <span class="number">4</span> == <span class="number">0</span>)</span><br><span class="line">      n /= <span class="number">4</span>;</span><br><span class="line">    <span class="keyword">if</span> (n % <span class="number">8</span> == <span class="number">7</span>)</span><br><span class="line">      <span class="keyword">return</span> <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.isSquare(n))</span><br><span class="line">      <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// enumeration to check if the number can be decomposed into sum of two squares.</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i * i &lt;= n; ++i) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.isSquare(n - i * i))</span><br><span class="line">        <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// bottom case of three-square theorem.</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">3</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/perfect-squares/solution/wan-quan-ping-fang-shu-by-leetcode/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数学</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">动态规划</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/01/16/%E5%AE%8C%E5%85%A8%E5%B9%B3%E6%96%B9%E6%95%B0/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-最小操作次数使数组元素相等" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -959,184 +1187,6 @@ tex2jax: {
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/01/15/%E9%95%BF%E5%BA%A6%E6%9C%80%E5%B0%8F%E7%9A%84%E5%AD%90%E6%95%B0%E7%BB%84/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-移除最多同行或者同列的石头" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/01/15/%E7%A7%BB%E9%99%A4%E6%9C%80%E5%A4%9A%E5%90%8C%E8%A1%8C%E6%88%96%E8%80%85%E5%90%8C%E5%88%97%E7%9A%84%E7%9F%B3%E5%A4%B4/">移除最多同行或者同列的石头</a>
-    </h1>
-  
-
-        
-        <a href="/2021/01/15/%E7%A7%BB%E9%99%A4%E6%9C%80%E5%A4%9A%E5%90%8C%E8%A1%8C%E6%88%96%E8%80%85%E5%90%8C%E5%88%97%E7%9A%84%E7%9F%B3%E5%A4%B4/" class="archive-article-date">
-  	<time datetime="2021-01-15T02:25:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-01-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">n 块石头放置在二维平面中的一些整数坐标点上。每个坐标点上最多只能有一块石头。</span><br><span class="line"></span><br><span class="line">如果一块石头的 同行或者同列 上有其他石头存在，那么就可以移除这块石头。</span><br><span class="line"></span><br><span class="line">给你一个长度为 n 的数组 stones ，其中 stones[i] &#x3D; [xi, yi] 表示第 i 块石头的位置，返回 可以移除的石子 的最大数量。</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">示例 1：</span><br><span class="line"></span><br><span class="line">输入：stones &#x3D; [[0,0],[0,1],[1,0],[1,2],[2,1],[2,2]]</span><br><span class="line">输出：5</span><br><span class="line">解释：一种移除 5 块石头的方法如下所示：</span><br><span class="line">1. 移除石头 [2,2] ，因为它和 [2,1] 同行。</span><br><span class="line">2. 移除石头 [2,1] ，因为它和 [0,1] 同列。</span><br><span class="line">3. 移除石头 [1,2] ，因为它和 [1,0] 同行。</span><br><span class="line">4. 移除石头 [1,0] ，因为它和 [0,0] 同列。</span><br><span class="line">5. 移除石头 [0,1] ，因为它和 [0,0] 同行。</span><br><span class="line">石头 [0,0] 不能移除，因为它没有与另一块石头同行&#x2F;列。</span><br><span class="line">示例 2：</span><br><span class="line"></span><br><span class="line">输入：stones &#x3D; [[0,0],[0,2],[1,1],[2,0],[2,2]]</span><br><span class="line">输出：3</span><br><span class="line">解释：一种移除 3 块石头的方法如下所示：</span><br><span class="line">1. 移除石头 [2,2] ，因为它和 [2,0] 同行。</span><br><span class="line">2. 移除石头 [2,0] ，因为它和 [0,0] 同列。</span><br><span class="line">3. 移除石头 [0,2] ，因为它和 [0,0] 同行。</span><br><span class="line">石头 [0,0] 和 [1,1] 不能移除，因为它们没有与另一块石头同行&#x2F;列。</span><br><span class="line">示例 3：</span><br><span class="line"></span><br><span class="line">输入：stones &#x3D; [[0,0]]</span><br><span class="line">输出：0</span><br><span class="line">解释：[0,0] 是平面上唯一一块石头，所以不可以移除它。</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">提示：</span><br><span class="line"></span><br><span class="line">1 &lt;&#x3D; stones.length &lt;&#x3D; 1000</span><br><span class="line">0 &lt;&#x3D; xi, yi &lt;&#x3D; 104</span><br><span class="line">不会有两块石头放在同一个坐标点上</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;most-stones-removed-with-same-row-or-column</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-<p><strong>如果x相同或者y相同那么认为两个点是连通的，只需要计算有多少个点是不连通的就可以计算出不能被移除的石头的数量</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">removeStones</span><span class="params">(<span class="keyword">int</span>[][] stones)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= <span class="number">20002</span>; i++) &#123;</span><br><span class="line">            father[i] = i;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果x相同或者y相同，那么两个点是相互连通的</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; stones.length; i++) &#123;</span><br><span class="line">            union(stones[i][<span class="number">0</span>], stones[i][<span class="number">1</span>] + <span class="number">10001</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 计算有多少个点是不互相连通的</span></span><br><span class="line">        Set&lt;Integer&gt; set = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; stones.length; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> fa = find(stones[i][<span class="number">0</span>]);</span><br><span class="line">            set.add(fa);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> stones.length - set.size();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span>[] father = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">200001</span>];</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">find</span><span class="params">(<span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> a = x;</span><br><span class="line">        <span class="keyword">while</span> (x != father[x]) x = father[x];</span><br><span class="line">        <span class="keyword">while</span> (a != father[a]) &#123;</span><br><span class="line">            <span class="keyword">int</span> z = a;</span><br><span class="line">            a = father[a];</span><br><span class="line">            father[z] = x;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">union</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> fa = find(a);</span><br><span class="line">        <span class="keyword">int</span> fb = find(b);</span><br><span class="line">        <span class="keyword">if</span> (fa != fb) father[fa] = fb;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h1 id="官方题解思路（不好理解）"><a href="#官方题解思路（不好理解）" class="headerlink" title="官方题解思路（不好理解）"></a>官方题解思路（不好理解）</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">removeStones</span><span class="params">(<span class="keyword">int</span>[][] stones)</span> </span>&#123;</span><br><span class="line">        UnionFind unionFind = <span class="keyword">new</span> UnionFind();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span>[] stone : stones) &#123;</span><br><span class="line">            <span class="comment">// 下面这三种写法任选其一</span></span><br><span class="line">            <span class="comment">// unionFind.union(~stone[0], stone[1]);</span></span><br><span class="line">            <span class="comment">// unionFind.union(stone[0] - 10001, stone[1]);</span></span><br><span class="line">            unionFind.union(stone[<span class="number">0</span>] + <span class="number">10001</span>, stone[<span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> stones.length - unionFind.getCount();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">UnionFind</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> Map&lt;Integer, Integer&gt; parent;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">int</span> count;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">UnionFind</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.parent = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">            <span class="keyword">this</span>.count = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getCount</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> count;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">find</span><span class="params">(<span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (!parent.containsKey(x)) &#123;</span><br><span class="line">                parent.put(x, x);</span><br><span class="line">                count++;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (x != parent.get(x)) &#123;</span><br><span class="line">                parent.put(x, find(parent.get(x)));</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> parent.get(x);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">union</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">int</span> rootX = find(x);</span><br><span class="line">            <span class="keyword">int</span> rootY = find(y);</span><br><span class="line">            <span class="keyword">if</span> (rootX == rootY) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            parent.put(rootX, rootY);</span><br><span class="line">            count--;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/most-stones-removed-with-same-row-or-column/solution/947-yi-chu-zui-duo-de-tong-xing-huo-tong-ezha/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">并查集</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/01/15/%E7%A7%BB%E9%99%A4%E6%9C%80%E5%A4%9A%E5%90%8C%E8%A1%8C%E6%88%96%E8%80%85%E5%90%8C%E5%88%97%E7%9A%84%E7%9F%B3%E5%A4%B4/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-数字范围按位与" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/01/14/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/">数字范围按位与</a>
-    </h1>
-  
-
-        
-        <a href="/2021/01/14/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/" class="archive-article-date">
-  	<time datetime="2021-01-14T15:22:40.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-01-14</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">给定范围 [m, n]，其中 0 &lt;&#x3D; m &lt;&#x3D; n &lt;&#x3D; 2147483647，返回此范围内所有数字的按位与（包含 m, n 两端点）。</span><br><span class="line"></span><br><span class="line">示例 1: </span><br><span class="line"></span><br><span class="line">输入: [5,7]</span><br><span class="line">输出: 4</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: [0,1]</span><br><span class="line">输出: 0</span><br><span class="line">通过次数38,943提交次数75,818</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;bitwise-and-of-numbers-range</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-<p><strong>找到公共前缀后，将后面的都置0</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">rangeBitwiseAnd</span><span class="params">(<span class="keyword">int</span> m, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> shift = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 找到公共前缀</span></span><br><span class="line">        <span class="keyword">while</span> (m &lt; n) &#123;</span><br><span class="line">            m &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">            n &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">            ++shift;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> m &lt;&lt; shift;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/bitwise-and-of-numbers-range/solution/shu-zi-fan-wei-an-wei-yu-by-leetcode-solution/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-<h1 id="高效方法"><a href="#高效方法" class="headerlink" title="高效方法"></a>高效方法</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">rangeBitwiseAnd</span><span class="params">(<span class="keyword">int</span> m, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span>(m&lt;n)&#123;</span><br><span class="line">            n=n&amp;(n-<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> n;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">位运算</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/01/14/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/">展开全文 >></a>
         </p>
       
 
