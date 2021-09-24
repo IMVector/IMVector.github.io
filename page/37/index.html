@@ -150,6 +150,297 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-红黑树" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/24/%E7%BA%A2%E9%BB%91%E6%A0%91/">红黑树</a>
+    </h1>
+  
+
+        
+        <a href="/2021/02/24/%E7%BA%A2%E9%BB%91%E6%A0%91/" class="archive-article-date">
+  	<time datetime="2021-02-24T14:15:11.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-24</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/carpenterlee/p/5503882.html">红黑树</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/CarpenterLee/JCFInternals/blob/master/markdown/5-TreeSet%20and%20TreeMap.md">TreeMap相关</a></p>
+<h2 id="红黑树介绍"><a href="#红黑树介绍" class="headerlink" title="红黑树介绍"></a>红黑树介绍</h2><p>红黑树是一颗二叉搜索树,他在每个节点上增加了一个存储位来表示节点的<strong>颜色</strong>,可以是RED或BLACK,通过对任何一条从根到叶子的简单路径上各个节点的颜色进行约束,红黑树确保没有一条路径会比其他路径长出2倍,因而使<strong>近似于平衡的</strong></p>
+<p><img src="img/450px-Red-black_tree_example.svg.png" alt="An example of a red-black tree"></p>
+<p>树中包含五个属性:<code>color</code>、<code>key</code>、<code>left</code>、<code>right</code>和<code>p</code></p>
+<h2 id="红黑树的性质"><a href="#红黑树的性质" class="headerlink" title="红黑树的性质"></a>红黑树的性质</h2><ol>
+<li>每个节点或是红色的或是黑色的</li>
+<li>根节点是黑色的</li>
+<li>每个叶子节点是黑色的（注：这里的叶子节点并不是真正意义上的叶子节点，而是一种只有颜色属性但不存放数据的节点，而且其没有儿子节点）<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Red%E2%80%93black_tree">^bignote</a></li>
+<li>如果一个节点是红色的，则它的两个字节点都是黑色的</li>
+<li>对于每个节点，从该节点到其所有后代叶子节点的简单路径上，均包含相同数目的黑色节点</li>
+</ol>
+<p>从某个节点$x$出发（不含该节点）到达一个叶子节点的任意一条简单路径上的黑色节点的个数为该节点的<strong>黑高</strong>，即为$bh（x）$</p>
+<p><strong>定理(引理): 一棵有$n$个内部节点的红黑树的高度至多为$2lg(n+1)$</strong></p>
+<h1 id="红黑树的左旋"><a href="#红黑树的左旋" class="headerlink" title="红黑树的左旋"></a>红黑树的左旋</h1><p>对<code>a</code>节点进行左旋，指将<code>a</code>节点的右子节点设为<code>a</code>节点的父节点，即将<code>a</code>节点变成一个左节点。因此左旋意味着被旋转的节点将变成一个左节点。</p>
+<h1 id="红黑树的右旋"><a href="#红黑树的右旋" class="headerlink" title="红黑树的右旋"></a>红黑树的右旋</h1><p>对<code>b</code>节点进行右旋，指将<code>b</code>节点的左子节点设为<code>b</code>的父节点，即将<code>b</code>节点变成一个右节点。因此右旋意味着被旋转的节点将变成一个右节点</p>
+<p><img src="img/image-20210306150833928.png" alt="image-20210306150833928"></p>
+<blockquote>
+<p>下一部分引用自</p>
+<h3 id="红黑树插入和删除的情况分析"><a href="#红黑树插入和删除的情况分析" class="headerlink" title="红黑树插入和删除的情况分析"></a><a target="_blank" rel="noopener" href="https://www.cnblogs.com/liyuan989/p/4071942.html">红黑树插入和删除的情况分析</a></h3></blockquote>
+<h2 id="插入"><a href="#插入" class="headerlink" title="插入"></a>插入</h2><p>首先约定插入的新节点的颜色都为红色。然后将该节点插入的按二叉查找树的规则插入到树中。这个节点后文称为N</p>
+<ol>
+<li><p>根节点为空。这种情况，将N的颜色改为黑色即可。</p>
+</li>
+<li><p>N的父节点为黑色。这种情况不需要做修改。</p>
+</li>
+<li><p>N的父节点为红色（根据性质3，N的祖父节点必为黑色）。</p>
+</li>
+</ol>
+<ul>
+<li>N的叔叔节点为红色。这种情况，将N的父节点和叔叔节点的颜色都改为黑色，若祖父节点是跟节点就将其改为黑色，否则将其颜色改为红色，并以祖父节点为插入的目标节点从情况1开始递归检测。</li>
+</ul>
+<p><img src="http://upload.wikimedia.org/wikipedia/commons/c/c8/Red-black_tree_insert_case_3.png" alt="情形3 示意图"></p>
+<ul>
+<li>N的叔叔节点为黑色， 且N和N的父节点在同一边（即父节点为祖父的左儿子时，N也是父节点的左儿子。父节点为祖父节点的右儿子时。N也是父节点的右儿子）。以父节点为祖父节的左儿子为例，将父节点改为黑色，祖父节点改为红色，然后以祖父节点为基准右旋。（N为父节点右儿子时做相应的左旋。）</li>
+</ul>
+<p><img src="http://upload.wikimedia.org/wikipedia/commons/6/66/Red-black_tree_insert_case_5.png" alt="情形5 示意图"></p>
+<ul>
+<li>N的叔叔节点为黑色，且N和N的父节点不在同一边（即父节点为祖父的左儿子时，N是父节点的右儿子。父节点为祖父节点的右儿子时。N也是父节点左右儿子）。以父节点为祖父节点的左儿子为例。以父节点为基准，进行左旋，然后以父节点为目标插入节点进入情况3的b情况进行操作。</li>
+</ul>
+<p><img src="http://upload.wikimedia.org/wikipedia/commons/5/56/Red-black_tree_insert_case_4.png" alt="情形4 示意图"></p>
+<h2 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h2><p>删除的节点有两个儿子时，可以转化为删除的节点只有一个儿子时的问题。对于二叉查找树，在删除带有两个非叶子儿子的节点的时候，我们找到要么在它的左子树中的最大元素、要么在它的右子树中的最小元素，并把它的值转移到要删除的节点中。我们接着删除我们从中复制出值的那个节点，它必定有少于两个非叶子的儿子。因为只是复制了一个值，不违反任何性质，这就把问题简化为如何删除最多有一个儿子的节点的问题。它不关心这个节点是最初要删除的节点还是我们从中复制出值的那个节点。</p>
+<p>那么所有情况都可以转化为删除只有一个儿子的节点的情况，我们约定这个要删除的节点为N（若N“没有”儿子节点，并用他的任意一个为叶子节点的儿子节点顶替即可）</p>
+<ol>
+<li><p>N为红色节点时。直接删除N，用它的黑色儿子代替它的位置。</p>
+</li>
+<li><p>N为黑色节点，且父节点为红色。直接删除N，用它的儿子节点代替它的位置，并将该儿子节点改为黑色。</p>
+</li>
+<li><p>N为黑色节点，且父节点为黑色。我们之间删除N，用它的儿子节点代替它，该儿子节点成为N’，将N’的颜色改为黑色。</p>
+</li>
+</ol>
+<ul>
+<li>N’的兄弟节点和兄弟节点的2个儿子都为黑色。交换兄弟节点和父节点的颜色即可。</li>
+</ul>
+<p><img src="http://upload.wikimedia.org/wikipedia/commons/d/d7/Red-black_tree_delete_case_4.png" alt="情形4 示意图"></p>
+<ul>
+<li>N‘的兄弟节点为黑色、且兄弟节点的红色儿子和兄弟节点在一边（即兄弟节点为左儿子时，红色儿子也为左儿子。兄弟节点为右儿子时，红色儿子也为右儿子）。我们以兄弟节点为右儿子为例。将祖父节点和兄弟节点的颜色互换，并将红色右儿子的颜色改为黑色，然后以祖父节点为基准左旋。（若兄弟节点为左儿子，则相应的右旋）</li>
+</ul>
+<p><img src="http://upload.wikimedia.org/wikipedia/commons/3/31/Red-black_tree_delete_case_6.png" alt="情形6 示意图"></p>
+<ul>
+<li>N‘的兄弟节点为黑色、且兄弟节点的红儿子和兄弟节点不在一边（即兄弟节点为左儿子时，红色儿子也为右儿子。兄弟节点为右儿子时，红色儿子也为左儿子）。我们以兄弟结点为右儿子为例。将兄弟节点和它的红色儿子的颜色互换，然后以兄弟节点为基准右旋。此时对于N’来说就进入了上文b情况。（若兄弟节点为右儿子，则相应的左旋）</li>
+</ul>
+<p><img src="http://upload.wikimedia.org/wikipedia/commons/3/30/Red-black_tree_delete_case_5.png" alt="情形5 示意图"></p>
+<ul>
+<li>N‘的兄弟节点为红色。以兄弟节点为右儿子为例，将父节点和兄弟节点的颜色互换，然后以父节点为基准左旋（若兄弟节点为左儿子则相应的右旋），此N’有一个黑色的兄弟节点，接下来N就可以进入a、b、c三种情况分别操作了。</li>
+</ul>
+<p><img src="http://upload.wikimedia.org/wikipedia/commons/3/39/Red-black_tree_delete_case_2.png" alt="情形2 示意图"></p>
+<ul>
+<li>N‘的兄弟节为黑色，父节点也为黑色。此时将兄弟节点的颜色改为红色。然后以父节点为目标插入节点从头开始依次判断。</li>
+</ul>
+<p><img src="http://upload.wikimedia.org/wikipedia/commons/c/c7/Red-black_tree_delete_case_3.png" alt="情形3 示意图"></p>
+<blockquote>
+<h3 id="以下引用原文-红黑树详细分析，看了都说好"><a href="#以下引用原文-红黑树详细分析，看了都说好" class="headerlink" title="以下引用原文:红黑树详细分析，看了都说好"></a>以下引用原文:<a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000012728513">红黑树详细分析，看了都说好</a></h3></blockquote>
+<h2 id="红黑树的插入"><a href="#红黑树的插入" class="headerlink" title="红黑树的插入"></a>红黑树的插入</h2><p><strong>红黑树插入时,插入节点的颜色是红色</strong>.(如果插入的节点是黑色,那么这个节点所在的路径会比其他路径多出一个黑色节点,难以调整). 如果插入节点的颜色是红色,此时所有路径上的黑色节点的数量不变,仅可能会出现两个连续的红色节点的情况,通过变色和旋转调整即可.</p>
+<p>这里假设要插入的节点为 N，N 的父节点为 P，祖父节点为 G，叔叔节点为 U。插入红色节点后，会出现5种情况，分别如下：</p>
+<h4 id="情况一：节点N是红黑树的根节点"><a href="#情况一：节点N是红黑树的根节点" class="headerlink" title="情况一：节点N是红黑树的根节点"></a>情况一：节点N是红黑树的根节点</h4><p>插入的新节点 N 是红黑树的根节点，这种情况下，我们把节点 N 的颜色由红色变为黑色，性质2（根是黑色）被满足。同时 N 被染成黑色后，红黑树所有路径上的黑色节点数量增加一个，性质5（从任一节点到其每个叶子的所有简单路径都包含相同数目的黑色节点）仍然被满足。</p>
+<p><img src="https://segmentfault.com/img/remote/1460000015590868?w=1308&h=88" alt="img">]</p>
+<h4 id="情况二：节点N的父节点是黑色"><a href="#情况二：节点N的父节点是黑色" class="headerlink" title="情况二：节点N的父节点是黑色"></a>情况二：节点N的父节点是黑色</h4><p>N 的父节点是黑色，这种情况下，性质4（每个红色节点必须有两个黑色的子节点）和性质5没有受到影响，不需要调整。</p>
+<p><img src="https://segmentfault.com/img/remote/1460000015590869?w=1304&h=138" alt="img">]</p>
+<h4 id="情况三：节点N的父节点P是红色，叔叔节点U也是红色。"><a href="#情况三：节点N的父节点P是红色，叔叔节点U也是红色。" class="headerlink" title="情况三：节点N的父节点P是红色，叔叔节点U也是红色。"></a>情况三：节点N的父节点P是红色，叔叔节点U也是红色。</h4><p>N 的父节点是红色（节点 P 为红色，其父节点必然为黑色），叔叔节点 U 也是红色。由于 P 和 N 均为红色，所有性质4被打破，此时需要进行调整。这种情况下，先将 P 和 U 的颜色染成黑色，再将 G 的颜色染成红色。此时经过 G 的路径上的黑色节点数量不变，性质5仍然满足。但需要注意的是 G 被染成红色后，可能会和它的父节点形成连续的红色节点，此时需要递归向上调整。</p>
+<p><img src="https://segmentfault.com/img/remote/1460000015590870?w=1304&h=230" alt="img"></p>
+<h4 id="情况四-节点N的父节点为红色-叔叔节点为黑色-节点N是P的右孩子-且节点P是G的左孩子"><a href="#情况四-节点N的父节点为红色-叔叔节点为黑色-节点N是P的右孩子-且节点P是G的左孩子" class="headerlink" title="情况四: 节点N的父节点为红色,叔叔节点为黑色.节点N是P的右孩子,且节点P是G的左孩子."></a>情况四: 节点N的父节点为红色,叔叔节点为黑色.节点N是P的右孩子,且节点P是G的左孩子.</h4><p>N 的父节点为红色，叔叔节点为黑色。节点 N 是 P 的右孩子，且节点 P 是 G 的左孩子。此时先对节点 P 进行左旋，调整 N 与 P 的位置。接下来按照情况五进行处理，以恢复性质4。</p>
+<p><img src="https://segmentfault.com/img/remote/1460000015590871?w=1302&h=224" alt="img"></p>
+<p>这里需要特别说明一下，上图中的节点 N 并非是新插入的节点。当 P 为红色时，P 有两个孩子节点，且孩子节点均为黑色，这样从 G 出发到各叶子节点路径上的黑色节点数量才能保持一致。既然 P 已经有两个孩子了，所以 N 不是新插入的节点。情况四是由以 N 为根节点的子树中插入了新节点，经过调整后，导致 N 被变为红色，进而导致了情况四的出现。考虑下面这种情况（PR 节点就是上图的 N 节点）：<br><a target="_blank" rel="noopener" href="http://www.coolblog.xyz/"><img src="https://segmentfault.com/img/remote/1460000015590872?w=1308&h=234" alt="img"></a></p>
+<p>如上图，插入节点 N 并按情况三处理。此时 PR 被染成了红色，与 P 节点形成了连续的红色节点，这个时候就需按情况四再次进行调整。</p>
+<h4 id="情况五-节点N的父节点为红色-叔叔节点为黑色-N是P的左孩子-且节点P是G的左孩子"><a href="#情况五-节点N的父节点为红色-叔叔节点为黑色-N是P的左孩子-且节点P是G的左孩子" class="headerlink" title="情况五:节点N的父节点为红色,叔叔节点为黑色.N是P的左孩子,且节点P是G的左孩子."></a>情况五:节点N的父节点为红色,叔叔节点为黑色.N是P的左孩子,且节点P是G的左孩子.</h4><p>N 的父节点为红色，叔叔节点为黑色。N 是 P 的左孩子，且节点 P 是 G 的左孩子。此时对 G 进行右旋，调整 P 和 G 的位置，并互换颜色。经过这样的调整后，性质4被恢复，同时也未破坏性质5。</p>
+<p><img src="https://segmentfault.com/img/remote/1460000012728526?w=1308&h=234" alt="img"></p>
+<h4 id="插入总结"><a href="#插入总结" class="headerlink" title="插入总结"></a>插入总结</h4><p>上面五种情况中，情况一和情况二比较简单，情况三、四、五稍复杂。但如果细心观察，会发现这三种情况的区别在于叔叔节点的颜色，如果叔叔节点为红色，直接变色即可。如果叔叔节点为黑色，则需要旋转，再交换颜色。当把这三种情况的图画在一起就区别就比较容易观察了，如下图：</p>
+<p><img src="https://segmentfault.com/img/remote/1460000012725117?w=1312&h=768" alt="img"></p>
+<h2 id="红黑树的删除"><a href="#红黑树的删除" class="headerlink" title="红黑树的删除"></a>红黑树的删除</h2><p>相较于插入操作，红黑树的删除操作则要更为复杂一些。删除操作首先要确定待删除节点有几个孩子，如果有两个孩子，不能直接删除该节点。而是要先找到该节点的前驱（该节点左子树中最大的节点）或者后继（该节点右子树中最小的节点），然后将前驱或者后继的值复制到要删除的节点中，最后再将前驱或后继删除。由于前驱和后继至多只有一个孩子节点，这样我们就把原来要删除的节点有两个孩子的问题转化为只有一个孩子节点的问题，问题被简化了一些。我们并不关心最终被删除的节点是否是我们开始想要删除的那个节点，只要节点里的值最终被删除就行了，至于树结构如何变化，这个并不重要。</p>
+<p>红黑树删除操作的复杂度在于删除节点的颜色，当删除的节点是红色时，直接拿其孩子节点补空位即可。因为删除红色节点，性质5（从任一节点到其每个叶子的所有简单路径都包含相同数目的黑色节点）仍能够被满足。当删除的节点是黑色时，那么所有经过该节点的路径上的黑节点数量少了一个，破坏了性质5。如果该节点的孩子为红色，直接拿孩子节点替换被删除的节点，并将孩子节点染成黑色，即可恢复性质5。但如果孩子节点为黑色，处理起来就要复杂的多。分为6种情况，下面会展开说明。</p>
+<p>在展开说明之前，我们先做一些假设，方便说明。这里假设最终被删除的节点为<code>X</code>（至多只有一个孩子节点），其孩子节点为<code>N</code>，<code>X</code>的兄弟节点为<code>S</code>，<code>S</code>的左节点为 SL，右节点为 SR。接下来讨论是建立在节点 <code>X</code> 被删除，节点 <code>N</code> 替换<code>X</code>的基础上进行的。这里说明把被删除的节点<code>X</code>特地拎出来说一下的原因是防止大家误以为节点<code>N</code>会被删除，不然后面就会看不明白。</p>
+<p><img src="https://segmentfault.com/img/remote/1460000015590874?w=1600&h=314" alt="img"></p>
+<p>在上面的基础上，接下来就可以展开讨论了。红黑树删除有6种情况，分别是：</p>
+<h4 id="情况一："><a href="#情况一：" class="headerlink" title="情况一："></a>情况一：</h4><blockquote>
+<p>N 是新的根。在这种情形下，我们就做完了。我们从所有路径去除了一个黑色节点，而新根是黑色的，所以性质都保持着。</p>
+</blockquote>
+<p>上面是维基百科中关于红黑树删除的情况一说明，由于没有配图，看的有点晕。经过思考，我觉得可能会是下面这种情形：</p>
+<p>要删除的节点 X 是根节点，且左右孩子节点均为空节点，此时将节点 X 用空节点替换完成删除操作。</p>
+<p>可能还有其他情形，大家如果知道，烦请告知。</p>
+<h4 id="情况二："><a href="#情况二：" class="headerlink" title="情况二："></a>情况二：</h4><p>S 为红色，其他节点为黑色。这种情况下可以对 N 的父节点进行左旋操作，然后互换 P 与 S 颜色。但这并未结束，经过节点 P 和 N 的路径删除前有3个黑色节点（<code>P -&gt; X -&gt; N</code>），现在只剩两个了（<code>P -&gt; N</code>）。比未经过 N 的路径少一个黑色节点，性质5仍不满足，还需要继续调整。不过此时可以按照情况四、五、六进行调整。</p>
+<p><img src="https://segmentfault.com/img/remote/1460000012728528?w=1310&h=218" alt="img"></p>
+<h4 id="情况三："><a href="#情况三：" class="headerlink" title="情况三："></a>情况三：</h4><p>N 的父节点，兄弟节点 S 和 S 的孩子节点均为黑色。这种情况下可以简单的把 S 染成红色，所有经过 S 的路径比之前少了一个黑色节点，这样经过 N 的路径和经过 S 的路径黑色节点数量一致了。但经过 P 的路径比不经过 P 的路径少一个黑色节点，此时需要从情况一开始对 P 进行平衡处理。</p>
+<p><img src="https://segmentfault.com/img/remote/1460000012728529?w=1306&h=210" alt="img"></p>
+<h4 id="情况四："><a href="#情况四：" class="headerlink" title="情况四："></a>情况四：</h4><p>N 的父节点是红色，S 和 S 孩子为黑色。这种情况比较简单，我们只需交换 P 和 S 颜色即可。这样所有通过 N 的路径上增加了一个黑色节点，所有通过 S 的节点的路径必然也通过 P 节点，由于 P 与 S 只是互换颜色，并不影响这些路径。</p>
+<p><img src="img/image-20210306201456764.png" alt="image-20210306201456764"></p>
+<h4 id="情况五："><a href="#情况五：" class="headerlink" title="情况五："></a>情况五：</h4><p>S 为黑色，S 的左孩子为红色，右孩子为黑色。N 的父节点颜色可红可黑，且 N 是 P 左孩子。这种情况下对 S 进行右旋操作，并互换 S 和 SL 的颜色。此时，所有路径上的黑色数量仍然相等，N 兄弟节点的由 S 变为了 SL，而 SL 的右孩子变为红色。接下来我们到情况六继续分析。</p>
+<p><a target="_blank" rel="noopener" href="http://www.coolblog.xyz/"><img src="https://segmentfault.com/img/remote/1460000015590878?w=1306&h=260" alt="img"></a></p>
+<h4 id="情况六："><a href="#情况六：" class="headerlink" title="情况六："></a>情况六：</h4><p>S 为黑色，S 的右孩子为红色。N 的父节点颜色可红可黑，且 N 是其父节点左孩子。这种情况下，我们对 P 进行左旋操作，并互换 P 和 S 的颜色，并将 SR 变为黑色。因为 P 变为黑色，所以经过 N 的路径多了一个黑色节点，经过 N 的路径上的黑色节点与删除前的数量一致。对于不经过 N 的路径，则有以下两种情况：</p>
+<ol>
+<li>该路径经过 N 新的兄弟节点 SL ，那它之前必然经过 S 和 P。而 S 和 P 现在只是交换颜色，对于经过 SL 的路径不影响。</li>
+<li>该路径经过 N 新的叔叔节点 SR，那它之前必然经过 P、 S 和 SR，而现在它只经过 S 和 SR。在对 P 进行左旋，并与 S 换色后，经过 SR 的路径少了一个黑色节点，性质5被打破。另外，由于 S 的颜色可红可黑，如果 S 是红色的话，会与 SR 形成连续的红色节点，打破性质4（每个红色节点必须有两个黑色的子节点）。此时仅需将 SR 由红色变为黑色即可同时恢复性质4和性质5（从任一节点到其每个叶子的所有简单路径都包含相同数目的黑色节点。）。</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="http://www.coolblog.xyz/"><img src="https://segmentfault.com/img/remote/1460000015590879?w=1308&h=214" alt="img"></a></p>
+<h4 id="删除总结"><a href="#删除总结" class="headerlink" title="删除总结"></a>删除总结</h4><p>红黑树删除的情况比较多，大家刚开始看的时候可能会比较晕。可能会产生这样的疑问，为啥红黑树会有这种删除情况，为啥又会有另一种情况，它们之间有什么联系和区别？和大家一样，我刚开始看的时候也有这样的困惑，直到我把所有情况对应的图形画在一起时，拨云见日，一切都明了了。此时天空中出现了4个字，原来如此、原来如此、原来如此。所以，请看图吧：</p>
+<p><a target="_blank" rel="noopener" href="http://www.coolblog.xyz/"><img src="https://segmentfault.com/img/remote/1460000015590880?w=1308&h=1278" alt="img"></a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>红黑树是一种重要的二叉树，应用广泛，但在很多数据结构相关的书本中出现的次数并不多。很多书中要么不说，要么就一笔带过，并不会进行详细的分析，这可能是因为红黑树比较复杂的缘故。我在学习红黑树的时候也找了很多资料，但总体感觉讲的都不太好。尤其是在我学习删除操作的时候，很多资料是实在人看不下去，看的我很痛苦。直到我看到维基百科上关于<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Red–black_tree">红黑树</a>的分析时，很是欣喜。这篇文章分析的很有条理，言简意赅，比很多资料好了太多。本文对红黑树的分析也主要参考了维基百科中的红黑树分析，并对维基百科中容易让人产生疑问和误解的地方进行了说明。同时维基百科中文版红黑树文中的图片较为模糊，这里我重新进行了绘制。需要说明的是，维基百科中文版无法打开了，文中关于维基百科的链接都是英文版的。另外在给大家推荐一个数据结构可视化的网站，里面包含常见数据结构可视化过程，地址为：<a target="_blank" rel="noopener" href="https://www.cs.usfca.edu/~galles/visualization/Algorithms.html">t.cn/RZFgryr</a>。</p>
+<p>[^wiki]: </p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">基础知识</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">二叉树</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/02/24/%E7%BA%A2%E9%BB%91%E6%A0%91/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-二叉查找树的插入和删除操作" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/02/24/%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91%E7%9A%84%E6%8F%92%E5%85%A5%E5%92%8C%E5%88%A0%E9%99%A4%E6%93%8D%E4%BD%9C/">二叉查找树的插入和删除操作</a>
+    </h1>
+  
+
+        
+        <a href="/2021/02/24/%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91%E7%9A%84%E6%8F%92%E5%85%A5%E5%92%8C%E5%88%A0%E9%99%A4%E6%93%8D%E4%BD%9C/" class="archive-article-date">
+  	<time datetime="2021-02-24T13:55:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-24</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h1 id="插入操作"><a href="#插入操作" class="headerlink" title="插入操作"></a>插入操作</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insertBST</span><span class="params">(<span class="keyword">int</span> val)</span></span>&#123;</span><br><span class="line">    TreeNode p=root;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 父节点</span></span><br><span class="line">    TreeNode prev=<span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(p!=<span class="keyword">null</span>)&#123;</span><br><span class="line">      prev = p;</span><br><span class="line">      <span class="keyword">if</span>(val&lt;p.val) p = p.left;</span><br><span class="line">      <span class="keyword">else</span> <span class="keyword">if</span>(val&gt;p.val) p=p.right;</span><br><span class="line">      <span class="keyword">else</span> <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// prev是待插入节点的父节点，根据节点值的大小，决定被插入的位置</span></span><br><span class="line">    <span class="keyword">if</span>(root==<span class="keyword">null</span>)root=<span class="keyword">new</span> TreeNode(val);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(val&lt;prev.val)prev.left=<span class="keyword">new</span> TreeNode(val);</span><br><span class="line">    <span class="keyword">else</span> prev.right=<span class="keyword">new</span> TreeNode(val);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="删除操作"><a href="#删除操作" class="headerlink" title="删除操作"></a>删除操作</h1><p>分为三种情况：要删除的节点为p，其父节点为f</p>
+<ol>
+<li>要删除的p节点是叶子节点，只需要修改他的双亲节点的指针为空</li>
+<li>若p只有左子树或者只有右子树，则直接让左子树或右子树代替p</li>
+<li>若p既有左子树悠悠右子树，则用p左子树中最大的值（即最右端S）代替p，删除S，重接其左子树</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">deleteBST</span><span class="params">(<span class="keyword">int</span> val)</span></span>&#123;</span><br><span class="line">  deleteBST(root,val);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">deleteBST</span><span class="params">(TreeNode node,<span class="keyword">int</span> val)</span></span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(node==<span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">  <span class="keyword">if</span>(val==node.val)<span class="keyword">return</span> delete(node);</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span>(val&lt;node.val)<span class="keyword">return</span> deleteBST(node.left,val);</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">return</span> deleteBST(node.right,val);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">delete</span><span class="params">(TreeNode node)</span></span>&#123;</span><br><span class="line">  TreeNode temp=<span class="keyword">null</span>;</span><br><span class="line">  <span class="comment">// 右子树为空，只需要重接他的左子树</span></span><br><span class="line">  <span class="comment">// 如果是叶子节点，则再这里也把叶子节点删除了</span></span><br><span class="line">  <span class="keyword">if</span>(node.right==<span class="keyword">null</span>)&#123;</span><br><span class="line">    temp=node;</span><br><span class="line">    node=node.left;</span><br><span class="line">  &#125;<span class="keyword">else</span> <span class="keyword">if</span>(node.left==<span class="keyword">null</span>)&#123;</span><br><span class="line">    temp=node;</span><br><span class="line">    node=node.right;</span><br><span class="line">  &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">    temp=node;</span><br><span class="line">    TreeNode s=node;</span><br><span class="line">    <span class="comment">// 转向左子树，然后向右走到尽头</span></span><br><span class="line">    s = s.left;</span><br><span class="line">    <span class="keyword">while</span>(s.right!=<span class="keyword">null</span>)&#123;</span><br><span class="line">      temp=s;</span><br><span class="line">      s=s.right;</span><br><span class="line">    &#125;</span><br><span class="line">    node.val=s.val;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(temp!=node)temp.right=s.left;</span><br><span class="line">    <span class="keyword">else</span> temp.left=s.left;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/02/24/%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91%E7%9A%84%E6%8F%92%E5%85%A5%E5%92%8C%E5%88%A0%E9%99%A4%E6%93%8D%E4%BD%9C/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-翻转图像" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -3050,204 +3341,9 @@ tex2jax: {
 
 
   
-    <article id="post-通过连接另一个数组的子数组得到一个数组" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/21/%E9%80%9A%E8%BF%87%E8%BF%9E%E6%8E%A5%E5%8F%A6%E4%B8%80%E4%B8%AA%E6%95%B0%E7%BB%84%E7%9A%84%E5%AD%90%E6%95%B0%E7%BB%84%E5%BE%97%E5%88%B0%E4%B8%80%E4%B8%AA%E6%95%B0%E7%BB%84/">通过连接另一个数组的子数组得到一个数组</a>
-    </h1>
-  
-
-        
-        <a href="/2021/02/21/%E9%80%9A%E8%BF%87%E8%BF%9E%E6%8E%A5%E5%8F%A6%E4%B8%80%E4%B8%AA%E6%95%B0%E7%BB%84%E7%9A%84%E5%AD%90%E6%95%B0%E7%BB%84%E5%BE%97%E5%88%B0%E4%B8%80%E4%B8%AA%E6%95%B0%E7%BB%84/" class="archive-article-date">
-  	<time datetime="2021-02-20T16:12:06.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-21</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h3 id="5669-通过连接另一个数组的子数组得到一个数组"><a href="#5669-通过连接另一个数组的子数组得到一个数组" class="headerlink" title="5669. 通过连接另一个数组的子数组得到一个数组"></a>5669. 通过连接另一个数组的子数组得到一个数组</h3><p>给你一个长度为 <code>n</code> 的二维整数数组 <code>groups</code> ，同时给你一个整数数组 <code>nums</code> 。</p>
-<p>你是否可以从 <code>nums</code> 中选出 <code>n</code> 个 <strong>不相交</strong> 的子数组，使得第 <code>i</code> 个子数组与 <code>groups[i]</code> （下标从 <strong>0</strong> 开始）完全相同，且如果 <code>i &gt; 0</code> ，那么第 <code>(i-1)</code> 个子数组在 <code>nums</code> 中出现的位置在第 <code>i</code> 个子数组前面。（也就是说，这些子数组在 <code>nums</code> 中出现的顺序需要与 <code>groups</code> 顺序相同）</p>
-<p>如果你可以找出这样的 <code>n</code> 个子数组，请你返回 <code>true</code> ，否则返回 <code>false</code> 。</p>
-<p>如果不存在下标为 <code>k</code> 的元素 <code>nums[k]</code> 属于不止一个子数组，就称这些子数组是 <strong>不相交</strong> 的。子数组指的是原数组中连续元素组成的一个序列。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：groups &#x3D; [[1,-1,-1],[3,-2,0]], nums &#x3D; [1,-1,0,1,-1,-1,3,-2,0]</span><br><span class="line">输出：true</span><br><span class="line">解释：你可以分别在 nums 中选出第 0 个子数组 [1,-1,0,1,-1,-1,3,-2,0] 和第 1 个子数组 [1,-1,0,1,-1,-1,3,-2,0] 。</span><br><span class="line">这两个子数组是不相交的，因为它们没有任何共同的元素。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：groups &#x3D; [[10,-2],[1,2,3,4]], nums &#x3D; [1,2,3,4,10,-2]</span><br><span class="line">输出：false</span><br><span class="line">解释：选择子数组 [1,2,3,4,10,-2] 和 [1,2,3,4,10,-2] 是不正确的，因为它们出现的顺序与 groups 中顺序不同。</span><br><span class="line">[10,-2] 必须出现在 [1,2,3,4] 之前。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：groups &#x3D; [[1,2,3],[3,4]], nums &#x3D; [7,7,1,2,3,4,7,7]</span><br><span class="line">输出：false</span><br><span class="line">解释：选择子数组 [7,7,1,2,3,4,7,7] 和 [7,7,1,2,3,4,7,7] 是不正确的，因为它们不是不相交子数组。</span><br><span class="line">它们有一个共同的元素 nums[4] （下标从 0 开始）。</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>groups.length == n</code></li>
-<li><code>1 &lt;= n &lt;= 103</code></li>
-<li><code>1 &lt;= groups[i].length, sum(groups[i].length) &lt;= 103</code></li>
-<li><code>1 &lt;= nums.length &lt;= 103</code></li>
-<li><code>-107 &lt;= groups[i][j], nums[k] &lt;= 107</code></li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">canChoose</span><span class="params">(<span class="keyword">int</span>[][] groups, <span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line">        <span class="keyword">int</span> m = groups.length;</span><br><span class="line">        <span class="keyword">int</span> gIndex = <span class="number">0</span>, index = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (index &lt; groups[gIndex].length &amp;&amp; nums[i] == groups[gIndex][index]) &#123;</span><br><span class="line">                index++;</span><br><span class="line">                <span class="keyword">if</span> (index == groups[gIndex].length) &#123;</span><br><span class="line">                    gIndex++;</span><br><span class="line">                    <span class="keyword">if</span> (gIndex == m) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">                    index = <span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (index &gt; <span class="number">0</span>) i--;</span><br><span class="line"></span><br><span class="line">                index = <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (gIndex == groups.length) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/02/21/%E9%80%9A%E8%BF%87%E8%BF%9E%E6%8E%A5%E5%8F%A6%E4%B8%80%E4%B8%AA%E6%95%B0%E7%BB%84%E7%9A%84%E5%AD%90%E6%95%B0%E7%BB%84%E5%BE%97%E5%88%B0%E4%B8%80%E4%B8%AA%E6%95%B0%E7%BB%84/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-最长的美好子字符串" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/02/21/%E6%9C%80%E9%95%BF%E7%9A%84%E7%BE%8E%E5%A5%BD%E5%AD%90%E5%AD%97%E7%AC%A6%E4%B8%B2/">最长的美好子字符串</a>
-    </h1>
-  
-
-        
-        <a href="/2021/02/21/%E6%9C%80%E9%95%BF%E7%9A%84%E7%BE%8E%E5%A5%BD%E5%AD%90%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="archive-article-date">
-  	<time datetime="2021-02-20T16:09:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-02-21</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="5668-最长的美好子字符串"><a href="#5668-最长的美好子字符串" class="headerlink" title="5668. 最长的美好子字符串"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/longest-nice-substring/">5668. 最长的美好子字符串</a></h4><p>难度简单1收藏分享切换为英文接收动态反馈</p>
-<p>当一个字符串 <code>s</code> 包含的每一种字母的大写和小写形式 <strong>同时</strong> 出现在 <code>s</code> 中，就称这个字符串 <code>s</code> 是 <strong>美好</strong> 字符串。比方说，<code>&quot;abABB&quot;</code> 是美好字符串，因为 <code>&#39;A&#39;</code> 和 <code>&#39;a&#39;</code> 同时出现了，且 <code>&#39;B&#39;</code> 和 <code>&#39;b&#39;</code> 也同时出现了。然而，<code>&quot;abA&quot;</code> 不是美好字符串因为 <code>&#39;b&#39;</code> 出现了，而 <code>&#39;B&#39;</code> 没有出现。</p>
-<p>给你一个字符串 <code>s</code> ，请你返回 <code>s</code> 最长的 <strong>美好子字符串</strong> 。如果有多个答案，请你返回 <strong>最早</strong> 出现的一个。如果不存在美好子字符串，请你返回一个空字符串。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;YazaAay&quot;</span><br><span class="line">输出：&quot;aAa&quot;</span><br><span class="line">解释：&quot;aAa&quot; 是一个美好字符串，因为这个子串中仅含一种字母，其小写形式 &#39;a&#39; 和大写形式 &#39;A&#39; 也同时出现了。</span><br><span class="line">&quot;aAa&quot; 是最长的美好子字符串。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;Bb&quot;</span><br><span class="line">输出：&quot;Bb&quot;</span><br><span class="line">解释：&quot;Bb&quot; 是美好字符串，因为 &#39;B&#39; 和 &#39;b&#39; 都出现了。整个字符串也是原字符串的子字符串。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;c&quot;</span><br><span class="line">输出：&quot;&quot;</span><br><span class="line">解释：没有美好子字符串。</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 4：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入：s &#x3D; &quot;dDzeE&quot;</span><br><span class="line">输出：&quot;dD&quot;</span><br><span class="line">解释：&quot;dD&quot; 和 &quot;eE&quot; 都是最长美好子字符串。</span><br><span class="line">由于有多个美好子字符串，返回 &quot;dD&quot; ，因为它出现得最早。</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= s.length &lt;= 100</code></li>
-<li><code>s</code> 只包含大写和小写英文字母。</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">longestNiceSubstring</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = s.length();</span><br><span class="line">        <span class="keyword">int</span> max = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> start = <span class="number">0</span>, end = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j &lt; n; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (judge(s.substring(i, j + <span class="number">1</span>))) &#123;</span><br><span class="line">                    <span class="keyword">int</span> interval = j - i + <span class="number">1</span>;</span><br><span class="line">                    <span class="keyword">if</span> (interval &gt; max) &#123;</span><br><span class="line">                        max = interval;</span><br><span class="line">                        start = i;</span><br><span class="line">                        end = j;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (start == end) <span class="keyword">return</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">        <span class="keyword">return</span> s.substring(start, end + <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">judge</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">char</span>[] arr = s.toCharArray();</span><br><span class="line">        <span class="keyword">int</span> n = s.length();</span><br><span class="line">        HashSet&lt;Character&gt; map = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            map.add(arr[i]);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="string">&#x27;A&#x27;</span> &lt;= arr[i] &amp;&amp; arr[i] &lt;= <span class="string">&#x27;Z&#x27;</span>) &#123;</span><br><span class="line">                <span class="keyword">char</span> c = (<span class="keyword">char</span>) (arr[i] - <span class="string">&#x27;A&#x27;</span> + <span class="string">&#x27;a&#x27;</span>);</span><br><span class="line">                <span class="keyword">if</span> (!map.contains(c)) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">char</span> c = (<span class="keyword">char</span>) (arr[i] - <span class="string">&#x27;a&#x27;</span> + <span class="string">&#x27;A&#x27;</span>);</span><br><span class="line">                <span class="keyword">if</span> (!map.contains(c)) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">longestNiceSubstring</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = s.length();</span><br><span class="line">        String ans = <span class="string">&quot;&quot;</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            out:<span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j &lt; n; j++) &#123;</span><br><span class="line">                String sub = s.substring(i, j + <span class="number">1</span>);</span><br><span class="line">                <span class="keyword">if</span> (sub.length() &gt; ans.length()) &#123;</span><br><span class="line">                    <span class="keyword">for</span> (<span class="keyword">char</span> c : sub.toCharArray()) &#123;</span><br><span class="line">                        <span class="keyword">char</span> lo = Character.toLowerCase(c), up = Character.toUpperCase(c);</span><br><span class="line">                        <span class="keyword">if</span> (sub.indexOf(lo) &lt; <span class="number">0</span> || sub.indexOf(up) &lt; <span class="number">0</span>) <span class="keyword">continue</span> out;</span><br><span class="line">                    &#125;  </span><br><span class="line">                    ans = sub;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/02/21/%E6%9C%80%E9%95%BF%E7%9A%84%E7%BE%8E%E5%A5%BD%E5%AD%90%E5%AD%97%E7%AC%A6%E4%B8%B2/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/36/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><a class="page-number" href="/page/36/">36</a><span class="page-number current">37</span><a class="page-number" href="/page/38/">38</a><a class="page-number" href="/page/39/">39</a><span class="space">&hellip;</span><a class="page-number" href="/page/90/">90</a><a class="extend next" rel="next" href="/page/38/">Next &amp;raquo;</a>
+      <a class="extend prev" rel="prev" href="/page/36/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/35/">35</a><a class="page-number" href="/page/36/">36</a><span class="page-number current">37</span><a class="page-number" href="/page/38/">38</a><a class="page-number" href="/page/39/">39</a><span class="space">&hellip;</span><a class="page-number" href="/page/91/">91</a><a class="extend next" rel="next" href="/page/38/">Next &amp;raquo;</a>
     </nav>
   
 
