@@ -150,6 +150,93 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-队列的最大值" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/12/24/%E9%98%9F%E5%88%97%E7%9A%84%E6%9C%80%E5%A4%A7%E5%80%BC/">队列的最大值</a>
+    </h1>
+  
+
+        
+        <a href="/2020/12/24/%E9%98%9F%E5%88%97%E7%9A%84%E6%9C%80%E5%A4%A7%E5%80%BC/" class="archive-article-date">
+  	<time datetime="2020-12-24T12:01:38.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-24</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">请定义一个队列并实现函数 max_value 得到队列里的最大值，要求函数max_value、push_back 和 pop_front 的均摊时间复杂度都是O(1)。</span><br><span class="line"></span><br><span class="line">若队列为空，pop_front 和 max_value 需要返回 -1</span><br><span class="line"></span><br><span class="line">示例 1：</span><br><span class="line"></span><br><span class="line">输入: </span><br><span class="line">[&quot;MaxQueue&quot;,&quot;push_back&quot;,&quot;push_back&quot;,&quot;max_value&quot;,&quot;pop_front&quot;,&quot;max_value&quot;]</span><br><span class="line">[[],[1],[2],[],[],[]]</span><br><span class="line">输出: [null,null,null,2,1,2]</span><br><span class="line">示例 2：</span><br><span class="line"></span><br><span class="line">输入: </span><br><span class="line">[&quot;MaxQueue&quot;,&quot;pop_front&quot;,&quot;max_value&quot;]</span><br><span class="line">[[],[],[]]</span><br><span class="line">输出: [null,-1,-1]</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">限制：</span><br><span class="line"></span><br><span class="line">1 &lt;&#x3D; push_back,pop_front,max_value的总操作数 &lt;&#x3D; 10000</span><br><span class="line">1 &lt;&#x3D; value &lt;&#x3D; 10^5</span><br><span class="line">通过次数48,113提交次数101,452</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;dui-lie-de-zui-da-zhi-lcof</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+<h1 id="因为求队列的最大值不会改变队列中的元素的数量，所以只需要维护一个双端辅助队列"><a href="#因为求队列的最大值不会改变队列中的元素的数量，所以只需要维护一个双端辅助队列" class="headerlink" title="因为求队列的最大值不会改变队列中的元素的数量，所以只需要维护一个双端辅助队列"></a>因为求队列的最大值不会改变队列中的元素的数量，所以只需要维护一个双端辅助队列</h1><p>辅助队列中维护最大值的递减序列，当插入一个元素时：</p>
+<ul>
+<li>如果这个元素之前的元素都小于他，那么这个元素在他前面的元素弹出之前，都是最大值，所以在最大值队列中，当前插入值之前的元素都可以删除了。</li>
+<li>如果这个元素小于队列中之前的最后一个元素，那么将其插入，当他前面的元素被弹出时，他就是最大的元素。</li>
+</ul>
+<p>如果需要查询最大元素，那么只需要查询队头的元素。<br>当真正维护所有元素的队列中的某个元素删除时，只需要判断当前删除的元素是不是最大值队列中的第一个元素就可以继续维护最大元素。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MaxQueue</span> </span>&#123;</span><br><span class="line">    Queue&lt;Integer&gt; queue;</span><br><span class="line">    Deque&lt;Integer&gt; maxQueue;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MaxQueue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        queue = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        maxQueue = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">max_value</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (maxQueue.isEmpty()) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> maxQueue.peek();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">push_back</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (!maxQueue.isEmpty() &amp;&amp; maxQueue.peekLast() &lt; value) &#123;</span><br><span class="line">            maxQueue.pollLast();</span><br><span class="line">        &#125;</span><br><span class="line">        maxQueue.offerLast(value);</span><br><span class="line">        queue.offer(value);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">pop_front</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (queue.isEmpty()) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> res = queue.poll();</span><br><span class="line">        <span class="keyword">if</span> (res == maxQueue.peekFirst()) &#123;</span><br><span class="line">            maxQueue.pollFirst();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Your MaxQueue object will be instantiated and called as such:</span></span><br><span class="line"><span class="comment"> * MaxQueue obj = new MaxQueue();</span></span><br><span class="line"><span class="comment"> * int param_1 = obj.max_value();</span></span><br><span class="line"><span class="comment"> * obj.push_back(value);</span></span><br><span class="line"><span class="comment"> * int param_3 = obj.pop_front();</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>参考文献</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/dui-lie-de-zui-da-zhi-lcof/solution/mian-shi-ti-59-ii-dui-lie-de-zui-da-zhi-by-leetcod/">作者：LeetCode-Solution 来源：力扣（LeetCode） 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">滑动窗口</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/12/24/%E9%98%9F%E5%88%97%E7%9A%84%E6%9C%80%E5%A4%A7%E5%80%BC/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-滑动窗口的最大值" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -908,90 +995,6 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2020/12/22/%E4%BF%84%E7%BD%97%E6%96%AF%E5%86%9C%E6%B0%91%E4%B9%98%E6%B3%95/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-求1-2-3-n" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/12/22/%E6%B1%821-2-3-n/">求1+2+3+...+n</a>
-    </h1>
-  
-
-        
-        <a href="/2020/12/22/%E6%B1%821-2-3-n/" class="archive-article-date">
-  	<time datetime="2020-12-22T05:23:14.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-12-22</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">求 1+2+...+n ，要求不能使用乘除法、for、while、if、else、switch、case等关键字及条件判断语句（A?B:C）。</span><br><span class="line"></span><br><span class="line">示例 1：</span><br><span class="line"></span><br><span class="line">输入: n &#x3D; 3</span><br><span class="line">输出: 6</span><br><span class="line">示例 2：</span><br><span class="line"></span><br><span class="line">输入: n &#x3D; 9</span><br><span class="line">输出: 45</span><br><span class="line"></span><br><span class="line">限制：</span><br><span class="line"></span><br><span class="line">1 &lt;&#x3D; n &lt;&#x3D; 10000</span><br><span class="line">通过次数79,016提交次数92,650</span><br><span class="line"></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;qiu-12n-lcof</span><br><span class="line">著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-<h1 id="使用递归-断路器机制"><a href="#使用递归-断路器机制" class="headerlink" title="使用递归+断路器机制"></a>使用递归+断路器机制</h1><p>以逻辑运算符 &amp;&amp; 为例，对于 A &amp;&amp; B 这个表达式，如果 A 表达式返回 False ，那么 A &amp;&amp; B 已经确定为 False ，此时不会去执行表达式 B。同理，对于逻辑运算符 ||， 对于 A || B 这个表达式，如果 A 表达式返回 True ，那么 A || B 已经确定为 True ，此时不会去执行表达式 B。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sumNums</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">boolean</span> flag = n &gt; <span class="number">0</span> &amp;&amp; (n += sumNums(n - <span class="number">1</span>)) &gt; <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">return</span> n;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="使用递归-try-catch"><a href="#使用递归-try-catch" class="headerlink" title="使用递归+try catch"></a>使用递归+try catch</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">sumNums</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span>[] sum = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">        <span class="keyword">return</span> getSum(n,sum);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">getSum</span><span class="params">(<span class="keyword">int</span> n,<span class="keyword">int</span>[] sum)</span></span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            sum[n-<span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">            sum[n-<span class="number">1</span>] = getSum(n-<span class="number">1</span>,sum)+ n;</span><br><span class="line">            <span class="keyword">return</span> sum[n-<span class="number">1</span>];</span><br><span class="line">        &#125;<span class="keyword">catch</span> (Exception e)&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<blockquote>
-<p>参考文献</p>
-</blockquote>
-<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/qiu-12n-lcof/solution/qiu-12n-by-leetcode-solution/423859">黄金大镖客的评论</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">作者：LeetCode-Solution</span><br><span class="line">链接：https:&#x2F;&#x2F;leetcode-cn.com&#x2F;problems&#x2F;qiu-12n-lcof&#x2F;solution&#x2F;qiu-12n-by-leetcode-solution&#x2F;</span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/12/22/%E6%B1%821-2-3-n/">展开全文 >></a>
         </p>
       
 
@@ -2060,6 +2063,10 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">幂</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">DFS</a>
               </li>
             
             <div class="clearfix"></div>
