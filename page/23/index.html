@@ -150,6 +150,227 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-数组元素积的符号" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/04/11/%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0%E7%A7%AF%E7%9A%84%E7%AC%A6%E5%8F%B7/">数组元素积的符号</a>
+    </h1>
+  
+
+        
+        <a href="/2021/04/11/%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0%E7%A7%AF%E7%9A%84%E7%AC%A6%E5%8F%B7/" class="archive-article-date">
+  	<time datetime="2021-04-11T05:05:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-11</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h3 id="5726-数组元素积的符号"><a href="#5726-数组元素积的符号" class="headerlink" title="5726. 数组元素积的符号"></a>5726. 数组元素积的符号</h3><p>已知函数 <code>signFunc(x)</code> 将会根据 <code>x</code> 的正负返回特定值：</p>
+<ul>
+<li>如果 <code>x</code> 是正数，返回 <code>1</code> 。</li>
+<li>如果 <code>x</code> 是负数，返回 <code>-1</code> 。</li>
+<li>如果 <code>x</code> 是等于 <code>0</code> ，返回 <code>0</code> 。</li>
+</ul>
+<p>给你一个整数数组 <code>nums</code> 。令 <code>product</code> 为数组 <code>nums</code> 中所有元素值的乘积。</p>
+<p>返回 <code>signFunc(product)</code> 。</p>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [-1,-2,-3,-4,3,2,1]</span><br><span class="line">输出：1</span><br><span class="line">解释：数组中所有值的乘积是 144 ，且 signFunc(144) &#x3D; 1</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [1,5,0,2,-3]</span><br><span class="line">输出：0</span><br><span class="line">解释：数组中所有值的乘积是 0 ，且 signFunc(0) &#x3D; 0</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 3：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：nums &#x3D; [-1,1,-1,1,-1]</span><br><span class="line">输出：-1</span><br><span class="line">解释：数组中所有值的乘积是 -1 ，且 signFunc(-1) &#x3D; -1</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>1 &lt;= nums.length &lt;= 1000</code></li>
+<li><code>-100 &lt;= nums[i] &lt;= 100</code></li>
+</ul>
+<h2 id="记录负数的数量"><a href="#记录负数的数量" class="headerlink" title="记录负数的数量"></a>记录负数的数量</h2><p>上当了不能直接用long去乘，否则会出错</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">arraySign</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line">        <span class="keyword">int</span> countNeg = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (nums[i] == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">if</span> (nums[i] &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                countNeg++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (countNeg % <span class="number">2</span> == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">签到题</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/04/11/%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0%E7%A7%AF%E7%9A%84%E7%AC%A6%E5%8F%B7/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-最大食物链计数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/04/10/%E6%9C%80%E5%A4%A7%E9%A3%9F%E7%89%A9%E9%93%BE%E8%AE%A1%E6%95%B0/">最大食物链计数</a>
+    </h1>
+  
+
+        
+        <a href="/2021/04/10/%E6%9C%80%E5%A4%A7%E9%A3%9F%E7%89%A9%E9%93%BE%E8%AE%A1%E6%95%B0/" class="archive-article-date">
+  	<time datetime="2021-04-10T15:28:32.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-10</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h2 id="题目背景"><a href="#题目背景" class="headerlink" title="题目背景"></a>题目背景</h2><p>你知道食物链吗？Delia 生物考试的时候，数食物链条数的题目全都错了，因为她总是重复数了几条或漏掉了几条。于是她来就来求助你，然而你也不会啊！写一个程序来帮帮她吧。</p>
+<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给你一个食物网，你要求出这个食物网中最大食物链的数量。</p>
+<p>（这里的“最大食物链”，指的是<strong>生物学意义上的食物链</strong>，即<strong>最左端是不会捕食其他生物的生产者，最右端是不会被其他生物捕食的消费者</strong>。）</p>
+<p><code>Delia</code>非常急，所以你只有 <code>1</code> 秒的时间。</p>
+<p>由于这个结果可能过大，你只需要输出总数模上 <code>80112002</code> 的结果。</p>
+<h2 id="输入格式"><a href="#输入格式" class="headerlink" title="输入格式"></a>输入格式</h2><p>第一行，两个正整数 $n、m$，表示生物种类 $n$ 和吃与被吃的关系数 $m$</p>
+<p>接下来 $m$ 行，每行两个正整数，表示被吃的生物<code>A</code>和吃<code>A</code>的生物<code>B</code>。</p>
+<h2 id="输出格式"><a href="#输出格式" class="headerlink" title="输出格式"></a>输出格式</h2><p>一行一个整数，为最大食物链数量模上 <code>80112002</code> 的结果。</p>
+<h2 id="输入输出样例"><a href="#输入输出样例" class="headerlink" title="输入输出样例"></a>输入输出样例</h2><p><strong>输入 #1</strong>复制</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">5 7</span><br><span class="line">1 2</span><br><span class="line">1 3</span><br><span class="line">2 3</span><br><span class="line">3 5</span><br><span class="line">2 5</span><br><span class="line">4 5</span><br><span class="line">3 4</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出 #1</strong>复制</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">5</span><br></pre></td></tr></table></figure>
+
+<h2 id="说明-提示"><a href="#说明-提示" class="headerlink" title="说明/提示"></a>说明/提示</h2><p>各测试点满足以下约定：</p>
+<p><img src="https://cdn.luogu.com.cn/upload/pic/12011.png" alt="img"></p>
+<p>【补充说明】</p>
+<p>数据中不会出现环，满足生物学的要求。（感谢 @AKEE ）</p>
+<h2 id="拓扑排序-动态规划"><a href="#拓扑排序-动态规划" class="headerlink" title="拓扑排序+动态规划"></a>拓扑排序+动态规划</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> mod = <span class="number">80112002</span>;</span><br><span class="line"></span><br><span class="line">        Scanner sc = <span class="keyword">new</span> Scanner(System.in);</span><br><span class="line">        <span class="keyword">int</span> n = sc.nextInt();</span><br><span class="line">        <span class="keyword">int</span> m = sc.nextInt();</span><br><span class="line"></span><br><span class="line">        List&lt;List&lt;Integer&gt;&gt; edges = <span class="keyword">new</span> ArrayList&lt;List&lt;Integer&gt;&gt;();</span><br><span class="line">        <span class="keyword">int</span>[] indeg = <span class="keyword">new</span> <span class="keyword">int</span>[n + <span class="number">1</span>];</span><br><span class="line">        <span class="keyword">int</span>[] dp = <span class="keyword">new</span> <span class="keyword">int</span>[n + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            edges.add(<span class="keyword">new</span> ArrayList&lt;&gt;());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; m; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> prey = sc.nextInt();</span><br><span class="line">            <span class="keyword">int</span> hunter = sc.nextInt();</span><br><span class="line">            edges.get(prey).add(hunter);</span><br><span class="line">            indeg[hunter]++;</span><br><span class="line">        &#125;</span><br><span class="line">        Queue&lt;Integer&gt; queue = <span class="keyword">new</span> LinkedList&lt;Integer&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (indeg[i] == <span class="number">0</span>) &#123;</span><br><span class="line">                queue.offer(i);</span><br><span class="line">                dp[i] = <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (!queue.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">int</span> pre = queue.poll();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> next : edges.get(pre)) &#123;</span><br><span class="line">                indeg[next]--;</span><br><span class="line"></span><br><span class="line">                dp[next] = (dp[next] + dp[pre]) % mod;<span class="comment">//这句话是本题的核心</span></span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (indeg[next] == <span class="number">0</span>) &#123;</span><br><span class="line">                    queue.offer(next);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> ans = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 找到那个不被吃的也就是食物链顶端的那个就是结果</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (edges.get(i).size() == <span class="number">0</span>) ans = (dp[i] + ans) % mod;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(ans);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">动态规划</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">拓扑排序</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/04/10/%E6%9C%80%E5%A4%A7%E9%A3%9F%E7%89%A9%E9%93%BE%E8%AE%A1%E6%95%B0/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-丑数2" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1027,224 +1248,6 @@ tex2jax: {
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/04/08/%E7%96%AF%E7%8B%82%E7%9A%84%E9%87%87%E8%8D%AF/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-查找薪水记录超过15次的员工" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/04/07/%E6%9F%A5%E6%89%BE%E8%96%AA%E6%B0%B4%E8%AE%B0%E5%BD%95%E8%B6%85%E8%BF%8715%E6%AC%A1%E7%9A%84%E5%91%98%E5%B7%A5/">查找薪水记录超过15次的员工</a>
-    </h1>
-  
-
-        
-        <a href="/2021/04/07/%E6%9F%A5%E6%89%BE%E8%96%AA%E6%B0%B4%E8%AE%B0%E5%BD%95%E8%B6%85%E8%BF%8715%E6%AC%A1%E7%9A%84%E5%91%98%E5%B7%A5/" class="archive-article-date">
-  	<time datetime="2021-04-07T11:34:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-07</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>有一个薪水表，salaries简况如下:</p>
-<p><img src="https://uploadfiles.nowcoder.com/images/20210203/557336_1612337273467/8307279490CB9F89069769B3CDABC925" alt="img"></p>
-<p>建表语句如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE &#96;salaries&#96; (&#96;&#96;&#96;emp_no&#96; &#96;&#96;int&#96;&#96;(11) NOT NULL,&#96;&#96;&#96;salary&#96; &#96;&#96;int&#96;&#96;(11) NOT NULL,&#96;&#96;&#96;from_date&#96; date NOT NULL,&#96;&#96;&#96;to_date&#96; date NOT NULL,&#96;&#96;PRIMARY KEY (&#96;emp_no&#96;,&#96;from_date&#96;));</span><br></pre></td></tr></table></figure>
-
-
-<p>请你查找薪水记录超过15次的员工号emp_no以及其对应的记录次数t，以上例子输出如下:</p>
-<p><img src="https://uploadfiles.nowcoder.com/images/20210203/557336_1612337361503/85F393DA0762A39426D8D7C5958C8976" alt="img"></p>
-<p><strong>在 SQL 中增加 HAVING 子句原因是，WHERE 关键字无法与聚合函数一起使用。</strong></p>
-<p><strong>HAVING 子句可以让我们筛选分组后的各组数据。</strong></p>
-<p>此题应注意以下3点：</p>
-<p>1、用COUNT()函数和GROUP BY语句可以统计同一emp_no值的记录条数</p>
-<p>2、根据题意，输出的变动次数为t，故用AS语句将COUNT(emp_no)的值转换为t</p>
-<p>3、由于COUNT()函数不可用于WHERE语句中，故使用HAVING语句来限定t&gt;15的条件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT emp_no, COUNT(emp_no) AS t FROM salaries GROUP BY emp_no HAVING t &gt; 15</span><br></pre></td></tr></table></figure>
-
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">sql</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/04/07/%E6%9F%A5%E6%89%BE%E8%96%AA%E6%B0%B4%E8%AE%B0%E5%BD%95%E8%B6%85%E8%BF%8715%E6%AC%A1%E7%9A%84%E5%91%98%E5%B7%A5/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-魔塔游戏" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/04/05/%E9%AD%94%E5%A1%94%E6%B8%B8%E6%88%8F/">魔塔游戏</a>
-    </h1>
-  
-
-        
-        <a href="/2021/04/05/%E9%AD%94%E5%A1%94%E6%B8%B8%E6%88%8F/" class="archive-article-date">
-  	<time datetime="2021-04-05T11:20:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-05</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="LCP-30-魔塔游戏"><a href="#LCP-30-魔塔游戏" class="headerlink" title="LCP 30. 魔塔游戏"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/p0NxJO/">LCP 30. 魔塔游戏</a></h4><p>难度中等2</p>
-<p>小扣当前位于魔塔游戏第一层，共有 <code>N</code> 个房间，编号为 <code>0 ~ N-1</code>。每个房间的补血道具/怪物对于血量影响记于数组 <code>nums</code>，其中正数表示道具补血数值，即血量增加对应数值；负数表示怪物造成伤害值，即血量减少对应数值；<code>0</code> 表示房间对血量无影响。</p>
-<p><strong>小扣初始血量为 1，且无上限</strong>。假定小扣原计划按房间编号升序访问所有房间补血/打怪，<strong>为保证血量始终为正值</strong>，小扣需对房间访问顺序进行调整，<strong>每次仅能将一个怪物房间（负数的房间）调整至访问顺序末尾</strong>。请返回小扣最少需要调整几次，才能顺利访问所有房间。若调整顺序也无法访问完全部房间，请返回 -1。</p>
-<p><strong>示例 1：</strong></p>
-<blockquote>
-<p>输入：<code>nums = [100,100,100,-250,-60,-140,-50,-50,100,150]</code></p>
-<p>输出：<code>1</code></p>
-<p>解释：初始血量为 1。至少需要将 nums[3] 调整至访问顺序末尾以满足要求。</p>
-</blockquote>
-<p><strong>示例 2：</strong></p>
-<blockquote>
-<p>输入：<code>nums = [-200,-300,400,0]</code></p>
-<p>输出：<code>-1</code></p>
-<p>解释：调整访问顺序也无法完成全部房间的访问。</p>
-</blockquote>
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= nums.length &lt;= 10^5</code></li>
-<li><code>-10^5 &lt;= nums[i] &lt;= 10^5</code></li>
-</ul>
-<h2 id="贪心"><a href="#贪心" class="headerlink" title="贪心"></a>贪心</h2><p>只需一次遍历就能完成证明：</p>
-<p>因为能够完成即和是大于<code>0</code>的，当只有一个负数时，假设该负数是<code>min</code>，将当前最大的那个放到最后之后，左边的和应该是<br>$$<br>sum + |min|(min&lt;0)<br>$$<br>右边的值是<code>min(min&lt;0)</code>,即从开始计算到<code>min</code>之前的那个数字（<code>min</code>被移动到最后了），左边的和为<br>$$<br>sum+|min| &gt;= |min|<br>$$<br>因为$sum&gt;0$,</p>
-<p>同理当有两个负数时，假设他们的和是<code>min</code> 同样可得<br>$$<br>sum+|min| &gt;= |min|<br>$$<br>即，从左往右遍历一次可以实现当前左边的和的绝对值始终大于右边的和的绝对值（这里的左边是指从<code>0</code>到<code>n-1</code>,右边是指从<code>n</code>到<code>调整的次数+n</code>）</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">magicTower</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> n = nums.length;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            sum += nums[i];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (sum &lt; <span class="number">0</span>) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        PriorityQueue&lt;Integer&gt; pq = <span class="keyword">new</span> PriorityQueue&lt;&gt;((a, b) -&gt; a - b);</span><br><span class="line">        <span class="keyword">long</span> hp = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> val : nums) &#123;</span><br><span class="line">            <span class="keyword">if</span> (val &lt; <span class="number">0</span>) pq.offer(val);</span><br><span class="line">            hp += val;</span><br><span class="line">            <span class="keyword">if</span> (hp &lt; <span class="number">0</span> &amp;&amp; !pq.isEmpty()) &#123;</span><br><span class="line">                <span class="comment">// 相当于把当前最大那个调整到了最后</span></span><br><span class="line">                hp -= pq.poll();</span><br><span class="line">                res++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<blockquote>
-<p>参考文献</p>
-<p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/p0NxJO/solution/lcp-30-mo-ta-you-xi-by-celestezephyr-xhlq/">https://leetcode-cn.com/problems/p0NxJO/solution/lcp-30-mo-ta-you-xi-by-celestezephyr-xhlq/</a></p>
-</blockquote>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">贪心</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/04/05/%E9%AD%94%E5%A1%94%E6%B8%B8%E6%88%8F/">展开全文 >></a>
         </p>
       
 
