@@ -150,6 +150,111 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-树的直径" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/05/03/%E6%A0%91%E7%9A%84%E7%9B%B4%E5%BE%84/">树的直径</a>
+    </h1>
+  
+
+        
+        <a href="/2021/05/03/%E6%A0%91%E7%9A%84%E7%9B%B4%E5%BE%84/" class="archive-article-date">
+  	<time datetime="2021-05-03T08:47:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-05-03</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给定一棵树，求出这棵树的直径，即树上最远两点的距离。</p>
+<p>包含n个结点，n-1条边的连通图称为树。</p>
+<p>示例1的树如下图所示。其中4到5之间的路径最长，是树的直径，距离为5+2+4=11</p>
+<p><img src="https://uploadfiles.nowcoder.com/images/20201202/999991351_1606896095422/54D43FCA3EABC9D96189FA8EA98A510C" alt="img"></p>
+<p>示例1</p>
+<h2 id="输入"><a href="#输入" class="headerlink" title="输入"></a>输入</h2><p><a href="javascript:void(0);">复制</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">6,[[0,1],[1,5],[1,2],[2,3],[2,4]],[3,4,2,1,5]</span><br></pre></td></tr></table></figure>
+
+<h2 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h2><p><a href="javascript:void(0);">复制</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">11</span><br></pre></td></tr></table></figure>
+
+<h2 id="通用解法"><a href="#通用解法" class="headerlink" title="通用解法"></a>通用解法</h2><p>对于此类问题，我们需要构建图来做深度优先搜索。</p>
+<ul>
+<li><p>首先，根据父子关系及边权重构建无向图；</p>
+</li>
+<li><p>然后，随机找一顶点，利用深度优先搜索找到距离该点最远的顶点remote。</p>
+</li>
+<li><p>最后，从remote顶点开始深度优先搜索找到最长路径，该路径即为直径。</p>
+</li>
+</ul>
+<h2 id="巧妙解法"><a href="#巧妙解法" class="headerlink" title="巧妙解法"></a>巧妙解法</h2><p>我们记录每个节点向下，所能延伸的最远距离 $d_1$，和次远距离$d_2$ ，那么直径就是所有$d_1+d_2$ 的最大值。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">solve</span> <span class="params">(<span class="keyword">int</span> n, Interval[] Tree_edge, <span class="keyword">int</span>[] Edge_value)</span> </span>&#123;</span><br><span class="line">        List&lt;Node&gt; [] edges = <span class="keyword">new</span> List[n];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;n;i++)&#123;</span><br><span class="line">            edges[i] = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 建立邻接表无向图</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;Tree_edge.length;i++)&#123;</span><br><span class="line">            edges[Tree_edge[i].start].add(<span class="keyword">new</span> Node(Tree_edge[i].end,Edge_value[i]));</span><br><span class="line">            edges[Tree_edge[i].end].add(<span class="keyword">new</span> Node(Tree_edge[i].start,Edge_value[i]));</span><br><span class="line">        &#125;</span><br><span class="line">        dfs(edges,Tree_edge[<span class="number">0</span>].start,-<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> max;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">int</span> max = <span class="number">0</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">dfs</span><span class="params">(List&lt;Node&gt; []edges,<span class="keyword">int</span> curr,<span class="keyword">int</span> parent)</span></span>&#123;</span><br><span class="line">        <span class="keyword">int</span> maxDepth = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> secondDepth = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(Node node:edges[curr])&#123;</span><br><span class="line">            <span class="keyword">if</span>(node.id == parent)<span class="keyword">continue</span>;</span><br><span class="line">            <span class="keyword">int</span> depth = node.weight + dfs(edges,node.id,curr);</span><br><span class="line">            <span class="keyword">if</span> (depth &gt; maxDepth) &#123;</span><br><span class="line">                secondDepth = maxDepth;</span><br><span class="line">                maxDepth = depth;</span><br><span class="line">            &#125;<span class="keyword">else</span> <span class="keyword">if</span> (depth &gt; secondDepth) &#123;</span><br><span class="line">                secondDepth = depth;</span><br><span class="line">            &#125;</span><br><span class="line">            maxDepth = Math.max(maxDepth,depth);</span><br><span class="line">        &#125;</span><br><span class="line">        max = Math.max(max,maxDepth+secondDepth);</span><br><span class="line">        <span class="keyword">return</span> maxDepth;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> id;</span><br><span class="line">        <span class="keyword">int</span> weight;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Node</span><span class="params">(<span class="keyword">int</span> id,<span class="keyword">int</span> weight)</span></span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.id = id;</span><br><span class="line">            <span class="keyword">this</span>.weight = weight;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<blockquote>
+<p>参考文献</p>
+<p><a target="_blank" rel="noopener" href="https://oi-wiki.org/graph/tree-diameter/">树的直径 - OI Wiki (oi-wiki.org)</a></p>
+</blockquote>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/05/03/%E6%A0%91%E7%9A%84%E7%9B%B4%E5%BE%84/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-到目标元素的最小距离" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1120,127 +1225,6 @@ tex2jax: {
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/04/26/%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-爱吃香蕉的珂珂" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/04/26/%E7%88%B1%E5%90%83%E9%A6%99%E8%95%89%E7%9A%84%E7%8F%82%E7%8F%82/">爱吃香蕉的珂珂</a>
-    </h1>
-  
-
-        
-        <a href="/2021/04/26/%E7%88%B1%E5%90%83%E9%A6%99%E8%95%89%E7%9A%84%E7%8F%82%E7%8F%82/" class="archive-article-date">
-  	<time datetime="2021-04-26T02:23:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-04-26</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="875-爱吃香蕉的珂珂"><a href="#875-爱吃香蕉的珂珂" class="headerlink" title="875. 爱吃香蕉的珂珂"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/koko-eating-bananas/">875. 爱吃香蕉的珂珂</a></h4><p>难度中等164收藏分享切换为英文接收动态反馈</p>
-<p>珂珂喜欢吃香蕉。这里有 <code>N</code> 堆香蕉，第 <code>i</code> 堆中有 <code>piles[i]</code> 根香蕉。警卫已经离开了，将在 <code>H</code> 小时后回来。</p>
-<p>珂珂可以决定她吃香蕉的速度 <code>K</code> （单位：根/小时）。每个小时，她将会选择一堆香蕉，从中吃掉 <code>K</code> 根。如果这堆香蕉少于 <code>K</code> 根，她将吃掉这堆的所有香蕉，然后这一小时内不会再吃更多的香蕉。 </p>
-<p>珂珂喜欢慢慢吃，但仍然想在警卫回来前吃掉所有的香蕉。</p>
-<p>返回她可以在 <code>H</code> 小时内吃掉所有香蕉的最小速度 <code>K</code>（<code>K</code> 为整数）。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: piles &#x3D; [3,6,7,11], H &#x3D; 8</span><br><span class="line">输出: 4</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: piles &#x3D; [30,11,23,4,20], H &#x3D; 5</span><br><span class="line">输出: 30</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: piles &#x3D; [30,11,23,4,20], H &#x3D; 6</span><br><span class="line">输出: 23</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= piles.length &lt;= 10^4</code></li>
-<li><code>piles.length &lt;= H &lt;= 10^9</code></li>
-<li><code>1 &lt;= piles[i] &lt;= 10^9</code></li>
-</ul>
-<p>通过次数30,497</p>
-<p>提交次数65,121</p>
-<h2 id="二分答案"><a href="#二分答案" class="headerlink" title="二分答案"></a>二分答案</h2><p>将答案的最小值和最大值作为搜索的左边界和右边界，每次搜索判断搜索到的值是否满足题目的条件（暴力计算即可），如果满足条件，那么就降低当前的条件，如果当前搜索到的值不满足条件，那么提升当前的条件。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">minEatingSpeed</span><span class="params">(<span class="keyword">int</span>[] piles, <span class="keyword">int</span> h)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = piles.length;</span><br><span class="line">        <span class="keyword">int</span> l = <span class="number">0</span>, r = (<span class="keyword">int</span>)<span class="number">1e9</span>;</span><br><span class="line">        <span class="keyword">while</span>(l&lt;r)&#123;</span><br><span class="line">            <span class="keyword">int</span> m = l+(r-l)/<span class="number">2</span>;</span><br><span class="line">            <span class="keyword">int</span> time = <span class="number">0</span>;</span><br><span class="line">            <span class="comment">// 这里是关键步骤，一下没想起来</span></span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> p:piles)&#123;</span><br><span class="line">                <span class="keyword">if</span>(p&lt;m)&#123;</span><br><span class="line">                    time++;</span><br><span class="line">                &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                    time += (<span class="keyword">int</span>)Math.ceil(p*<span class="number">1.0</span>/m);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(time&lt;=h)&#123;</span><br><span class="line">                r = m;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                l = m + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> l;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="官方题解"><a href="#官方题解" class="headerlink" title="官方题解"></a>官方题解</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">minEatingSpeed</span><span class="params">(<span class="keyword">int</span>[] piles, <span class="keyword">int</span> H)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> lo = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> hi = <span class="number">1_000_000_000</span>;</span><br><span class="line">        <span class="keyword">while</span> (lo &lt; hi) &#123;</span><br><span class="line">            <span class="keyword">int</span> mi = (lo + hi) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (!possible(piles, H, mi))</span><br><span class="line">                lo = mi + <span class="number">1</span>;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                hi = mi;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> lo;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Can Koko eat all bananas in H hours with eating speed K?</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">possible</span><span class="params">(<span class="keyword">int</span>[] piles, <span class="keyword">int</span> H, <span class="keyword">int</span> K)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> time = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> p: piles)</span><br><span class="line">            time += (p-<span class="number">1</span>) / K + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> time &lt;= H;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/koko-eating-bananas/solution/ai-chi-xiang-jiao-de-ke-ke-by-leetcode/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="同类型题目"><a href="#同类型题目" class="headerlink" title="同类型题目"></a>同类型题目</h2><p><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/capacity-to-ship-packages-within-d-days/solution/zai-d-tian-nei-song-da-bao-guo-de-neng-l-ntml/">在 D 天内送达包裹的能力 - 在 D 天内送达包裹的能力 - 力扣（LeetCode） (leetcode-cn.com)</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">二分查找</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">重要题型</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/04/26/%E7%88%B1%E5%90%83%E9%A6%99%E8%95%89%E7%9A%84%E7%8F%82%E7%8F%82/">展开全文 >></a>
         </p>
       
 
