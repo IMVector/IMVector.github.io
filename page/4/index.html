@@ -150,6 +150,123 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-救生艇" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/08/26/%E6%95%91%E7%94%9F%E8%89%87/">救生艇</a>
+    </h1>
+  
+
+        
+        <a href="/2021/08/26/%E6%95%91%E7%94%9F%E8%89%87/" class="archive-article-date">
+  	<time datetime="2021-08-26T01:46:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-26</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="881-救生艇"><a href="#881-救生艇" class="headerlink" title="881. 救生艇"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/boats-to-save-people/">881. 救生艇</a></h4><p>难度中等131收藏分享切换为英文接收动态反馈</p>
+<p>第 <code>i</code> 个人的体重为 <code>people[i]</code>，每艘船可以承载的最大重量为 <code>limit</code>。</p>
+<p>每艘船最多可同时载两人，但条件是这些人的重量之和最多为 <code>limit</code>。</p>
+<p>返回载到每一个人所需的最小船数。(保证每个人都能被船载)。</p>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：people &#x3D; [1,2], limit &#x3D; 3</span><br><span class="line">输出：1</span><br><span class="line">解释：1 艘船载 (1, 2)</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：people &#x3D; [3,2,2,1], limit &#x3D; 3</span><br><span class="line">输出：3</span><br><span class="line">解释：3 艘船分别载 (1, 2), (2) 和 (3)</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 3：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：people &#x3D; [3,5,3,4], limit &#x3D; 5</span><br><span class="line">输出：4</span><br><span class="line">解释：4 艘船分别载 (3), (3), (4), (5)</span><br></pre></td></tr></table></figure>
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>1 &lt;= people.length &lt;= 50000</code></li>
+<li><code>1 &lt;= people[i] &lt;= limit &lt;= 30000</code></li>
+</ul>
+<p>通过次数24,141</p>
+<p>提交次数47,412</p>
+<h2 id="双指针"><a href="#双指针" class="headerlink" title="双指针"></a>双指针</h2><p>先对数组从小到大排序，然后判断最重的和最轻的两个人是否可以上同一条船，如果不可以，那么最重的自己只能占用一条船，然后判断第二重的和最轻的是否可以上同一条船，如果可以，那么继续看第二轻和第三重的人是否可以上一条船。</p>
+<p>即：从数组前面找一个最小的数，从数组后面找一个最大的数：</p>
+<ul>
+<li>如果两数之和小于等于limit，那么船的数量加1，左右指针向中间收缩；</li>
+<li>如果两数之和大于limit，那么右指针向左收缩，船的数量加1</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">numRescueBoats</span><span class="params">(<span class="keyword">int</span>[] people, <span class="keyword">int</span> limit)</span> </span>&#123;</span><br><span class="line">        Arrays.sort(people);</span><br><span class="line">        <span class="keyword">int</span> l = <span class="number">0</span>,r= people.length-<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> cnt=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(l&lt;=r)&#123;</span><br><span class="line">            <span class="keyword">if</span>(l&lt;r&amp;&amp;people[l]+people[r]&lt;=limit)&#123;</span><br><span class="line">                cnt++;</span><br><span class="line">                l++;</span><br><span class="line">                r--;</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                r--;</span><br><span class="line">                cnt++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> cnt;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">双指针</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">重要题型</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/08/26/%E6%95%91%E7%94%9F%E8%89%87/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-所有可能的路径" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1162,94 +1279,6 @@ tex2jax: {
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/08/20/%E5%8F%8D%E8%BD%AC%E5%AD%97%E7%AC%A6%E4%B8%B22/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-excel获取当前的列的index" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/08/20/excel%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E7%9A%84%E5%88%97%E7%9A%84index/">excel获取当前的列的index</a>
-    </h1>
-  
-
-        
-        <a href="/2021/08/20/excel%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E7%9A%84%E5%88%97%E7%9A%84index/" class="archive-article-date">
-  	<time datetime="2021-08-19T16:12:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-08-20</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-
-
-<p>在某一列单元格中输入=column()，即得到所在列的列数。比如在B1中输入=column()，返回结果2，即当前列为第二列</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">工具使用</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/08/20/excel%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E7%9A%84%E5%88%97%E7%9A%84index/">展开全文 >></a>
         </p>
       
 
