@@ -150,6 +150,107 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-最大整除子集" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/03/21/%E6%9C%80%E5%A4%A7%E6%95%B4%E9%99%A4%E5%AD%90%E9%9B%86/">最大整除子集</a>
+    </h1>
+  
+
+        
+        <a href="/2021/03/21/%E6%9C%80%E5%A4%A7%E6%95%B4%E9%99%A4%E5%AD%90%E9%9B%86/" class="archive-article-date">
+  	<time datetime="2021-03-21T15:19:43.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-21</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="368-最大整除子集"><a href="#368-最大整除子集" class="headerlink" title="368. 最大整除子集"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/largest-divisible-subset/">368. 最大整除子集</a></h4><p>难度中等207收藏分享切换为英文接收动态反馈</p>
+<p>给出一个由<strong>无重复的</strong>正整数组成的集合，找出其中最大的整除子集，子集中任意一对 (Si，Sj) 都要满足：Si % Sj = 0 或 Sj % Si = 0。</p>
+<p>如果有多个目标子集，返回其中任何一个均可。</p>
+<p><strong>示例 1:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: [1,2,3]</span><br><span class="line">输出: [1,2] (当然, [1,3] 也正确)</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: [1,2,4,8]</span><br><span class="line">输出: [1,2,4,8]</span><br></pre></td></tr></table></figure>
+
+<h2 id="动态规划"><a href="#动态规划" class="headerlink" title="动态规划"></a>动态规划</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">largestDivisibleSubset</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Test case with empty set.</span></span><br><span class="line">    <span class="keyword">int</span> n = nums.length;</span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">new</span> ArrayList();</span><br><span class="line">        </span><br><span class="line">    <span class="comment">// Container to keep the largest divisible subset</span></span><br><span class="line">    <span class="comment">//   that ends with each of the nums.</span></span><br><span class="line">    List&lt;ArrayList&gt; EDS = <span class="keyword">new</span> ArrayList();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> num : nums) EDS.add(<span class="keyword">new</span> ArrayList());</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Sort the original list in ascending order. */</span></span><br><span class="line">    Arrays.sort(nums);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Calculate all the values of EDS(X_i) */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">      List&lt;Integer&gt; maxSubset = <span class="keyword">new</span> ArrayList();</span><br><span class="line">            </span><br><span class="line">      <span class="comment">// Find the largest divisible subset of previous elements.</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; i; ++k) </span><br><span class="line">        <span class="keyword">if</span> (nums[i] % nums[k] == <span class="number">0</span> &amp;&amp; maxSubset.size() &lt; EDS.get(k).size())</span><br><span class="line">          maxSubset = EDS.get(k);</span><br><span class="line">          </span><br><span class="line">      <span class="comment">// Extend the found subset with the element itself.</span></span><br><span class="line">      EDS.get(i).addAll(maxSubset);</span><br><span class="line">      EDS.get(i).add(nums[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/* Find the largest of EDS values  */</span></span><br><span class="line">    List&lt;Integer&gt; ret = <span class="keyword">new</span> ArrayList();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) </span><br><span class="line">      <span class="keyword">if</span> (ret.size() &lt; EDS.get(i).size()) ret = EDS.get(i);</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">  &#125;  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/largest-divisible-subset/solution/zui-da-zheng-chu-zi-ji-by-leetcode/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+<h2 id="优化的动态规划"><a href="#优化的动态规划" class="headerlink" title="优化的动态规划"></a>优化的动态规划</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">largestDivisibleSubset</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Test case with empty set.</span></span><br><span class="line">    <span class="keyword">int</span> n = nums.length;</span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">new</span> ArrayList();</span><br><span class="line">        </span><br><span class="line">    <span class="comment">// Container to keep the size of the largest divisible subset</span></span><br><span class="line">    <span class="comment">//   that ends with each of the nums.</span></span><br><span class="line">    Integer[] dp = <span class="keyword">new</span> Integer[n];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Sort the original list in ascending order. */</span></span><br><span class="line">    Arrays.sort(nums);</span><br><span class="line"></span><br><span class="line">    Integer maxSubsetSize = -<span class="number">1</span>, maxSubsetIndex = -<span class="number">1</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* Calculate the rest of EDS(X_i) */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">      Integer subsetSize = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Find the size of the largest divisible subset.</span></span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; i; ++k) </span><br><span class="line">        <span class="keyword">if</span> (nums[i] % nums[k] == <span class="number">0</span> &amp;&amp; subsetSize &lt; dp[k])</span><br><span class="line">          subsetSize = dp[k];</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Extend the found subset with the element itself.</span></span><br><span class="line">      dp[i] = subsetSize + <span class="number">1</span>;</span><br><span class="line">    </span><br><span class="line">      <span class="comment">// We reuse this loop to obtain the largest subset size </span></span><br><span class="line">      <span class="comment">//   in order to prepare for the reconstruction of subset.</span></span><br><span class="line">      <span class="keyword">if</span> (maxSubsetSize &lt; dp[i]) &#123;</span><br><span class="line">        maxSubsetSize = dp[i];</span><br><span class="line">        maxSubsetIndex = i;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* Reconstruct the largest divisible subset  */</span></span><br><span class="line">    LinkedList&lt;Integer&gt; subset = <span class="keyword">new</span> LinkedList();</span><br><span class="line">    Integer currSize = maxSubsetSize;</span><br><span class="line">    Integer currTail = nums[maxSubsetIndex];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = maxSubsetIndex; i &gt;= <span class="number">0</span>; --i) &#123;</span><br><span class="line">      <span class="keyword">if</span> (currSize == <span class="number">0</span>) <span class="keyword">break</span>;</span><br><span class="line">    </span><br><span class="line">      <span class="keyword">if</span> (currTail % nums[i] == <span class="number">0</span> &amp;&amp; currSize == dp[i]) &#123;</span><br><span class="line">        subset.addFirst(nums[i]);</span><br><span class="line">        currTail = nums[i];</span><br><span class="line">        currSize -= <span class="number">1</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> subset;</span><br><span class="line">  &#125;  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：LeetCode</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/largest-divisible-subset/solution/zui-da-zheng-chu-zi-ji-by-leetcode/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">动态规划</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">重要题型</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/03/21/%E6%9C%80%E5%A4%A7%E6%95%B4%E9%99%A4%E5%AD%90%E9%9B%86/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-和为奇数的子数组数目" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1121,111 +1222,6 @@ tex2jax: {
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/03/21/%E7%9F%A9%E9%98%B5%E7%BD%AE%E9%9B%B6-1/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-表达式求值" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/03/21/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B1%82%E5%80%BC/">表达式求值</a>
-    </h1>
-  
-
-        
-        <a href="/2021/03/21/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B1%82%E5%80%BC/" class="archive-article-date">
-  	<time datetime="2021-03-21T01:22:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-03-21</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<p>给定一个表达式，其中运算符仅包含 <code>+,-,*,/</code>（加 减 乘 整除），可能包含括号，请你求出表达式的最终值。</p>
-<p><strong>注意：</strong></p>
-<ul>
-<li>数据保证给定的表达式合法。</li>
-<li>题目保证符号 <code>-</code> 只作为减号出现，不会作为负号出现，例如，<code>-1+2</code>,<code>(2+2)*(-(1+1)+2)</code> 之类表达式均不会出现。</li>
-<li>题目保证表达式中所有数字均为正整数。</li>
-<li>题目保证表达式在中间计算过程以及结果中，均不超过 231−1231−1。</li>
-<li>题目中的整除是指向 00 取整，也就是说对于大于 00 的结果向下取整，例如 5/3=15/3=1，对于小于 00 的结果向上取整，例如 5/(1−4)=−15/(1−4)=−1。</li>
-<li>C++和Java中的整除默认是向零取整；Python中的整除<code>//</code>默认向下取整，因此Python的<code>eval()</code>函数中的整除也是向下取整，在本题中不能直接使用。</li>
-</ul>
-<h4 id="输入格式"><a href="#输入格式" class="headerlink" title="输入格式"></a>输入格式</h4><p>共一行，为给定表达式。</p>
-<h4 id="输出格式"><a href="#输出格式" class="headerlink" title="输出格式"></a>输出格式</h4><p>共一行，为表达式的结果。</p>
-<h4 id="数据范围"><a href="#数据范围" class="headerlink" title="数据范围"></a>数据范围</h4><p>表达式的长度不超过 105105。</p>
-<h4 id="输入样例："><a href="#输入样例：" class="headerlink" title="输入样例："></a>输入样例：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(2+2)*(1+1)</span><br></pre></td></tr></table></figure>
-
-<h4 id="输出样例："><a href="#输出样例：" class="headerlink" title="输出样例："></a>输出样例：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">8</span><br></pre></td></tr></table></figure>
-
-<h2 id="双栈"><a href="#双栈" class="headerlink" title="双栈"></a>双栈</h2><p>利用双栈，一个栈保存数字，一个栈保存运算符和括号</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Scanner sc = <span class="keyword">new</span> Scanner(System.in);</span><br><span class="line">        String s = sc.nextLine();</span><br><span class="line">        <span class="comment">// 数字栈</span></span><br><span class="line">        Deque&lt;Integer&gt; stack = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        <span class="comment">// 符号栈</span></span><br><span class="line">        Deque&lt;Character&gt; opStack = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        <span class="comment">// 运算的优先级</span></span><br><span class="line">        Map&lt;Character, Integer&gt; priority = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">		<span class="comment">// 括号不参与运算优先级设置为0,没有括号时,先乘除法再加减法</span></span><br><span class="line">        priority.put(<span class="string">&#x27;+&#x27;</span>, <span class="number">1</span>);</span><br><span class="line">        priority.put(<span class="string">&#x27;-&#x27;</span>, <span class="number">1</span>);</span><br><span class="line">        priority.put(<span class="string">&#x27;*&#x27;</span>, <span class="number">2</span>);</span><br><span class="line">        priority.put(<span class="string">&#x27;/&#x27;</span>, <span class="number">2</span>);</span><br><span class="line">        priority.put(<span class="string">&#x27;(&#x27;</span>, <span class="number">0</span>);</span><br><span class="line">        priority.put(<span class="string">&#x27;)&#x27;</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> n = s.length();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">char</span> c = s.charAt(i);</span><br><span class="line">            <span class="comment">// 如果某个字符是数字,那么把连续的数字转换成运算数</span></span><br><span class="line">            <span class="keyword">if</span> (Character.isDigit(c)) &#123;</span><br><span class="line">                <span class="keyword">int</span> val = <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">boolean</span> flag = <span class="keyword">false</span>;</span><br><span class="line">                <span class="keyword">while</span> (i &lt; n &amp;&amp; Character.isDigit(s.charAt(i))) &#123;</span><br><span class="line">                    val = val * <span class="number">10</span> + s.charAt(i) - <span class="string">&#x27;0&#x27;</span>;</span><br><span class="line">                    flag = <span class="keyword">true</span>;</span><br><span class="line">                    i++;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (flag) i--;</span><br><span class="line">                <span class="comment">// 将数字加入数字栈</span></span><br><span class="line">                stack.push(val);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (c == <span class="string">&#x27;(&#x27;</span>) &#123;<span class="comment">// 遇到左括号直接入栈</span></span><br><span class="line">                opStack.push(c);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (c == <span class="string">&#x27;)&#x27;</span>) &#123;<span class="comment">// 遇到右括号,计算括号里面的加减法,因为在下个部分没有遇到右括号之前,乘除法已经运算完了,所以这边只剩下加减法.</span></span><br><span class="line">                <span class="keyword">while</span> (opStack.peek() != <span class="string">&#x27;(&#x27;</span>) &#123;</span><br><span class="line">                    eval(stack, opStack);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 左括号出栈</span></span><br><span class="line">                opStack.pop();</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 计算乘除法</span></span><br><span class="line">                <span class="comment">// 如果符号栈不为空,并且栈顶的优先级大于目前操作符的优先级,那么对当前的符号和数字进行计算</span></span><br><span class="line">                <span class="keyword">while</span> (!opStack.isEmpty() &amp;&amp; priority.get(opStack.peek()) &gt;= priority.get(c)) &#123;</span><br><span class="line">                    <span class="comment">// 计算的应该是乘除法</span></span><br><span class="line">                    eval(stack, opStack);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 把当前的运算符入栈(应该是加减法的符号)</span></span><br><span class="line">                opStack.push(c);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果符号栈还没有空,说明还有需要计算的,此时应该只剩下加减法,直接计算即可</span></span><br><span class="line">        <span class="keyword">while</span> (!opStack.isEmpty()) &#123;</span><br><span class="line">            eval(stack, opStack);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(stack.pop());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 计算模块,计算模块只负责计算,不考虑优先级</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">eval</span><span class="params">(Deque&lt;Integer&gt; stack, Deque&lt;Character&gt; opStack)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> op2 = stack.pop();</span><br><span class="line">        <span class="keyword">int</span> op1 = stack.pop();</span><br><span class="line">        <span class="keyword">char</span> op = opStack.pop();</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">switch</span> (op) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;+&#x27;</span>:</span><br><span class="line">                res = op1 + op2;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;-&#x27;</span>:</span><br><span class="line">                res = op1 - op2;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;*&#x27;</span>:</span><br><span class="line">                res = op1 * op2;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;/&#x27;</span>:</span><br><span class="line">                res = op1 / op2;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        stack.push(res);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">栈</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/03/21/%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B1%82%E5%80%BC/">展开全文 >></a>
         </p>
       
 
@@ -2310,6 +2306,10 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">网络测量</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">逆向思维</a>
               </li>
             
             <div class="clearfix"></div>
