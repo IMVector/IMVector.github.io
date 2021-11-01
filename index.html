@@ -150,6 +150,196 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-分糖果" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/11/01/%E5%88%86%E7%B3%96%E6%9E%9C/">分糖果</a>
+    </h1>
+  
+
+        
+        <a href="/2021/11/01/%E5%88%86%E7%B3%96%E6%9E%9C/" class="archive-article-date">
+  	<time datetime="2021-11-01T11:25:06.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-11-01</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h4 id="575-分糖果"><a href="#575-分糖果" class="headerlink" title="575. 分糖果"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/distribute-candies/">575. 分糖果</a></h4><p>难度简单174</p>
+<p>Alice 有 <code>n</code> 枚糖，其中第 <code>i</code> 枚糖的类型为 <code>candyType[i]</code> 。Alice 注意到她的体重正在增长，所以前去拜访了一位医生。</p>
+<p>医生建议 Alice 要少摄入糖分，只吃掉她所有糖的 <code>n / 2</code> 即可（<code>n</code> 是一个偶数）。Alice 非常喜欢这些糖，她想要在遵循医生建议的情况下，尽可能吃到最多不同种类的糖。</p>
+<p>给你一个长度为 <code>n</code> 的整数数组 <code>candyType</code> ，返回： Alice 在仅吃掉 <code>n / 2</code> 枚糖的情况下，可以吃到糖的最多种类数。</p>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：candyType &#x3D; [1,1,2,2,3,3]</span><br><span class="line">输出：3</span><br><span class="line">解释：Alice 只能吃 6 &#x2F; 2 &#x3D; 3 枚糖，由于只有 3 种糖，她可以每种吃一枚。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 2：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：candyType &#x3D; [1,1,2,3]</span><br><span class="line">输出：2</span><br><span class="line">解释：Alice 只能吃 4 &#x2F; 2 &#x3D; 2 枚糖，不管她选择吃的种类是 [1,2]、[1,3] 还是 [2,3]，她只能吃到两种不同类的糖。</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例 3：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输入：candyType &#x3D; [6,6,6,6]</span><br><span class="line">输出：1</span><br><span class="line">解释：Alice 只能吃 4 &#x2F; 2 &#x3D; 2 枚糖，尽管她能吃 2 枚，但只能吃到 1 种糖。</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>n == candyType.length</code></li>
+<li><code>2 &lt;= n &lt;= 104</code></li>
+<li><code>n</code> 是一个偶数</li>
+<li><code>-105 &lt;= candyType[i] &lt;= 105</code></li>
+</ul>
+<p>通过次数70,881</p>
+<p>提交次数99,319</p>
+<h2 id="哈希表"><a href="#哈希表" class="headerlink" title="哈希表"></a>哈希表</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">distributeCandies</span><span class="params">(<span class="keyword">int</span>[] candyType)</span> </span>&#123;</span><br><span class="line">        Set&lt;Integer&gt; set = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">        <span class="keyword">int</span> n = candyType.length;</span><br><span class="line">        <span class="keyword">int</span> eat = n/<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;n;i++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(set.size()&lt;eat)set.add(candyType[i]);</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> set.size();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">哈希表</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/11/01/%E5%88%86%E7%B3%96%E6%9E%9C/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-Stream用法" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/10/30/Stream%E7%94%A8%E6%B3%95/">Stream用法</a>
+    </h1>
+  
+
+        
+        <a href="/2021/10/30/Stream%E7%94%A8%E6%B3%95/" class="archive-article-date">
+  	<time datetime="2021-10-30T14:14:37.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-30</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!--将该代码放入博客模板的head中即可-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+  inlineMath: [['$','$'], ['\\(','\\)']],
+  processEscapes: true
+  }
+});
+</script>
+<!--latex数学显示公式-->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+
+
+<p><img src="https://imgur.com/EX5KVXs" alt="Imgur"></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/10/30/Stream%E7%94%A8%E6%B3%95/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-大礼包" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1025,235 +1215,6 @@ tex2jax: {
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2021/10/15/%E5%A4%96%E8%A7%82%E6%95%B0%E5%88%97/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-前n个数组二进制中1的个数" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/10/14/%E5%89%8Dn%E4%B8%AA%E6%95%B0%E7%BB%84%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%B8%AD1%E7%9A%84%E4%B8%AA%E6%95%B0/">前n个数组二进制中1的个数</a>
-    </h1>
-  
-
-        
-        <a href="/2021/10/14/%E5%89%8Dn%E4%B8%AA%E6%95%B0%E7%BB%84%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%B8%AD1%E7%9A%84%E4%B8%AA%E6%95%B0/" class="archive-article-date">
-  	<time datetime="2021-10-14T15:34:22.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-14</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="剑指-Offer-II-003-前-n-个数字二进制中-1-的个数"><a href="#剑指-Offer-II-003-前-n-个数字二进制中-1-的个数" class="headerlink" title="剑指 Offer II 003. 前 n 个数字二进制中 1 的个数"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/w3tCBm/">剑指 Offer II 003. 前 n 个数字二进制中 1 的个数</a></h4><p>难度简单13</p>
-<p>给定一个非负整数 <code>n</code> ，请计算 <code>0</code> 到 <code>n</code> 之间的每个数字的二进制表示中 1 的个数，并输出一个数组。</p>
-<p><strong>示例 1:</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">输入: n &#x3D; 2</span><br><span class="line">输出: [0,1,1]</span><br><span class="line">解释: </span><br><span class="line">0 --&gt; 0</span><br><span class="line">1 --&gt; 1</span><br><span class="line">2 --&gt; 10</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2:</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">输入: n &#x3D; 5</span><br><span class="line">输出: [0,1,1,2,1,2]</span><br><span class="line">解释:</span><br><span class="line">0 --&gt; 0</span><br><span class="line">1 --&gt; 1</span><br><span class="line">2 --&gt; 10</span><br><span class="line">3 --&gt; 11</span><br><span class="line">4 --&gt; 100</span><br><span class="line">5 --&gt; 101</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>说明 :</strong></p>
-<ul>
-<li><code>0 &lt;= n &lt;= 105</code></li>
-</ul>
-<p><strong>进阶:</strong></p>
-<ul>
-<li><p>给出时间复杂度为 <code>O(n*sizeof(integer))</code> 的解答非常容易。但你可以在线性时间 <code>O(n)</code> 内用一趟扫描做到吗？</p>
-</li>
-<li><p>要求算法的空间复杂度为 <code>O(n)</code> 。</p>
-</li>
-<li><p>你能进一步完善解法吗？要求在C++或任何其他语言中不使用任何内置函数（如 C++ 中的 <code>__builtin_popcount</code> ）来执行此操作。</p>
-<h2 id="java-bitcount解法"><a href="#java-bitcount解法" class="headerlink" title="java bitcount解法"></a>java bitcount解法</h2></li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] countBits(<span class="keyword">int</span> n) &#123;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">int</span> []ans = <span class="keyword">new</span> <span class="keyword">int</span>[n+<span class="number">1</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;=n;i++)&#123;</span><br><span class="line">            ans[i] = bitCount(i);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">bitCount</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// HD, Figure 5-2</span></span><br><span class="line">        i = i - ((i &gt;&gt;&gt; <span class="number">1</span>) &amp; <span class="number">0x55555555</span>);</span><br><span class="line">        i = (i &amp; <span class="number">0x33333333</span>) + ((i &gt;&gt;&gt; <span class="number">2</span>) &amp; <span class="number">0x33333333</span>);</span><br><span class="line">        i = (i + (i &gt;&gt;&gt; <span class="number">4</span>)) &amp; <span class="number">0x0f0f0f0f</span>;</span><br><span class="line">        i = i + (i &gt;&gt;&gt; <span class="number">8</span>);</span><br><span class="line">        i = i + (i &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">        <span class="keyword">return</span> i &amp; <span class="number">0x3f</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="动态规划-位运算"><a href="#动态规划-位运算" class="headerlink" title="动态规划 +位运算"></a>动态规划 +位运算</h2><p>对于所有的数字，只有奇数和偶数两种：</p>
-<p>奇数：二进制表示中，奇数一定比前面那个偶数多一个 1，因为多的就是最低位的 1。<br>偶数：二进制表示中，偶数中 1 的个数一定和除以 2 之后的那个数一样多。因为最低位是 0，除以 2 就是右移一位，也就是把那个 0 抹掉而已，所以 1 的个数是不变的。<br>所以我们可以得到如下的状态转移方程：</p>
-<p>$dp[i] = dp[i-1]$，当i为奇数<br>$dp[i] = dp[i/2]$，当i为偶数<br>上面的方程还可进一步合并为：<br>$dp[i] = dp[i/2] + i % 2$</p>
-<p>通过位运算进一步优化：</p>
-<p>$i / 2 $可以通过$ i &gt;&gt; 1 $得到；<br>$i % 2 $可以通过$ i &amp; 1 $得到；</p>
-<blockquote>
-<p>作者：Terry2020<br>链接：<a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/w3tCBm/solution/rang-ni-miao-dong-de-shuang-bai-ti-jie-b-84hh/">https://leetcode-cn.com/problems/w3tCBm/solution/rang-ni-miao-dong-de-shuang-bai-ti-jie-b-84hh/</a><br>来源：力扣（LeetCode）<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
-</blockquote>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/10/14/%E5%89%8Dn%E4%B8%AA%E6%95%B0%E7%BB%84%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%B8%AD1%E7%9A%84%E4%B8%AA%E6%95%B0/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-允许重复选择元素的组合" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2021/10/14/%E5%85%81%E8%AE%B8%E9%87%8D%E5%A4%8D%E9%80%89%E6%8B%A9%E5%85%83%E7%B4%A0%E7%9A%84%E7%BB%84%E5%90%88/">允许重复选择元素的组合</a>
-    </h1>
-  
-
-        
-        <a href="/2021/10/14/%E5%85%81%E8%AE%B8%E9%87%8D%E5%A4%8D%E9%80%89%E6%8B%A9%E5%85%83%E7%B4%A0%E7%9A%84%E7%BB%84%E5%90%88/" class="archive-article-date">
-  	<time datetime="2021-10-14T15:11:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-14</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!--将该代码放入博客模板的head中即可-->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-tex2jax: {
-  inlineMath: [['$','$'], ['\\(','\\)']],
-  processEscapes: true
-  }
-});
-</script>
-<!--latex数学显示公式-->
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<h4 id="剑指-Offer-II-081-允许重复选择元素的组合"><a href="#剑指-Offer-II-081-允许重复选择元素的组合" class="headerlink" title="剑指 Offer II 081. 允许重复选择元素的组合"></a><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/Ygoe9J/">剑指 Offer II 081. 允许重复选择元素的组合</a></h4><p>难度中等3</p>
-<p>给定一个<strong>无重复元素</strong>的正整数数组 <code>candidates</code> 和一个正整数 <code>target</code> ，找出 <code>candidates</code> 中所有可以使数字和为目标数 <code>target</code> 的唯一组合。</p>
-<p><code>candidates</code> 中的数字可以无限制重复被选取。如果至少一个所选数字数量不同，则两种组合是唯一的。 </p>
-<p>对于给定的输入，保证和为 <code>target</code> 的唯一组合数少于 <code>150</code> 个。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: candidates &#x3D; [2,3,6,7], target &#x3D; 7</span><br><span class="line">输出: [[7],[2,2,3]]</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: candidates &#x3D; [2,3,5], target &#x3D; 8</span><br><span class="line">输出: [[2,2,2,2],[2,3,3],[3,5]]</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 3：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: candidates &#x3D; [2], target &#x3D; 1</span><br><span class="line">输出: []</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 4：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: candidates &#x3D; [1], target &#x3D; 1</span><br><span class="line">输出: [[1]]</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 5：</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入: candidates &#x3D; [1], target &#x3D; 2</span><br><span class="line">输出: [[1,1]]</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>提示：</strong></p>
-<ul>
-<li><code>1 &lt;= candidates.length &lt;= 30</code></li>
-<li><code>1 &lt;= candidates[i] &lt;= 200</code></li>
-<li><code>candidate</code> 中的每个元素都是独一无二的。</li>
-<li><code>1 &lt;= target &lt;= 500</code></li>
-</ul>
-<p>注意：本题与主站 39 题相同： <a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/combination-sum/">https://leetcode-cn.com/problems/combination-sum/</a></p>
-<h2 id="回溯"><a href="#回溯" class="headerlink" title="回溯"></a>回溯</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; combinationSum(<span class="keyword">int</span>[] candidates, <span class="keyword">int</span> target) &#123;</span><br><span class="line">        backtrack(candidates,<span class="number">0</span>,target,<span class="keyword">new</span> ArrayList&lt;&gt;());</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; ans = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">backtrack</span><span class="params">(<span class="keyword">int</span> []candidates,<span class="keyword">int</span> sum,<span class="keyword">int</span> target,List&lt;Integer&gt; list)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(sum &gt; target)<span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">if</span>(sum==target)&#123;</span><br><span class="line">            List&lt;Integer&gt; temp =  <span class="keyword">new</span> ArrayList(list);</span><br><span class="line">            Collections.sort(temp);</span><br><span class="line">            <span class="keyword">if</span>(!ans.contains(temp))&#123;</span><br><span class="line">                ans.add(temp);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;candidates.length;i++)&#123;   </span><br><span class="line">            list.add(candidates[i]);</span><br><span class="line">            sum+=candidates[i];</span><br><span class="line">            backtrack(candidates,sum,target,list);</span><br><span class="line">            sum-=candidates[i];</span><br><span class="line">            list.remove(list.size()-<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="回溯剪枝"><a href="#回溯剪枝" class="headerlink" title="回溯剪枝"></a>回溯剪枝</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; combinationSum(<span class="keyword">int</span>[] candidates, <span class="keyword">int</span> target) &#123;</span><br><span class="line">        List&lt;List&lt;Integer&gt;&gt; ans = <span class="keyword">new</span> ArrayList&lt;List&lt;Integer&gt;&gt;();</span><br><span class="line">        List&lt;Integer&gt; combine = <span class="keyword">new</span> ArrayList&lt;Integer&gt;();</span><br><span class="line">        dfs(candidates, target, ans, combine, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> ans;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">dfs</span><span class="params">(<span class="keyword">int</span>[] candidates, <span class="keyword">int</span> target, List&lt;List&lt;Integer&gt;&gt; ans, List&lt;Integer&gt; combine, <span class="keyword">int</span> idx)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (idx == candidates.length) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (target == <span class="number">0</span>) &#123;</span><br><span class="line">            ans.add(<span class="keyword">new</span> ArrayList&lt;Integer&gt;(combine));</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 直接跳过</span></span><br><span class="line">        dfs(candidates, target, ans, combine, idx + <span class="number">1</span>);</span><br><span class="line">        <span class="comment">// 选择当前数</span></span><br><span class="line">        <span class="keyword">if</span> (target - candidates[idx] &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">            combine.add(candidates[idx]);</span><br><span class="line">            dfs(candidates, target - candidates[idx], ans, combine, idx);</span><br><span class="line">            combine.remove(combine.size() - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">作者：vanilla111</span><br><span class="line">链接：https:<span class="comment">//leetcode-cn.com/problems/Ygoe9J/solution/java-dfsjian-zhi-tao-lu-by-vanilla111-8lpp/</span></span><br><span class="line">来源：力扣（LeetCode）</span><br><span class="line">著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">动态规划</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">回溯</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2021/10/14/%E5%85%81%E8%AE%B8%E9%87%8D%E5%A4%8D%E9%80%89%E6%8B%A9%E5%85%83%E7%B4%A0%E7%9A%84%E7%BB%84%E5%90%88/">展开全文 >></a>
         </p>
       
 
